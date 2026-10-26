@@ -31,6 +31,7 @@ import 'package:folio/helpers/android_live_activity_helper.dart';
 import 'package:folio/api/providers/live_card_provider.dart';
 import 'package:folio/api/providers/update_provider.dart';
 import 'package:folio/models/settings.dart';
+import 'package:folio/theme/colors/accent.dart';
 import 'package:folio/theme/colors/colors.dart';
 import 'package:folio/theme/observer.dart';
 import 'package:folio/utils/format.dart';
@@ -2029,10 +2030,21 @@ class SettingsScreenState extends State<SettingsScreen>
           child: _ThemeColorPicker(
             isOpen: _themeColorOpen,
             onToggle: () => setState(() => _themeColorOpen = !_themeColorOpen),
+            selectedAccent: settings.accentColor,
             selectedColor: settings.adaptiveSeedColor,
+            onTintaSelected: (accent) {
+              _haptic();
+              settings.update(accentColor: accent, adaptiveSeedColor: 0);
+              Provider.of<ThemeModeObserver>(context, listen: false)
+                  .changeTheme(settings.theme, updateNavbarColor: false);
+              setState(() {});
+            },
             onColorSelected: (color) {
               _haptic();
-              settings.update(adaptiveSeedColor: color?.value ?? 0);
+              // Material You colors only apply in adaptive mode.
+              settings.update(
+                  accentColor: AccentColor.adaptive,
+                  adaptiveSeedColor: color?.value ?? 0);
               Provider.of<ThemeModeObserver>(context, listen: false)
                   .changeTheme(settings.theme, updateNavbarColor: false);
               setState(() {});
@@ -2840,15 +2852,25 @@ class SettingsScreenState extends State<SettingsScreen>
 class _ThemeColorPicker extends StatelessWidget {
   final bool isOpen;
   final VoidCallback onToggle;
+  final AccentColor selectedAccent;
   final Color? selectedColor;
+  final void Function(AccentColor) onTintaSelected;
   final void Function(Color?) onColorSelected;
 
   const _ThemeColorPicker({
     required this.isOpen,
     required this.onToggle,
+    required this.selectedAccent,
     required this.selectedColor,
+    required this.onTintaSelected,
     required this.onColorSelected,
   });
+
+  static const Map<AccentColor, String> _tintaThemes = {
+    AccentColor.kobalt: 'Kobalt',
+    AccentColor.feketeSarga: 'Fekete-sárga',
+    AccentColor.petrol: 'Petrol',
+  };
 
   // Colors in hue order (spectrum: red → pink)
   static const List<Color> _colors = [
@@ -2873,7 +2895,8 @@ class _ThemeColorPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final textColor = AppColors.of(context).text;
     final accentColor = Theme.of(context).colorScheme.secondary;
-    final isSystem = selectedColor == null;
+    final isAdaptive = selectedAccent == AccentColor.adaptive;
+    final isSystem = isAdaptive && selectedColor == null;
 
     return Padding(
       padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 14.0),
@@ -2932,8 +2955,44 @@ class _ThemeColorPicker extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // System (reset) option
+                              // Tinta themes, with names
+                              for (final t in _tintaThemes.entries) ...[
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _ColorDot(
+                                      color: accentColorMap[t.key]!,
+                                      isSelected: selectedAccent == t.key,
+                                      isSystem: false,
+                                      onTap: () => onTintaSelected(t.key),
+                                      accentColor: accentColor,
+                                    ),
+                                    const SizedBox(height: 6.0),
+                                    Text(
+                                      t.value,
+                                      style: TextStyle(
+                                        fontSize: 11.0,
+                                        color: textColor.withValues(alpha: .75),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 12.0),
+                              ],
+                              Container(
+                                width: 1.5,
+                                height: 32.0,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                decoration: BoxDecoration(
+                                  color: textColor.withValues(alpha: .15),
+                                  borderRadius: BorderRadius.circular(1.0),
+                                ),
+                              ),
+                              const SizedBox(width: 8.0),
+                              // System (Material You) option
                               _ColorDot(
                                 color: Theme.of(context).colorScheme.primary,
                                 isSelected: isSystem,
@@ -2958,7 +3017,7 @@ class _ThemeColorPicker extends StatelessWidget {
                               for (final c in _colors) ...[
                                 _ColorDot(
                                   color: c,
-                                  isSelected: !isSystem &&
+                                  isSelected: isAdaptive &&
                                       selectedColor != null &&
                                       selectedColor!.value == c.value,
                                   isSystem: false,
@@ -3017,8 +3076,11 @@ class _ColorDot extends StatelessWidget {
                     ? Colors.black54
                     : Colors.white70)
             : isSelected
-                ? const Icon(Icons.check_rounded,
-                    size: 18.0, color: Colors.white)
+                ? Icon(Icons.check_rounded,
+                    size: 18.0,
+                    color: color.computeLuminance() > 0.5
+                        ? Colors.black87
+                        : Colors.white)
                 : null,
       ),
     );
