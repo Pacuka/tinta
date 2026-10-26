@@ -1,30 +1,36 @@
 <h1 align="left">
-<img src="https://github.com/Zan1456/folio/blob/master/folio/assets/icons/ic_rounded.png" alt="Folio icon" width="30px" style="vertical-align: middle;">
-<span style="vertical-align: middle;">Folio</span>
+<img src="folio/assets/icons/ic_rounded.png" alt="Tinta ikon" width="30px" style="vertical-align: middle;">
+<span style="vertical-align: middle;">Tinta</span>
 </h1>
 
-### Nem hivatalos e-napló alkalmazás az e-KRÉTA rendszerhez - tanulóktól, tanulóknak.
+### Nem hivatalos e-napló alkalmazás az e-KRÉTA rendszerhez – tanulóktól, tanulóknak.
 
-[![GitHub Letöltések](https://img.shields.io/github/downloads-pre/zan1456/folio/latest/total?style=for-the-badge&logo=github&logoColor=EAF7CC&label=Let%C3%B6lt%C3%A9sek&labelColor=051219&color=00D2A9)]([https://github.com/zan1456/folio/releases/latest](https://github.com/Zan1456/folio/blob/master/refilc/assets/icons/ic_android.png?raw=true))
-[![Discord](https://img.shields.io/discord/1111649116020285532?style=for-the-badge&logo=discord&logoColor=EAF7CC&label=Discord&labelColor=051219&color=00D2A9)](https://discord.gg/6DvjyPAw2T)
+## Letöltés
 
-### Hozzájárulás
+- **Android:** a legfrissebb APK a [Releases](https://github.com/Pacuka/tinta/releases/latest) oldalon
+  (`arm64` a legtöbb mai telefonra, `armeabi` a régebbiekre).
+- **iPhone:** a `Tinta.ipa` ugyanott; telepítés AltStore-ral, lásd az
+  [iPhone-os útmutatót](ipa-sideloading.md).
 
-Építési segédlethez és hozzájárulási útmutatóhoz
-**nézd meg a [Hozzájárulási útmutató](CONTRIBUTING.md)t!**
+## Mit tud?
 
-***annon:** a régi Filc Napló fejlesztője (ez az app, ha bár sokban változott, alapjaiban a Filc-re, reFilc-re, illetve a jelenlegi Firka-Legacy-ra épül)*
+- Jegyek, átlagok, statisztika, jegykalkulátor
+- Órarend, házik (a beírás pontos idejével), számonkérések, hiányzások, üzenetek
+- Értesítés új jegyről, üzenetről, házi feladatról és órarend-változásról –
+  push-szerver nélkül, minden a telefonon fut
+- Saját témák (Kobalt, Fekete-sárga, Petrol, Material You), névnapi és szülinapi köszöntés
 
-# GYIK
+## Adatvédelem
 
-## Mi a projekt célja?
+A Tinta nem gyűjt semmilyen statisztikát, és nem küld hibajelentést. A tanulmányi
+adataid csak a telefonod és a KRÉTA szerverei között közlekednek, titkosított
+kapcsolaton. A bejelentkezési adatok nem kerülnek a telefon felhőmentésébe.
 
-A régi alkalmazás optimalizálása és a régóta ígért funkciók lefejlesztése.
+## Honnan származik?
 
-## Elérhető lesz IOS-re?
+A Tinta a [Folio](https://github.com/Zan1456/folio) (Zan) továbbfejlesztése, ami a
+Filc / reFilc / Firka-Legacy alkalmazásokra épül. Köszönet minden korábbi fejlesztőnek!
 
-Nem, mivel teljes mértékben a Material You-ra épül
+Licenc: [AGPL-3.0](LICENSE.md)
 
-## Van dokumentáció a KRÉTA APIról?
-
-Van! A KRÉTA API dokumentáció [itt érhető el](https://docs.zan1456.dev/e-kreta/app).
+Hibát találtál? Írj egy [hibajegyet](https://github.com/Pacuka/tinta/issues).
