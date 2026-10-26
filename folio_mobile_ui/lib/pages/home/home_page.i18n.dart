@@ -36,7 +36,7 @@ extension Localization on String {
           "empty": "Nincs itt semmi látnivaló.",
           "All": "Összes",
           "Grades": "Jegyek",
-          "Exams": "Számonkérések",
+          "Exams": "Számonkérés",
           "Messages": "Üzenetek",
           "Absences": "Hiányzások",
           "update_available": "Frissítés elérhető",

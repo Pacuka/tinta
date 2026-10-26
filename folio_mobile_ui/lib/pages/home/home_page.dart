@@ -238,13 +238,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                     .fontFamily,
                                                 textStyle: TextStyle(
                                                   fontWeight: FontWeight.w800,
-                                                  fontSize: 30.0,
+                                                  fontSize: 24.0,
                                                   color: greetingColor,
                                                 ),
                                               )
                                             : TextStyle(
                                                 fontWeight: FontWeight.w800,
-                                                fontSize: 30.0,
+                                                fontSize: 24.0,
                                                 color: greetingColor,
                                               ),
                                   ),

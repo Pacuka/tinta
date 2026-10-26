@@ -241,6 +241,25 @@ class NavigationScreenState extends State<NavigationScreen>
               initialRoute: selected.name,
               onGenerateRoute: (settings) => navigationRouteHandler(settings),
             ),
+            // A lista elhalványul a lebegő menüsor mögött
+            IgnorePointer(
+              child: Container(
+                height: 96.0 + MediaQuery.of(context).padding.bottom,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Theme.of(context)
+                          .scaffoldBackgroundColor
+                          .withValues(alpha: 0.0),
+                      Theme.of(context).scaffoldBackgroundColor,
+                    ],
+                    stops: const [0.0, 0.55],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: Column(

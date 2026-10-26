@@ -82,3 +82,22 @@ extension DateFormatUtils on DateTime {
         .capital();
   }
 }
+
+/// Dátumfejléc a listákban: „Ma” / „Holnap” / „Tegnap”, egyébként
+/// a nap neve + dátum (pl. „Hétfő, nov. 2.”), más évnél „2025. márc. 4.”.
+String dateHeaderLabel(DateTime date, DateTime now, String locale,
+    {required String today,
+    required String tomorrow,
+    required String yesterday}) {
+  final d = DateTime(date.year, date.month, date.day);
+  final n = DateTime(now.year, now.month, now.day);
+  final diff = (d.difference(n).inHours / 24).round();
+
+  if (diff == 0) return today;
+  if (diff == 1) return tomorrow;
+  if (diff == -1) return yesterday;
+
+  final pattern = date.year == now.year ? "EEEE, MMM d." : "y. MMM d.";
+  final s = DateFormat(pattern, locale).format(date);
+  return s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+}

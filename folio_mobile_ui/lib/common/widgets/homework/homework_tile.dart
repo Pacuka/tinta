@@ -1,4 +1,3 @@
-import 'package:folio/helpers/subject.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/colors.dart';
 import 'package:folio_kreta_api/models/homework.dart';
@@ -6,6 +5,8 @@ import 'package:folio/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
+import 'package:folio_mobile_ui/common/type_tag.dart';
+import 'package:folio_mobile_ui/common/type_tag.i18n.dart';
 
 class HomeworkTile extends StatelessWidget {
   const HomeworkTile(
@@ -68,7 +69,7 @@ class HomeworkTile extends StatelessWidget {
                 )
               : Text(
                   homework.content.escapeHtml().replaceAll('\n', ' '),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
@@ -107,11 +108,7 @@ class HomeworkTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 )
-              : Icon(
-                  SubjectIcon.resolveVariant(
-                      context: context, subject: homework.subject),
-                  color: AppColors.of(context).text.withValues(alpha: .5),
-                ),
+              : TypeTag("homework_tag".i18n),
           minLeadingWidth: 0,
         ),
       ),

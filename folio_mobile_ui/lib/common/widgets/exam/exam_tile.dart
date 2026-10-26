@@ -1,8 +1,8 @@
-import 'package:folio/helpers/subject.dart';
-import 'package:folio/theme/colors/colors.dart';
 import 'package:folio_kreta_api/models/exam.dart';
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/type_tag.dart';
+import 'package:folio_mobile_ui/common/type_tag.i18n.dart';
 import 'package:folio/utils/format.dart';
 
 class ExamTile extends StatelessWidget {
@@ -41,7 +41,7 @@ class ExamTile extends StatelessWidget {
                 : (exam.description != ""
                     ? exam.description
                     : (exam.mode?.description ?? "Számonkérés")),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
@@ -55,13 +55,7 @@ class ExamTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
           ),
-          trailing: showSubject
-              ? Icon(
-                  SubjectIcon.resolveVariant(
-                      context: context, subject: exam.subject),
-                  color: AppColors.of(context).text.withValues(alpha: .5),
-                )
-              : null,
+          trailing: showSubject ? TypeTag("exam_tag".i18n) : null,
           minLeadingWidth: 0,
         ),
       ),

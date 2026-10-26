@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:folio_mobile_ui/common/widgets/lesson/changed_lesson_tile.dart';
 import 'package:folio/utils/format.dart';
+import 'package:folio/utils/format.i18n.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 
 // difference.inDays is not reliable
 bool _sameDate(DateTime a, DateTime b) =>
@@ -140,7 +142,13 @@ List<Widget> sortDateWidgets(
             isTransparent: true,
             key: ValueKey(date),
             padding: padding ?? const EdgeInsets.symmetric(vertical: 6.0),
-            title: cst ? Text(date.format(context, forceToday: true)) : null,
+            title: cst
+                ? Text(dateHeaderLabel(
+                    date, DateTime.now(), I18n.of(context).locale.toString(),
+                    today: "Today".i18n,
+                    tomorrow: "Tomorrow".i18n,
+                    yesterday: "Yesterday".i18n))
+                : null,
             hasShadow: hasShadow,
             child: ImplicitlyAnimatedList<DateWidget>(
               areItemsTheSame: (a, b) => a.key == b.key,
