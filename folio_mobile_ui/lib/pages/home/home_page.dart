@@ -19,6 +19,7 @@ import 'package:folio_kreta_api/providers/exam_provider.dart';
 import 'package:folio_kreta_api/providers/grade_provider.dart';
 import 'package:folio_kreta_api/providers/homework_provider.dart';
 import 'package:folio_kreta_api/providers/message_provider.dart';
+import 'package:folio_kreta_api/models/message.dart';
 import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
@@ -172,6 +173,53 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         : Localization(greeting.i18n).fill([firstName]);
   }
 
+  int _upcomingExamCount(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return Provider.of<ExamProvider>(context)
+        .exams
+        .where((e) => !e.writeDate.isBefore(today))
+        .length;
+  }
+
+  int _unreadMessageCount(BuildContext context) =>
+      Provider.of<MessageProvider>(context)
+          .messages
+          .where((m) => m.type == MessageType.inbox && !m.seen && !m.deleted)
+          .length;
+
+  /// Filter chip with a small count badge (hidden when 0).
+  Widget _countTab(BuildContext context, String label, int count) {
+    if (count == 0) return Tab(text: label);
+    final colorScheme = Theme.of(context).colorScheme;
+    return Tab(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+          const SizedBox(width: 6.0),
+          Container(
+            constraints: const BoxConstraints(minWidth: 18.0),
+            padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
+            decoration: BoxDecoration(
+              color: colorScheme.secondary,
+              borderRadius: BorderRadius.circular(9.0),
+            ),
+            child: Text(
+              count > 99 ? "99+" : "$count",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.0,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     user = Provider.of<UserProvider>(context);
@@ -311,8 +359,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               items: [
                                 Tab(text: "All".i18n),
                                 Tab(text: "Grades".i18n),
-                                Tab(text: "Exams".i18n),
-                                Tab(text: "Messages".i18n),
+                                _countTab(context, "Exams".i18n,
+                                    _upcomingExamCount(context)),
+                                _countTab(context, "Messages".i18n,
+                                    _unreadMessageCount(context)),
                                 Tab(text: "Absences".i18n),
                               ],
                               controller: _tabController,

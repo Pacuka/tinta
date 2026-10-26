@@ -56,7 +56,8 @@ class NavbarItem extends StatelessWidget {
           AnimatedDefaultTextStyle(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
-            style: TextStyle(
+            // Start from the theme so the app font (Outfit) is kept.
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
               fontSize: 11.0,
               fontWeight: active ? FontWeight.w700 : FontWeight.w500,
               color: active ? activeColor : inactiveColor,
