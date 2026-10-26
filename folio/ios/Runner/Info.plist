@@ -4,8 +4,10 @@
 	<dict>
 		<key>BGTaskSchedulerPermittedIdentifiers</key>
 		<array>
+			<string>com.transistorsoft.fetch</string>
 			<string>com.transistorsoft.folionotification</string>
 			<string>com.transistorsoft.folioliveactivity</string>
+			<string>hu.pacuka.tinta.lessoncheck</string>
 		</array>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
@@ -71,7 +73,9 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>Folio</string>
+		<string>Tinta</string>
+		<key>CFBundleDisplayName</key>
+		<string>Tinta</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -85,7 +89,7 @@
 				<string>Editor</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>folioapp</string>
+					<string>tinta</string>
 				</array>
 			</dict>
 		</array>

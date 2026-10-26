@@ -37,6 +37,12 @@ class UpdateNotifier {
     await _plugin.initialize(
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('@drawable/ic_notification'),
+        // Permission is asked explicitly in requestPermission().
+        iOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        ),
       ),
     );
     _pluginReady = true;
@@ -44,12 +50,18 @@ class UpdateNotifier {
 
   /// Asks for the Android 13+ notification permission (no-op if granted).
   static Future<void> requestPermission() async {
-    if (!Platform.isAndroid) return;
     await _initPlugin();
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    if (Platform.isAndroid) {
+      await _plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    } else if (Platform.isIOS) {
+      await _plugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(alert: true, badge: false, sound: true);
+    }
   }
 
   static KretaClient? _appKreta;
@@ -265,6 +277,7 @@ class UpdateNotifier {
         priority: Priority.high,
         styleInformation: BigTextStyleInformation(''),
       ),
+      iOS: DarwinNotificationDetails(),
     );
     for (final n in notes.take(8)) {
       await _plugin.show(

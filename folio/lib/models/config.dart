@@ -26,6 +26,11 @@ class Config {
   /// Same format as the official app (UserAgentStringProvider):
   /// hu.ekreta.student/<app version>/<Build.MODEL>/<Android release>/<SDK>
   static Future<void> initDeviceUserAgent() async {
+    if (Platform.isIOS) {
+      // The official iOS app is native; its requests look like this.
+      _deviceUserAgent = "eKretaStudent/264745 CFNetwork/1494.0.7 Darwin/23.4.0";
+      return;
+    }
     if (!Platform.isAndroid) return;
     try {
       final info = await DeviceInfoPlugin().androidInfo;
