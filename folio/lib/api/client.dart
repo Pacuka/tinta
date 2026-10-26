@@ -19,7 +19,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:html/parser.dart' show parse;
 import 'package:folio/models/config.dart';
