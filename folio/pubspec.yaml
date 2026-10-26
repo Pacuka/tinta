@@ -79,6 +79,7 @@ flutter:
     - assets/images/
     - assets/svg/menu_icons/
     - assets/other/dirtywords.xml
+    - assets/data/namedays.json
     - assets/svg/
     - assets/svg/cover_arts/
 

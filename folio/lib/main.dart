@@ -39,6 +39,15 @@ import 'helpers/live_activity_helper.dart';
 // days without touching grass: 5,843 (16 yrs)
 
 void main() async {
+  // Name day data attribution (CC BY-SA 4.0), shown on the licenses page.
+  LicenseRegistry.addLicense(() => Stream.value(const LicenseEntryWithLineBreaks(
+      ['Névnaptár (assets/data/namedays.json)'],
+      'Forrás: Wikipédia, „Magyar névnapok listája betűrendben” '
+      '(https://hu.wikipedia.org/wiki/Magyar_névnapok_listája_betűrendben), '
+      'a Wikipédia szerzői. Licenc: CC BY-SA 4.0 '
+      '(https://creativecommons.org/licenses/by-sa/4.0/). '
+      'Fő névnapok: sbolch/name-days (https://github.com/sbolch/name-days), '
+      'MIT licenc.')));
   try {
     WidgetsBinding binding = WidgetsFlutterBinding.ensureInitialized();
     // ignore: deprecated_member_use

@@ -12,6 +12,7 @@ import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:folio/api/providers/update_provider.dart';
 import 'package:folio/api/providers/sync.dart';
 import 'package:confetti/confetti.dart';
+import 'package:folio/helpers/celebration.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_kreta_api/providers/absence_provider.dart';
 import 'package:folio_kreta_api/providers/event_provider.dart';
@@ -87,6 +88,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         duration: Duration.zero);
 
     listOrder = List.generate(pageCount, (index) => "$index");
+
+    NameDay.load().then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -99,6 +104,21 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     super.dispose();
   }
+
+  /// Confetti once per app start, and only on the first start of the day.
+  void _celebrate(Duration duration) {
+    if (!(NavigationScreen.of(context)?.init("confetti") ?? false)) return;
+    confettiAllowedToday().then((allowed) {
+      if (!allowed || !mounted) return;
+      setState(() => _confettiController = ConfettiController(duration: duration));
+      Future.delayed(const Duration(seconds: 1))
+          .then((value) => mounted ? _confettiController?.play() : null);
+    });
+  }
+
+  // Days since epoch, so the picked greeting stays the same all day.
+  int _dayNumber(DateTime d) =>
+      DateTime.utc(d.year, d.month, d.day).millisecondsSinceEpoch ~/ 86400000;
 
   void setGreeting() {
     DateTime now = DateTime.now();
@@ -115,22 +135,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         now.isAfter(DateTime(now.year, DateTime.june, 14))) {
       greeting = "goodrest";
 
-      if (NavigationScreen.of(context)?.init("confetti") ?? false) {
-        _confettiController =
-            ConfettiController(duration: const Duration(seconds: 1));
-        Future.delayed(const Duration(seconds: 1))
-            .then((value) => mounted ? _confettiController?.play() : null);
-      }
+      _celebrate(const Duration(seconds: 1));
     } else if (now.month == user.student?.birth.month &&
         now.day == user.student?.birth.day) {
       greeting = "happybirthday";
 
-      if (NavigationScreen.of(context)?.init("confetti") ?? false) {
-        _confettiController =
-            ConfettiController(duration: const Duration(seconds: 3));
-        Future.delayed(const Duration(seconds: 1))
-            .then((value) => mounted ? _confettiController?.play() : null);
-      }
+      _celebrate(const Duration(seconds: 3));
+    } else if (!settings.presentationMode &&
+        NameDay.isNameDay(nameParts.skip(1), now)) {
+      greeting = "happynameday";
+      _celebrate(const Duration(seconds: 2));
     } else if (now.month == DateTime.october &&
         now.day == 26 &&
         now.year > 2026) {
@@ -138,12 +152,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       greeting = Localization("folioopen".i18n).fill([age]);
       customWelcome = true;
 
-      if (NavigationScreen.of(context)?.init("confetti") ?? false) {
-        _confettiController =
-            ConfettiController(duration: const Duration(seconds: 3));
-        Future.delayed(const Duration(seconds: 1))
-            .then((value) => mounted ? _confettiController?.play() : null);
-      }
+      _celebrate(const Duration(seconds: 3));
     } else if (now.month == DateTime.december &&
         now.day >= 24 &&
         now.day <= 26) {
@@ -158,6 +167,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
 
       customWelcome = true;
+    } else if (_dayNumber(now) % 2 == 0 && now.hour >= 6 && now.hour < 21) {
+      greeting = "fun_${(_dayNumber(now) ~/ 2) % 8}";
     } else if (now.hour >= 21 || now.hour < 4) {
       greeting = "goodnight";
     } else if (now.hour >= 18) {
@@ -265,11 +276,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             titleSpacing: 0.0,
                             // Welcome text
                             title: Padding(
-                              padding: const EdgeInsets.only(left: 24.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  // Long greetings shrink to one line.
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
                                     greeting,
                                     overflow: TextOverflow.fade,
                                     textAlign: TextAlign.start,
@@ -295,6 +311,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 fontSize: 24.0,
                                                 color: greetingColor,
                                               ),
+                                  ),
                                   ),
                                   const SizedBox(height: 2.0),
                                   Text(
