@@ -289,7 +289,31 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// Login on the official KRÉTA page (idp.e-kreta.hu) shown in-app, so
+  /// the password is visibly typed into KRÉTA itself, not into Tinta.
   Future<void> _openLoginSheet() async {
+    final result = await Navigator.of(context).push<_LoginSheetResult>(
+      MaterialPageRoute(
+        builder: (pageContext) => _OfficialLoginPage(
+          onDemoMode: () {
+            Navigator.of(pageContext).pop();
+            final userProvider =
+                Provider.of<UserProvider>(context, listen: false);
+            final demoUser = User.demo();
+            userProvider.addUser(demoUser);
+            userProvider.setUser(demoUser.id);
+            setSystemChrome(context);
+            Navigator.of(context).pushReplacementNamed('login_to_navigation');
+          },
+        ),
+      ),
+    );
+    if (result != null && mounted) _processLogin(result);
+  }
+
+  // Previous flow: Tinta's own username/password fields (kept for reference).
+  // ignore: unused_element
+  Future<void> _openCredentialsSheet() async {
     // Step 1 — school selection
     final school = await showModalBottomSheet<School>(
       context: context,
@@ -1287,5 +1311,84 @@ class _OtpPasteFormatter extends TextInputFormatter {
       return newValue;
     }
     return newValue;
+  }
+}
+
+class _OfficialLoginPage extends StatefulWidget {
+  const _OfficialLoginPage({this.onDemoMode});
+
+  final VoidCallback? onDemoMode;
+
+  @override
+  State<_OfficialLoginPage> createState() => _OfficialLoginPageState();
+}
+
+class _OfficialLoginPageState extends State<_OfficialLoginPage> {
+  String _host = 'idp.e-kreta.hu';
+  bool _secure = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Scaffold(
+      backgroundColor: cs.surface,
+      appBar: AppBar(
+        backgroundColor: cs.surface,
+        leading: IconButton(
+          icon: const Icon(Icons.close_rounded),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        titleSpacing: 0,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Bejelentkezés a KRÉTA oldalán',
+              style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface),
+            ),
+            const SizedBox(height: 2.0),
+            // Like a browser address bar: shows who receives the password.
+            Row(
+              children: [
+                Icon(
+                  _secure ? Icons.lock_rounded : Icons.lock_open_rounded,
+                  size: 13.0,
+                  color: _secure ? Colors.green.shade600 : cs.error,
+                ),
+                const SizedBox(width: 4.0),
+                Text(
+                  _host,
+                  style: TextStyle(
+                      fontSize: 13.0,
+                      color: cs.onSurface.withValues(alpha: 0.7)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      body: KretenLoginWidget(
+        onDemoMode: widget.onDemoMode,
+        onUrlChanged: (url) {
+          final uri = Uri.tryParse(url);
+          if (uri == null || !mounted) return;
+          setState(() {
+            _host = uri.host;
+            _secure = uri.scheme == 'https';
+          });
+        },
+        onLogin: (code, app, rem) {
+          if (!mounted) return;
+          Navigator.of(context).pop(_LoginSheetResult(
+            code: code,
+            idpApplication: app,
+            idpRememberBrowser: rem,
+          ));
+        },
+      ),
+    );
   }
 }

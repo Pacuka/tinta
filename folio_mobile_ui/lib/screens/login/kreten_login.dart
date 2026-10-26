@@ -27,12 +27,47 @@ import 'package:flutter/services.dart';
 import 'package:folio/api/login.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+/// idp.e-kreta.hu cookies (idp.application, idp.rememberbrowser) after login.
+Future<Map<String, String>> _readIdpCookies() async {
+  final map = <String, String>{};
+  try {
+    String? cookieStr;
+    if (Platform.isAndroid) {
+      cookieStr = await const MethodChannel(
+        'app.zan1456.folio/android_live_activity',
+      ).invokeMethod<String>('getCookies', {'url': 'https://idp.e-kreta.hu'});
+    } else if (Platform.isIOS) {
+      cookieStr = await const MethodChannel(
+        'app.zan1456.folio/liveactivity',
+      ).invokeMethod<String>('getCookies', {'url': 'https://idp.e-kreta.hu'});
+    }
+    for (final part in (cookieStr ?? '').split(';')) {
+      final idx = part.indexOf('=');
+      if (idx < 0) continue;
+      map[part.substring(0, idx).trim()] = part.substring(idx + 1).trim();
+    }
+  } catch (_) {}
+  return map;
+}
+
 class KretenLoginWidget extends StatefulWidget {
-  const KretenLoginWidget({super.key, required this.onLogin, this.onDemoMode});
+  const KretenLoginWidget({
+    super.key,
+    required this.onLogin,
+    this.onDemoMode,
+    this.onUrlChanged,
+  });
 
   // final String selectedSchool;
-  final void Function(String code) onLogin;
+  final void Function(
+    String code,
+    String? idpApplication,
+    String? idpRememberBrowser,
+  ) onLogin;
   final VoidCallback? onDemoMode;
+
+  /// Current page URL, so the parent can show where the user types.
+  final ValueChanged<String>? onUrlChanged;
 
   @override
   State<KretenLoginWidget> createState() => _KretenLoginWidgetState();
@@ -52,6 +87,7 @@ class _KretenLoginWidgetState extends State<KretenLoginWidget>
   int _autoRetryCount = 0;
   static const int _maxAutoRetries = 3;
   bool _hasLoadedOnce = false;
+  bool _loginDone = false;
 
   static const _loginUrl =
       'https://idp.e-kreta.hu/connect/authorize?prompt=login&nonce=wylCrqT4oN6PPgQn2yQB0euKei9nJeZ6_ffJ-VpSKZU&response_type=code&code_challenge_method=S256&scope=openid%20email%20offline_access%20kreta-ellenorzo-webapi.public%20kreta-eugyintezes-webapi.public%20kreta-fileservice-webapi.public%20kreta-mobile-global-webapi.public%20kreta-dkt-webapi.public%20kreta-ier-webapi.public&code_challenge=HByZRRnPGb-Ko_wTI7ibIba1HQ6lor0ws4bcgReuYSQ&redirect_uri=https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect&client_id=kreta-ellenorzo-student-mobile-ios&state=folio_student_mobile';
@@ -98,9 +134,15 @@ class _KretenLoginWidgetState extends State<KretenLoginWidget>
             final Uri? uri = Uri.tryParse(n.url);
             if (uri != null && _isRedirectUri(uri)) {
               final String? code = uri.queryParameters['code'];
-              if (code != null && code.isNotEmpty) {
+              if (code != null && code.isNotEmpty && !_loginDone) {
+                _loginDone = true;
                 _timeoutTimer?.cancel();
-                widget.onLogin(code);
+                final cookies = await _readIdpCookies();
+                widget.onLogin(
+                  code,
+                  cookies['idp.application'],
+                  cookies['idp.rememberbrowser'],
+                );
                 return NavigationDecision.prevent;
               }
             }
@@ -110,6 +152,7 @@ class _KretenLoginWidgetState extends State<KretenLoginWidget>
           onPageStarted: (url) async {
             if (!mounted) return;
 
+            widget.onUrlChanged?.call(url);
             setState(() {
               currentUrl = url;
               _hasError = false;
