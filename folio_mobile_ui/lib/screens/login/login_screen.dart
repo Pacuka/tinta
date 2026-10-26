@@ -182,8 +182,7 @@ class LoginScreenState extends State<LoginScreen> {
 
                       // Feature highlights
                       Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 28.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 28.0),
                         child: Column(
                           children: [
                             _FeatureRow(
@@ -208,8 +207,8 @@ class LoginScreenState extends State<LoginScreen> {
 
                       if (_loginState == LoginState.failed)
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              28.0, 0, 28.0, 12.0),
+                          padding:
+                              const EdgeInsets.fromLTRB(28.0, 0, 28.0, 12.0),
                           child: Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(
@@ -234,8 +233,7 @@ class LoginScreenState extends State<LoginScreen> {
 
                 // Bottom actions
                 Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(24.0, 0, 24.0, 12.0),
+                  padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 12.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -257,8 +255,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   width: 22,
                                   height: 22,
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white),
+                                      strokeWidth: 2.5, color: Colors.white),
                                 )
                               : Text(
                                   'login_w_kreta_acc'.i18n,
@@ -269,9 +266,7 @@ class LoginScreenState extends State<LoginScreen> {
                                 ),
                         ),
                       ),
-
                       const SizedBox(height: 14.0),
-
                       GestureDetector(
                         onTap: () => PrivacyView.show(context),
                         child: Text(
@@ -282,7 +277,6 @@ class LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 8.0),
                     ],
                   ),
@@ -553,8 +547,7 @@ class _SchoolSheetState extends State<_SchoolSheet> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14.0),
-                  borderSide:
-                      BorderSide(color: cs.primary, width: 1.5),
+                  borderSide: BorderSide(color: cs.primary, width: 1.5),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                     vertical: 12.0, horizontal: 16.0),
@@ -606,8 +599,7 @@ class _SchoolSheetState extends State<_SchoolSheet> {
                                     decoration: BoxDecoration(
                                       color: cs.primaryContainer
                                           .withValues(alpha: 0.6),
-                                      borderRadius:
-                                          BorderRadius.circular(10.0),
+                                      borderRadius: BorderRadius.circular(10.0),
                                     ),
                                     child: Icon(
                                       Icons.school_rounded,
@@ -642,8 +634,7 @@ class _SchoolSheetState extends State<_SchoolSheet> {
                                   Icon(
                                     Icons.chevron_right_rounded,
                                     size: 20.0,
-                                    color:
-                                        cs.onSurface.withValues(alpha: 0.25),
+                                    color: cs.onSurface.withValues(alpha: 0.25),
                                   ),
                                 ],
                               ),
@@ -688,12 +679,12 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
 
   // 2FA state
   bool _showTwoFactor = false;
+  bool _showCaptcha = false;
   int _twoFactorAttempt = 0;
   Completer<String?>? _twoFactorCompleter;
   final List<TextEditingController> _otpControllers =
       List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _otpFocusNodes =
-      List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _otpFocusNodes = List.generate(6, (_) => FocusNode());
 
   @override
   void dispose() {
@@ -782,37 +773,67 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
   }
 
   Widget _buildLoading(ColorScheme cs, TextTheme tt, double bottomPad) {
+    // The webview stays in the same slot (so the page survives); it only
+    // becomes visible when KRÉTA asks for a captcha the user has to solve.
+    final width = MediaQuery.of(context).size.width;
+    const captchaTop = 64.0;
+    final captchaHeight = MediaQuery.of(context).size.height * 0.62;
     return Stack(
       children: [
         Positioned(
-          left: 0,
-          top: 0,
-          width: 1,
-          height: 1,
-          child: KretaBgLoginWidget(
-            instituteCode: widget.school.instituteCode,
-            username: _usernameController.text.trim(),
-            password: _passwordController.text,
-            rememberbrowserCookie: null,
-            onLogin: (code, app, rem) {
-              if (!mounted) return;
-              widget.onLogin(_LoginSheetResult(
-                code: code,
-                idpApplication: app,
-                idpRememberBrowser: rem,
-              ));
-            },
-            onError: (state) {
-              if (!mounted) return;
-              setState(() {
-                _isLoading = false;
-                _sheetError = state;
-              });
-            },
-            onTwoFactorRequired: _onTwoFactorRequired,
+          left: 12.0,
+          top: captchaTop,
+          width: width - 24.0,
+          height: captchaHeight,
+          // Laid out full size even while hidden, so the page has a real
+          // viewport when it has to be shown.
+          child: IgnorePointer(
+            ignoring: !_showCaptcha,
+            child: Opacity(
+              opacity: _showCaptcha ? 1.0 : 0.0,
+              child: KretaBgLoginWidget(
+                instituteCode: widget.school.instituteCode,
+                username: _usernameController.text.trim(),
+                password: _passwordController.text,
+                rememberbrowserCookie: null,
+                onLogin: (code, app, rem) {
+                  if (!mounted) return;
+                  widget.onLogin(_LoginSheetResult(
+                    code: code,
+                    idpApplication: app,
+                    idpRememberBrowser: rem,
+                  ));
+                },
+                onError: (state) {
+                  if (!mounted) return;
+                  setState(() {
+                    _isLoading = false;
+                    _showCaptcha = false;
+                    _sheetError = state;
+                  });
+                },
+                onTwoFactorRequired: _onTwoFactorRequired,
+                onCaptchaRequired: () {
+                  if (mounted) setState(() => _showCaptcha = true);
+                },
+              ),
+            ),
           ),
         ),
-        if (_showTwoFactor)
+        if (_showCaptcha)
+          SizedBox(
+            height: captchaTop + captchaHeight + bottomPad + 16.0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                'A KRÉTA ellenőrzést kér. Pipáld ki a „Nem vagyok robot” '
+                'mezőt, majd nyomd meg a Bejelentkezés gombot.',
+                style: tt.bodyMedium!
+                    .copyWith(color: cs.onSurface.withValues(alpha: 0.75)),
+              ),
+            ),
+          )
+        else if (_showTwoFactor)
           _buildTwoFactor(cs, tt, bottomPad)
         else
           SizedBox(
@@ -874,8 +895,8 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
             const SizedBox(height: 12.0),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14.0, vertical: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
               decoration: BoxDecoration(
                 color: cs.errorContainer,
                 borderRadius: BorderRadius.circular(12.0),
@@ -930,8 +951,7 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
               onPressed: _submitTwoFactor,
               child: const Text(
                 'Megerősítés',
-                style:
-                    TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -991,8 +1011,7 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
           cursorColor: cs.primary,
           decoration: InputDecoration(
             isDense: true,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 14.0),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(
@@ -1067,8 +1086,8 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
           if (hasError) ...[
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14.0, vertical: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
               decoration: BoxDecoration(
                 color: cs.errorContainer,
                 borderRadius: BorderRadius.circular(12.0),
@@ -1110,8 +1129,7 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
                   focusNode: _usernameFocus,
                   autofillHints: const [AutofillHints.username],
                   textInputAction: TextInputAction.next,
-                  onEditingComplete: () =>
-                      _passwordFocus.requestFocus(),
+                  onEditingComplete: () => _passwordFocus.requestFocus(),
                   cs: cs,
                 ),
                 const SizedBox(height: 12.0),
@@ -1129,9 +1147,7 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
                           ? Icons.visibility_rounded
                           : Icons.visibility_off_rounded,
                       size: 18.0,
-                      color: AppColors.of(context)
-                          .text
-                          .withValues(alpha: 0.6),
+                      color: AppColors.of(context).text.withValues(alpha: 0.6),
                     ),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),

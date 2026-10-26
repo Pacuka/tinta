@@ -356,6 +356,7 @@ class KretaBgLoginWidget extends StatefulWidget {
     required this.onLogin,
     this.onError,
     this.onTwoFactorRequired,
+    this.onCaptchaRequired,
   });
 
   final String instituteCode;
@@ -371,6 +372,10 @@ class KretaBgLoginWidget extends StatefulWidget {
   final void Function(LoginState)? onError;
   final Future<String?> Function()? onTwoFactorRequired;
 
+  /// KRÉTA asked for a reCAPTCHA: the parent should show this webview so the
+  /// user can solve it and press "Bejelentkezés" (credentials are refilled).
+  final VoidCallback? onCaptchaRequired;
+
   @override
   State<KretaBgLoginWidget> createState() => _KretaBgLoginWidgetState();
 }
@@ -381,6 +386,7 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
   bool _loginCompleted = false;
   bool _awaitingTwoFactor = false;
   bool _clickContinueOnNextLoad = false;
+  bool _captchaShown = false;
   Timer? _loginTimer;
   String? _savedIdpApplication;
   String? _savedIdpRememberBrowser;
@@ -472,6 +478,23 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
             }
 
             if (url.contains('idp.e-kreta.hu')) {
+              if (await _hasCaptcha()) {
+                if (_captchaShown) return;
+                _captchaShown = true;
+                _loginTimer?.cancel();
+                await _fillCredentials(submit: false);
+                // The cookie notice modal would cover the captcha; hide it
+                // (accepting would reload the page and lose the form).
+                try {
+                  await controller.runJavaScript(
+                    "var c=document.getElementById('cookieBanner');if(c)c.remove();"
+                    "document.querySelectorAll('.modal-backdrop').forEach(function(e){e.remove();});"
+                    "document.body.classList.remove('modal-open');document.body.style.overflow='auto';",
+                  );
+                } catch (_) {}
+                widget.onCaptchaRequired?.call();
+                return;
+              }
               if (!_credentialsInjected) {
                 await _tryInjectCredentials();
               } else {
@@ -562,6 +585,41 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
     controller.loadRequest(Uri.parse(_loginUrl));
   }
 
+  /// A visible reCAPTCHA widget (not just the script or an invisible badge).
+  /// Waits a bit because the widget is rendered after page load.
+  Future<bool> _hasCaptcha() async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted || _loginCompleted) return false;
+      final res = await controller.runJavaScriptReturningResult(
+        "document.querySelector('.g-recaptcha[data-sitekey]:not([data-size=\"invisible\"]), iframe[src*=\"api2/anchor\"], iframe[src*=\"enterprise/anchor\"], iframe[src*=\"api2/bframe\"]') !== null",
+      );
+      return res.toString() == 'true';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _fillCredentials({required bool submit}) async {
+    final usernameJson = jsonEncode(widget.username);
+    final passwordJson = jsonEncode(widget.password);
+    final instituteJson = jsonEncode(widget.instituteCode);
+    await controller.runJavaScript("""
+(function() {
+  var u = document.getElementById('UserName');
+  var p = document.getElementById('Password');
+  var s = document.getElementById('instituteSelector');
+  var c = document.getElementById('InstituteCode');
+  var b = document.getElementById('submit-btn');
+  if (u) u.value = $usernameJson;
+  if (p) p.value = $passwordJson;
+  if (s) s.value = $instituteJson;
+  if (c) c.value = $instituteJson;
+  if ($submit && b) b.click();
+})();
+""");
+  }
+
   Future<void> _tryInjectCredentials() async {
     try {
       final hasForm = await controller.runJavaScriptReturningResult(
@@ -569,21 +627,7 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
       );
       if (hasForm.toString() == 'true') {
         _credentialsInjected = true;
-        final usernameJson = jsonEncode(widget.username);
-        final passwordJson = jsonEncode(widget.password);
-        final instituteJson = jsonEncode(widget.instituteCode);
-        await controller.runJavaScript("""
-(function() {
-  var u = document.getElementById('UserName');
-  var p = document.getElementById('Password');
-  var s = document.getElementById('instituteSelector');
-  var b = document.getElementById('submit-btn');
-  if (u) u.value = $usernameJson;
-  if (p) p.value = $passwordJson;
-  if (s) s.value = $instituteJson;
-  if (b) b.click();
-})();
-""");
+        await _fillCredentials(submit: true);
         _loginTimer = Timer(const Duration(seconds: 30), () {
           if (mounted && !_loginCompleted) {
             widget.onError?.call(LoginState.failed);
