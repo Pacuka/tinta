@@ -1,0 +1,5 @@
+• Belépés a KRÉTA hivatalos oldalán
+• Frissítés után azonnal látszanak az új adatok
+• Órarend: elmaradó óra és helyettesítés jól jelölve
+• Egységes dizájn tintacsíkkal, új mozgások
+• Wear OS óra-app párosítása
