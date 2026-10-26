@@ -69,11 +69,11 @@ flutter:
 
 
 flutter_launcher_icons:
-  image_path: assets/icons/colored_logo.webp
+  image_path: assets/icons/tinta_icon.png
   android: true
-  adaptive_icon_background: assets/icons/colored_logo_without_mustache.png
-  adaptive_icon_foreground: assets/icons/colored_logo_only_mustache.png
-  adaptive_icon_monochrome: assets/icons/monochrome_logo.png
+  adaptive_icon_background: "#2440C8"
+  adaptive_icon_foreground: assets/icons/tinta_icon_fg.png
+  adaptive_icon_monochrome: assets/icons/tinta_icon_mono.png
   ios: false
   remove_alpha_ios: false
   web:
@@ -81,12 +81,16 @@ flutter_launcher_icons:
   compress: true
 
 flutter_native_splash:
-  color: "#7CA021"
-  image: assets/icons/splash_android12.png
+  color: "#F6F7F9"
+  image: assets/icons/tinta_splash.png
+  color_dark: "#101218"
+  image_dark: assets/icons/tinta_splash_dark.png
   android_12:
-    image: assets/icons/splash_android12.png
+    image: assets/icons/tinta_splash.png
+    color: "#F6F7F9"
+    image_dark: assets/icons/tinta_splash_dark.png
+    color_dark: "#101218"
   android: true
   android_gravity: center
-  ios: true
-  ios_content_mode: center
+  ios: false
   web: false
