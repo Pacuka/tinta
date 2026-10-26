@@ -641,7 +641,7 @@ class _PremiumCustomAccentColorSettingState
                                                   "azonosito": 0,
                                                   "kuldesDatum":
                                                       "2022-01-01T23:00:00",
-                                                  "feladoNev": "Folio",
+                                                  "feladoNev": "Tinta",
                                                   "feladoTitulus":
                                                       "Nagyon magas szintű személy",
                                                   "szoveg":

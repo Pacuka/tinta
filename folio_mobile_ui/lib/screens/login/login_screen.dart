@@ -158,7 +158,7 @@ class LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20.0),
 
                       Text(
-                        'Folio',
+                        'Tinta',
                         style: tt.headlineLarge!.copyWith(
                           fontWeight: FontWeight.w800,
                           color: cs.onSurface,

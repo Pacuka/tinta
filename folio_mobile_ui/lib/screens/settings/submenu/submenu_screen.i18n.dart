@@ -8,7 +8,7 @@ extension SettingsLocalization on String {
           "personalization": "Personalization",
           "extras": "Extras",
           "other": "Other",
-          "stickermap": "Folio Stickermap",
+          "stickermap": "Tinta Stickermap",
           "surprise_grades": "Surprise Grades",
           "cancel": "Cancel",
           "done": "Done",
@@ -38,14 +38,14 @@ extension SettingsLocalization on String {
           "presentation": "Presentation Mode",
           "shareNickname": "Anonymous Share",
           "goodstudent_disclaimer":
-          "Folio can not be held liable for the usage of this feature.\n\n(if your mother beats you up because you showed her fake grades, you can only blame yourself for it)",
+          "Tinta can not be held liable for the usage of this feature.\n\n(if your mother beats you up because you showed her fake grades, you can only blame yourself for it)",
         },
         "hu-HU": {
           "general": "Általános",
           "personalization": "Személyre szabás",
           "extras": "Extrák",
           "other": "Egyéb",
-          "stickermap": "Folio Matricatérkép",
+          "stickermap": "Tinta Matricatérkép",
           "surprise_grades": "Meglepetés jegyek",
           "cancel": "Mégse",
           "done": "Kész",
@@ -74,14 +74,14 @@ extension SettingsLocalization on String {
           "presentation": "Bemutató mód",
           "shareNickname": "Anoním megosztás",
           "goodstudent_disclaimer":
-          "A Folio minden felelősséget elhárít a funkció használatával kapcsolatban.\n\n(Értsd: ha az anyád megver, mert megtévesztő ábrákat mutattál neki, azért csakis magadat hibáztathatod.)",
+          "A Tinta minden felelősséget elhárít a funkció használatával kapcsolatban.\n\n(Értsd: ha az anyád megver, mert megtévesztő ábrákat mutattál neki, azért csakis magadat hibáztathatod.)",
         },
         "de-DE": {
           "general": "Allgemeine",
           "personalization": "Personalisierung",
           "extras": "Extras",
           "other": "Andere",
-          "stickermap": "Folio Aufkleberkarte",
+          "stickermap": "Tinta Aufkleberkarte",
           "surprise_grades": "Überraschende Noten",
           "cancel": "Abbrechen",
           "done": "Bereit",
@@ -111,7 +111,7 @@ extension SettingsLocalization on String {
           "goodstudent": "Guter Student Modus",
           "shareNickname": "Anonymes Teilen",
           "goodstudent_disclaimer":
-          "Folio kann nicht für die Nutzung dieser Funktion haftbar gemacht werden.\n\n(Wenn deine Mutter dich verprügelt, weil du ihr falsche Noten gezeigt hast, kannst du dir nur die Schuld dafür geben)",
+          "Tinta kann nicht für die Nutzung dieser Funktion haftbar gemacht werden.\n\n(Wenn deine Mutter dich verprügelt, weil du ihr falsche Noten gezeigt hast, kannst du dir nur die Schuld dafür geben)",
         },
       };
 

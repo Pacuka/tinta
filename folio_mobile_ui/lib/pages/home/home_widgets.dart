@@ -111,8 +111,10 @@ class GreetingWidget extends StatelessWidget {
     } else if (now.month == user.student?.birth.month &&
         now.day == user.student?.birth.day) {
       return localizeFill(_t('happybirthday'), [firstName]);
-    } else if (now.month == DateTime.march && now.day == 28) {
-      final age = now.year - 2025;
+    } else if (now.month == DateTime.october &&
+        now.day == 26 &&
+        now.year > 2026) {
+      final age = now.year - 2026;
       return localizeFill(_t('folioopen'), [age]);
     } else if (now.month == DateTime.december && now.day >= 24 && now.day <= 26) {
       return localizeFill(_t('merryxmas'), [firstName]);

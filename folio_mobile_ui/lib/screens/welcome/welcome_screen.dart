@@ -119,7 +119,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                           const SizedBox(height: 20.0),
                           Text(
-                            'Folio',
+                            'Tinta',
                             style: tt.displaySmall!.copyWith(
                               fontWeight: FontWeight.w800,
                               color: cs.onSurface,

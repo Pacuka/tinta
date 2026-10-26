@@ -2599,7 +2599,6 @@ class SettingsScreenState extends State<SettingsScreen>
         searchTerms: [
           'adatvédelem',
           'privacy',
-          'discord',
           'github',
           'licenc',
           'license',
@@ -2620,23 +2619,12 @@ class SettingsScreenState extends State<SettingsScreen>
                     top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
               ),
               PanelButton(
-                leading: Icon(Icons.alternate_email_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(alpha: 0.95)),
-                title: const Text("Discord"),
-                onPressed: () => launchUrl(
-                    Uri.parse("https://discord.gg/6DvjyPAw2T"),
-                    mode: LaunchMode.externalApplication),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
-              ),
-              PanelButton(
                 leading: Icon(Icons.code_rounded,
                     size: 22.0,
                     color: AppColors.of(context).text.withValues(alpha: 0.95)),
                 title: const Text("GitHub"),
                 onPressed: () => launchUrl(
-                    Uri.parse("https://github.com/zan1456/folio"),
+                    Uri.parse("https://github.com/Pacuka/tinta"),
                     mode: LaunchMode.externalApplication),
                 borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
@@ -2646,7 +2634,10 @@ class SettingsScreenState extends State<SettingsScreen>
                     size: 22.0,
                     color: AppColors.of(context).text.withValues(alpha: 0.95)),
                 title: Text("licenses".i18n),
-                onPressed: () => showLicensePage(context: context),
+                onPressed: () => showLicensePage(
+                    context: context,
+                    applicationName: "Tinta",
+                    applicationLegalese: "packagetext".i18n),
                 borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
               ),

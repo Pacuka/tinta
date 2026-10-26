@@ -7,7 +7,7 @@ extension SettingsLocalization on String {
         "en-US": {
           "heads_up": "Heads up!",
           "export_warning":
-              "Exported grades are currently not yet viewable in Folio, you'll only be able to view them manually in JSON format. In the future, this functionality will be extended and you will be able to view the tickets in the app interface.",
+              "Exported grades are currently not yet viewable in Tinta, you'll only be able to view them manually in JSON format. In the future, this functionality will be extended and you will be able to view the tickets in the app interface.",
           "personal_details": "Personal Details",
           "open_dkt": "Open DCS",
           "edit_nickname": "Edit Nickname",
@@ -106,7 +106,7 @@ extension SettingsLocalization on String {
           "search": "Search...",
           "goodstudent": "Good Student Mode",
           "goodstudent_disclaimer":
-              "Folio can not be held liable for the usage of this feature.\n\n(if your mother beats you up because you showed her fake grades, you can only blame yourself for it)",
+              "Tinta can not be held liable for the usage of this feature.\n\n(if your mother beats you up because you showed her fake grades, you can only blame yourself for it)",
           "presentation": "Presentation Mode",
           "show_breaks": "Show Breaks",
           "live_activity_enabled": "Live Activity",
@@ -204,7 +204,7 @@ extension SettingsLocalization on String {
           "new_colors": "New Colors",
           "exp_settings": "Export Settings",
           "manage_subs": "Manage Subscription",
-          "copy_plus_id": "Copy Folio+ ID",
+          "copy_plus_id": "Copy Tinta+ ID",
           // grade streak
           "grade_streak": "Grade 5 Streak",
           "grade_streak_subtitle": "So many 5s in a row?!",
@@ -219,7 +219,7 @@ extension SettingsLocalization on String {
           "stickermap": "Sticker Map",
           "success": "Success!",
           "versiontext": "v%s, modified by the Firka team",
-          "packagetext": "Folio, modified by the Firka team",
+          "packagetext": "Tinta, based on Folio (Zan1456), Firka and Filc. License: AGPL-3.0",
           "notifications_section": "Notifications",
           "push_notifications": "Push Notifications",
           "notification_grades": "Grades",
@@ -257,7 +257,7 @@ extension SettingsLocalization on String {
         "hu-HU": {
           "heads_up": "Figyelem!",
           "export_warning":
-              "Az exportált jegyek jelenleg még nem megtekinthetők a Folio-ben, csak te magad tudod átnézni őket JSON formátumban. A jövőben ez a funkció bővülni fog, és a jegyeket meg is tekintheted majd a Folio felületén.",
+              "Az exportált jegyek jelenleg még nem megtekinthetők a Tintában, csak te magad tudod átnézni őket JSON formátumban. A jövőben ez a funkció bővülni fog, és a jegyeket meg is tekintheted majd a Tinta felületén.",
           "personal_details": "Személyes információk",
           "open_dkt": "DKT megnyitása",
           "edit_nickname": "Becenév szerkesztése",
@@ -356,7 +356,7 @@ extension SettingsLocalization on String {
           "search": "Keresés...",
           "goodstudent": "Jó tanuló mód",
           "goodstudent_disclaimer":
-              "A Folio nem vállal felelősséget a funkció használatáért.\n\n(ha anyád megver, mert hamis jegyeket mutattál neki, csak magadat okolhatod érte)",
+              "A Tinta nem vállal felelősséget a funkció használatáért.\n\n(ha anyád megver, mert hamis jegyeket mutattál neki, csak magadat okolhatod érte)",
           "presentation": "Bemutató mód",
           "show_breaks": "Szünetek megjelenítése",
           "live_activity_enabled": "Live Activity",
@@ -456,7 +456,7 @@ extension SettingsLocalization on String {
           "new_colors": "Új színek",
           "exp_settings": "Beállítások exportálása",
           "manage_subs": "Előfizetés kezelése",
-          "copy_plus_id": "Folio+ ID másolása",
+          "copy_plus_id": "Tinta+ ID másolása",
           // grade streak
           "grade_streak": "5-ös sorozat",
           "grade_streak_subtitle": "Egymás után ennyi 5-ös?!",
@@ -492,7 +492,7 @@ extension SettingsLocalization on String {
           "material_you_system": "Rendszer",
           "success": "Siker!",
           "versiontext": "v%s, módosítva a Firka csapat által",
-          "packagetext": "Folio, módosítva a Firka csapat által",
+          "packagetext": "A Tinta a Folio (Zan1456), a Firka és a Filc nyílt forráskódú munkájára épül. Licenc: AGPL-3.0",
           "navbar_order": "Navbar testreszabása",
           "navbar_section": "NAVBAR ELEMEK",
           "more_section": "TÖBB MENÜ ELEMEK",
@@ -509,7 +509,7 @@ extension SettingsLocalization on String {
         "de-DE": {
           "heads_up": "Achtung!",
           "export_warning":
-              "Exportierte Tickets sind derzeit noch nicht in Folio einsehbar, Sie können sie nur selbst im JSON- Format überprüfen. In Zukunft wird diese Funktionalität erweitert und Sie werden die Tickets in der Folio-Oberfläche anzeigen können",
+              "Exportierte Tickets sind derzeit noch nicht in Tinta einsehbar, Sie können sie nur selbst im JSON- Format überprüfen. In Zukunft wird diese Funktionalität erweitert und Sie werden die Tickets in der Tinta-Oberfläche anzeigen können",
           "personal_details": "Persönliche Angaben",
           "open_dkt": "Öffnen RDZ",
           "edit_nickname": "Spitznamen bearbeiten",
@@ -608,7 +608,7 @@ extension SettingsLocalization on String {
           "search": "Suchen...",
           "goodstudent": "Guter Student Modus",
           "goodstudent_disclaimer":
-              "Folio kann nicht für die Nutzung dieser Funktion haftbar gemacht werden.\n\n(Wenn deine Mutter dich verprügelt, weil du ihr falsche Noten gezeigt hast, kannst du dir nur die Schuld dafür geben)",
+              "Tinta kann nicht für die Nutzung dieser Funktion haftbar gemacht werden.\n\n(Wenn deine Mutter dich verprügelt, weil du ihr falsche Noten gezeigt hast, kannst du dir nur die Schuld dafür geben)",
           "presentation": "Präsentationsmodus",
           "show_breaks": "Pausen anzeigen",
           "live_activity_enabled": "Live Activity",
@@ -710,7 +710,7 @@ extension SettingsLocalization on String {
           "new_colors": "Neue Farben",
           "exp_settings": "Einstellungen exportieren",
           "manage_subs": "Abonnement verwalten",
-          "copy_plus_id": "Folio+ ID kopieren",
+          "copy_plus_id": "Tinta+ ID kopieren",
           // grade streak
           "grade_streak": "5er-Streak",
           "grade_streak_subtitle": "So viele 5er in Folge?!",
@@ -725,7 +725,7 @@ extension SettingsLocalization on String {
           "stickermap": "Sticker Map",
           "success": "Erfolg!",
           "versiontext": "v%s, geändert vom Firka",
-          "packagetext": "Folio, geändert vom Firka",
+          "packagetext": "Tinta, basierend auf Folio (Zan1456), Firka und Filc. Lizenz: AGPL-3.0",
           "notifications_section": "Benachrichtigungen",
           "countdown_enabled": "Countdown",
           "countdown_before_lesson": "Countdown vor Stunden",

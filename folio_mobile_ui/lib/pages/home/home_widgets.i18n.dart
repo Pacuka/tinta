@@ -13,7 +13,7 @@ extension HomeWidgetsLocalization on String {
           "happybirthday": "🎂 Happy birthday, %s!",
           "merryxmas": "🎄 Merry Christmas, %s!",
           "happynewyear": "🎉 Happy New Year, %s!",
-          "folioopen": "🎈 Folio is %s years old!",
+          "folioopen": "🎈 Tinta is %s years old!",
           // Widget titles
           "greeting": "Greeting",
           "live_card": "Live Card",
@@ -67,7 +67,7 @@ extension HomeWidgetsLocalization on String {
           "happybirthday": "🎂 Boldog születésnapot, %s!",
           "merryxmas": "🎄 Boldog Karácsonyt, %s!",
           "happynewyear": "🎉 Boldog új évet, %s!",
-          "folioopen": "🎈 %s éves a Folio!",
+          "folioopen": "🎈 %s éves a Tinta!",
           // Widget titles
           "greeting": "Köszöntés",
           "live_card": "Live Card",
@@ -121,7 +121,7 @@ extension HomeWidgetsLocalization on String {
           "happybirthday": "🎂 Alles Gute zum Geburtstag, %s!",
           "merryxmas": "🎄 Frohe Weihnachten, %s!",
           "happynewyear": "🎉 Frohes neues Jahr, %s!",
-          "folioopen": "🎈 Folio ist %s Jahre alt!",
+          "folioopen": "🎈 Tinta ist %s Jahre alt!",
           // Widget titles
           "greeting": "Begrüßung",
           "live_card": "Live Card",

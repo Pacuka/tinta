@@ -144,7 +144,7 @@ class MessageViewTile extends StatelessWidget {
                     onPressed: () {
                       Share.share(
                         message.content.escapeHtml(),
-                        subject: 'Folio',
+                        subject: 'Tinta',
                       );
                     },
                     icon: Icon(

@@ -256,7 +256,7 @@ class _AppState extends State<App> {
                     ),
                   );
                 },
-                title: "Folio",
+                title: "Tinta",
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.lightTheme(context, palette: corePalette),
                 darkTheme: AppTheme.darkTheme(context, palette: corePalette),

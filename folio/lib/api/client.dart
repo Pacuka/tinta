@@ -51,7 +51,7 @@ class FilcAPI {
 
   // updates path to github
   static const releases =
-      "https://api.github.com/repos/Zan1456/folio/releases";
+      "https://api.github.com/repos/Pacuka/tinta/releases";
 
   // theme sharing api
   static const themeShare = "$baseUrl/theme/";
@@ -122,21 +122,12 @@ class FilcAPI {
   static Future<Config?> getConfig(SettingsProvider settings) async {
     final userAgent = SettingsProvider.defaultSettings().config.userAgent;
 
+    // Tinta: a konfigurációt azonosító nélkül kérjük le (nincs x-filc-id,
+    // nincs platform-statisztika), mert a Firka szervere nem a miénk.
     Map<String, String> headers = {
-      "x-filc-id": settings.xFilcId,
       "user-agent": userAgent,
-      // platform things
-      "rf-platform":
-          settings.analyticsEnabled ? Platform.operatingSystem : "unknown",
-      "rf-platform-version": settings.analyticsEnabled
-          ? Platform.operatingSystemVersion
-          : "unknown",
-      "rf-app-version":
-          const String.fromEnvironment("APPVER", defaultValue: "?"),
-      "rf-uinid": settings.xFilcId,
     };
 
-    log("[CONFIG] x-filc-id: \"${settings.xFilcId}\"");
     log("[CONFIG] user-agent: \"$userAgent\"");
 
     try {
@@ -208,6 +199,9 @@ class FilcAPI {
   }
 
   static Future<void> sendReport(ErrorReport report) async {
+    // Tinta: nem küldünk hibajelentést a Firka szerverére (nem a miénk).
+    return;
+    // ignore: dead_code
     try {
       Map body = {
         "os": report.os,
