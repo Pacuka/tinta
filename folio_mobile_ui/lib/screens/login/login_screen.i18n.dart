@@ -56,8 +56,9 @@ extension Localization on String {
           "invalid_grant":
               // "Helytelen Felhasználónév/Jelszó! (Próbálj szóközöket írni a Felhasználónév után)",
               "Helytelen Felhasználónév/Jelszó!",
-          "error": "Sikertelen bejelentkezés.",
-          "schools_error": "Nem sikerült lekérni az iskolákat.",
+          "error": "Sikertelen bejelentkezés. A KRÉTA ma nincs formában.",
+          "schools_error":
+              "Nem sikerült lekérni az iskolákat. A KRÉTA szerint ma nincs suli.",
           "login_w_kreten":
               "Jelentkezz be az e-KRÉTA fiókoddal a folytatáshoz!",
           "privacy": "Adatkezelési tájékoztató",
