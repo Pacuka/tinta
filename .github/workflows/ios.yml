@@ -29,6 +29,9 @@ jobs:
 
       - name: Dependencies
         run: |
+          # Several plugins are CocoaPods-only; mixing in SwiftPM makes
+          # DKImagePickerController link twice.
+          flutter config --no-enable-swift-package-manager
           flutter pub get
           cd ios && pod install --repo-update
 
