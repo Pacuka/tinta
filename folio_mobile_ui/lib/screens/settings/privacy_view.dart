@@ -34,7 +34,9 @@ class PrivacyView extends StatelessWidget {
 
   • Azok törlésével vagy módosításával kapcsolatban keresd az osztályfőnöködet vagy az iskolád rendszergazdáját.
 
-  • Az alkalmazás nem gyűjt használati statisztikát és nem küld hibajelentést. Induláskor letölt egy általános beállításfájlt a Firka nyilvános szerveréről (api.firka.app), ehhez semmilyen azonosítót nem küld.
+  • Az alkalmazás nem gyűjt használati statisztikát és magától nem küld hibajelentést. A bejelentkezési adatok nem kerülnek a telefon felhőmentésébe.
+
+  • Más szerverhez csak akkor fordul, ha te kéred: témák megosztásához és letöltéséhez a Firka szerveréhez (api.firka.app), másik betűtípus választásakor a Google Fonts-hoz.
 
   • Az alkalmazás minden indításakor a GitHub API segítségével ellenőrzi, hogy elérhető-e új verzió (github.com/Pacuka/tinta), és kérésre innen letölti a frissítést.
 

@@ -576,7 +576,7 @@ class SettingsProvider extends ChangeNotifier {
       appIcon: 'folio_default',
       currentThemeId: '',
       currentThemeDisplayName: 'Alapértelmezett',
-      currentThemeCreator: 'Firka',
+      currentThemeCreator: 'Tinta',
       showBreaks: false,
       pinSetGeneral: '',
       pinSetPersonalize: '',

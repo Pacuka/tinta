@@ -185,7 +185,7 @@ extension SettingsLocalization on String {
           "la_pp_r4":
               "Right to object: You can object to data processing at any time by disabling the Live Activity feature.",
           "la_pp_updated": "Privacy policy last updated: November 2025",
-          "la_pp_contact": "Have questions? Contact us at support@firka.app.",
+          "la_pp_contact": "Have questions? Open an issue at github.com/Pacuka/tinta/issues.",
           "fonts": "Fonts",
           "font_family": "Font Family",
           "calendar_sync": "Calendar Sync",
@@ -437,7 +437,7 @@ extension SettingsLocalization on String {
               "Tiltakozás joga: Bármikor tiltakozhatsz az adatfeldolgozás ellen a Live Activity funkció kikapcsolásával.",
           "la_pp_updated":
               "Adatvédelmi szabályzat utolsó frissítése: 2025. november",
-          "la_pp_contact": "Kérdésed van? Írj nekünk: support@firka.app.",
+          "la_pp_contact": "Kérdésed van? Nyiss egy hibajegyet: github.com/Pacuka/tinta/issues.",
           "fonts": "Betűk",
           "font_family": "Betűtípus",
           "calendar_sync": "Naptár szinkronizálás",
@@ -691,7 +691,7 @@ extension SettingsLocalization on String {
           "la_pp_updated":
               "Datenschutzrichtlinie zuletzt aktualisiert: November 2025",
           "la_pp_contact":
-              "Fragen? Kontaktieren Sie uns unter support@firka.app.",
+              "Fragen? Erstelle ein Issue unter github.com/Pacuka/tinta/issues.",
           "fonts": "Schriftarten",
           "font_family": "Schriftfamilie",
           "calendar_sync": "Kalender-Synchronisation",
