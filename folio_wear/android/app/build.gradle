@@ -16,7 +16,9 @@ def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '
 def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0.0'
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
+// Same (gitignored) release key as the phone app: the Wearable data layer
+// only connects apps with the same package name AND signing key.
+def keystorePropertiesFile = rootProject.file("../../folio/android/key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -30,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.zan1456.folio"
+        applicationId "hu.pacuka.tinta"
         minSdkVersion 26
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()

@@ -46,7 +46,7 @@ class PairingScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4.0),
                   Text(
-                    'Add meg ezt a kódot\na Folio appban:',
+                    'Add meg ezt a kódot\na Tinta appban:',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.42),
