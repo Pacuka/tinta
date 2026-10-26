@@ -51,6 +51,7 @@ import 'package:folio_mobile_ui/screens/settings/privacy_view.dart';
 import 'package:folio_mobile_ui/screens/settings/settings_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -761,9 +762,13 @@ class SettingsScreenState extends State<SettingsScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ── Header (Messages-style) ───────────────────────────
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(28.0)),
             ),
@@ -957,6 +962,8 @@ class SettingsScreenState extends State<SettingsScreen>
               ),
             ),
           ),
+  const InkStroke(),
+]),
 
           // ── Scrollable content ────────────────────────────────
           Expanded(

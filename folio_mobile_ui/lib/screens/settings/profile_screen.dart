@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as tabs;
 import 'package:image_crop_plus/image_crop_plus.dart';
@@ -350,9 +351,13 @@ class ProfileScreenState extends State<ProfileScreen>
       body: Column(
         children: [
           // ── Header ──────────────────────────────────────────────────────
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(28.0)),
             ),
@@ -432,6 +437,8 @@ class ProfileScreenState extends State<ProfileScreen>
               ),
             ),
           ),
+  const InkStroke(),
+]),
           Expanded(
             child: TabBarView(
               controller: _tabController,

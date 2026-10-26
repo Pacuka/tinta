@@ -20,6 +20,7 @@ import 'package:folio_mobile_ui/common/widgets/miss_tile.dart';
 import 'package:folio_mobile_ui/pages/absences/absence_subject_modal.dart';
 import 'package:folio/ui/filter/sort.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
@@ -223,9 +224,13 @@ class AbsencesPageState extends State<AbsencesPage>
       body: Column(
         children: [
           // ─── Accent Header ────────────────────────────────────────────
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(28.0)),
             ),
@@ -347,6 +352,8 @@ class AbsencesPageState extends State<AbsencesPage>
               ),
             ),
           ),
+  const InkStroke(),
+]),
           // ─── Content ─────────────────────────────────────────────────
           Expanded(
             child: TabBarView(

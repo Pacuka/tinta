@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio/helpers/average_helper.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/ui/widgets/grade/grade_tile.dart';
@@ -344,9 +345,13 @@ class _GradesPageState extends State<GradesPage>
       key: _scaffoldKey,
       body: Column(
         children: [
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(28.0)),
             ),
@@ -464,6 +469,8 @@ class _GradesPageState extends State<GradesPage>
               ),
             ),
           ),
+  const InkStroke(),
+]),
           Expanded(
             child: TabBarView(
               controller: _tabController,

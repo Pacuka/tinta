@@ -12,6 +12,7 @@ import 'package:folio_mobile_ui/common/empty.dart';
 import 'package:folio/ui/filter/sort.dart';
 import 'package:folio_mobile_ui/common/widgets/message/message_viewable.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'messages_page.i18n.dart';
@@ -58,9 +59,13 @@ class MessagesPageState extends State<MessagesPage>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(28.0)),
             ),
@@ -214,6 +219,8 @@ class MessagesPageState extends State<MessagesPage>
               ),
             ),
           ),
+  const InkStroke(),
+]),
           Expanded(
             child: TabBarView(
               physics: const BouncingScrollPhysics(),

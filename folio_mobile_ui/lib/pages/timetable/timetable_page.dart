@@ -22,6 +22,7 @@ import 'package:folio_mobile_ui/screens/navigation/navigation_route_handler.dart
 import 'package:folio_mobile_ui/screens/navigation/navigation_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:flutter/services.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
@@ -234,9 +235,13 @@ class TimetablePageState extends State<TimetablePage>
       body: Column(
         children: [
           // ─── Accent Header ─────────────────────────────────────────────
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(28.0)),
             ),
@@ -482,6 +487,8 @@ class TimetablePageState extends State<TimetablePage>
               ),
             ),
           ),
+  const InkStroke(),
+]),
           // ─── Timetable content ─────────────────────────────────────────
           Expanded(
             child: PageTransitionSwitcher(

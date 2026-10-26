@@ -41,6 +41,7 @@ import 'package:folio_mobile_ui/common/panel/panel.dart';
 import 'package:folio_mobile_ui/common/soon_alert/soon_alert.dart';
 import 'package:folio_mobile_ui/common/widgets/tick_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'package:folio_mobile_ui/pages/notes/submenu/add_note_screen.dart';
@@ -302,9 +303,13 @@ if (selfNoteProvider.todos.isNotEmpty) {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          Container(
+          Column(
+  mainAxisSize: MainAxisSize.min,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28.0)),
             ),
             child: SafeArea(
@@ -381,6 +386,8 @@ if (selfNoteProvider.todos.isNotEmpty) {
               ),
             ),
           ),
+  const InkStroke(),
+]),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {

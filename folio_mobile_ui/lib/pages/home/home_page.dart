@@ -33,6 +33,7 @@ import 'package:folio_mobile_ui/common/widgets/update/update_tile.dart';
 import 'package:folio_mobile_ui/pages/home/live_card/live_card.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'home_page.i18n.dart';
@@ -228,6 +229,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         .length;
   }
 
+  // Ink line (Tinta's page signature) above the filter chips.
+  PreferredSizeWidget _withInkStroke(FilterBar bar) => PreferredSize(
+        preferredSize:
+            Size.fromHeight(bar.preferredSize.height + _inkStrokeHeight),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const InkStroke(padding: EdgeInsets.fromLTRB(24.0, 0, 24.0, 4.0)),
+            bar,
+          ],
+        ),
+      );
+  static const _inkStrokeHeight = 30.0;
+
   /// Filter chip with a small count badge (hidden when 0).
   Widget _countTab(BuildContext context, String label, int count) {
     if (count == 0) return Tab(text: label);
@@ -410,7 +425,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                             shadowColor: Colors.black,
                             // Filter Bar
-                            bottom: FilterBar(
+                            bottom: _withInkStroke(
+                              FilterBar(
                               items: [
                                 Tab(text: "All".i18n),
                                 Tab(text: "Grades".i18n),
@@ -445,7 +461,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   listOrder[i] = currentList;
                                 });
                               },
-                            ),
+                            )),
                             pinned: true,
                             floating: false,
                             snap: false,
