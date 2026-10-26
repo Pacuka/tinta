@@ -25,6 +25,7 @@ import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
+import 'package:folio_kreta_api/models/week.dart';
 import 'package:folio_mobile_ui/common/empty.dart';
 import 'package:folio_mobile_ui/common/filter_bar.dart';
 import 'package:folio_mobile_ui/common/widgets/update/update_dialog.dart';
@@ -120,6 +121,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int _dayNumber(DateTime d) =>
       DateTime.utc(d.year, d.month, d.day).millisecondsSinceEpoch ~/ 86400000;
 
+  /// On birthdays/name days with lessons, replaces the date line.
+  String? greetingSub;
+
+  bool _hasLessonsToday(DateTime now) =>
+      Provider.of<TimetableProvider>(context, listen: false)
+          .getWeek(Week.current())
+          ?.any((l) =>
+              l.date.year == now.year &&
+              l.date.month == now.month &&
+              l.date.day == now.day) ??
+      false;
+
   void setGreeting() {
     DateTime now = DateTime.now();
     List<String> nameParts = user.displayName?.split(" ") ?? ["?"];
@@ -130,6 +143,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     bool customWelcome = false;
+    greetingSub = null;
 
     if (now.isBefore(DateTime(now.year, DateTime.august, 31)) &&
         now.isAfter(DateTime(now.year, DateTime.june, 14))) {
@@ -139,11 +153,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } else if (now.month == user.student?.birth.month &&
         now.day == user.student?.birth.day) {
       greeting = "happybirthday";
+      if (_hasLessonsToday(now)) greetingSub = "noschoolruin".i18n;
 
       _celebrate(const Duration(seconds: 3));
     } else if (!settings.presentationMode &&
         NameDay.isNameDay(nameParts.skip(1), now)) {
       greeting = "happynameday";
+      if (_hasLessonsToday(now)) greetingSub = "noschoolruin".i18n;
       _celebrate(const Duration(seconds: 2));
     } else if (now.month == DateTime.october &&
         now.day == 26 &&
@@ -315,10 +331,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                   const SizedBox(height: 2.0),
                                   Text(
-                                    DateFormat('EEEE, MMM d',
-                                            I18n.locale.countryCode)
-                                        .format(DateTime.now())
-                                        .capital(),
+                                    greetingSub ??
+                                        DateFormat('EEEE, MMM d',
+                                                I18n.locale.countryCode)
+                                            .format(DateTime.now())
+                                            .capital(),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                       fontSize: 14.0,

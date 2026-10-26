@@ -5,7 +5,8 @@ extension Localization on String {
       {
         "en-US": {
           "happynameday": "🌷 Happy name day, %s!",
-          "fun_0": "Don't let school ruin your day!",
+          "fun_0": "Take it easy, %s, you got this!",
+          "noschoolruin": "Don't let school ruin your day!",
           "fun_1": "You've got this today too, %s!",
           "fun_2": "Deep breath, %s, you can do it!",
           "fun_3": "KRÉTA is slow, but you're not, %s!",
@@ -34,7 +35,8 @@ extension Localization on String {
         },
         "hu-HU": {
           "happynameday": "🌷 Boldog névnapot, %s!",
-          "fun_0": "Ne hagyd, hogy a suli elrontsa a napod!",
+          "fun_0": "Csak lazán, %s, ez is megy!",
+          "noschoolruin": "Ne hagyd, hogy a suli elrontsa a napod!",
           "fun_1": "Ma is meglesz ez, %s!",
           "fun_2": "Nyugi, %s, menni fog!",
           "fun_3": "A KRÉTA lassú, de te nem, %s!",
@@ -63,7 +65,8 @@ extension Localization on String {
         },
         "de-DE": {
           "happynameday": "🌷 Alles Gute zum Namenstag, %s!",
-          "fun_0": "Lass dir den Tag nicht verderben!",
+          "fun_0": "Ganz locker, %s, das klappt!",
+          "noschoolruin": "Lass dir den Tag nicht von der Schule verderben!",
           "fun_1": "Das schaffst du heute auch, %s!",
           "fun_2": "Ruhig bleiben, %s, du schaffst das!",
           "fun_3": "KRÉTA ist langsam, du aber nicht, %s!",
