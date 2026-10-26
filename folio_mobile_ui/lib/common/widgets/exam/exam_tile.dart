@@ -55,10 +55,18 @@ class ExamTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
           ),
-          trailing: showSubject ? TypeTag("exam_tag".i18n) : null,
+          trailing: showSubject ? TypeTag(_tagKey(exam).i18n) : null,
           minLeadingWidth: 0,
         ),
       ),
     );
   }
+}
+
+// Oral answers and practical tasks aren't "Dolgozat".
+String _tagKey(Exam exam) {
+  final mode = (exam.mode?.description ?? '').toLowerCase();
+  if (mode.contains('szóbeli')) return 'oral_tag';
+  if (mode.contains('gyakorlati')) return 'practical_tag';
+  return 'exam_tag';
 }

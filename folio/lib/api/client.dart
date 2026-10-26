@@ -81,7 +81,7 @@ class FilcAPI {
       } else {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getSchools: $error $stacktrace");
     }
     return null;
@@ -142,7 +142,7 @@ class FilcAPI {
         if (res.statusCode == 200) return Config.fromJson(jsonDecode(res.body));
       }
       throw "HTTP ${res.statusCode}: ${res.body}";
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getConfig: $error $stacktrace");
     }
     return null;
@@ -161,7 +161,7 @@ class FilcAPI {
       } else {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getNews: $error $stacktrace");
     }
     return null;
@@ -179,7 +179,7 @@ class FilcAPI {
       } else {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getReleases: $error $stacktrace");
     }
     return null;
@@ -191,7 +191,7 @@ class FilcAPI {
       var client = http.Client();
       var request = http.Request('GET', Uri.parse(release.url));
       return client.send(request);
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.downloadRelease: $error $stacktrace");
       return Future.value(null);
     }
@@ -222,7 +222,7 @@ class FilcAPI {
       if (res.statusCode != 200) {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.sendReport: $error $stacktrace");
     }
   }
@@ -270,7 +270,7 @@ class FilcAPI {
       }
 
       return res.statusCode;
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.addSharedTheme: $error $stacktrace");
 
       return 696;
@@ -286,7 +286,7 @@ class FilcAPI {
       } else {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getSharedTheme: $error $stacktrace");
     }
     return null;
@@ -301,7 +301,7 @@ class FilcAPI {
       } else {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getAllSharedThemes: $error $stacktrace");
       // return empty array if error
       return [];
@@ -333,7 +333,7 @@ class FilcAPI {
       }
 
       return res.statusCode;
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.addSharedGradeColors: $error $stacktrace");
 
       return 696;
@@ -351,7 +351,7 @@ class FilcAPI {
       } else {
         throw "HTTP ${res.statusCode}: ${res.body}";
       }
-    } on Exception catch (error, stacktrace) {
+    } catch (error, stacktrace) {
       log("ERROR: FilcAPI.getSharedGradeColors: $error $stacktrace");
     }
     return null;

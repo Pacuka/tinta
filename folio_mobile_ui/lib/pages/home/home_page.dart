@@ -215,11 +215,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         .length;
   }
 
-  int _unreadMessageCount(BuildContext context) =>
-      Provider.of<MessageProvider>(context)
-          .messages
-          .where((m) => m.type == MessageType.inbox && !m.seen && !m.deleted)
-          .length;
+  // Only recent ones: old unread KRÉTA messages would keep the badge stuck.
+  int _unreadMessageCount(BuildContext context) {
+    final since = DateTime.now().subtract(const Duration(days: 30));
+    return Provider.of<MessageProvider>(context)
+        .messages
+        .where((m) =>
+            m.type == MessageType.inbox &&
+            !m.seen &&
+            !m.deleted &&
+            m.date.isAfter(since))
+        .length;
+  }
 
   /// Filter chip with a small count badge (hidden when 0).
   Widget _countTab(BuildContext context, String label, int count) {
@@ -504,6 +511,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   dateWidgets:
                                                       dateWidgets.data!,
                                                   padding: EdgeInsets.zero),
+                                              if (dateWidgets.data!.isEmpty)
+                                                Padding(
+                                                  key: const Key("\$empty"),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 48.0),
+                                                  child: Empty(
+                                                      subtitle:
+                                                          "empty".i18n),
+                                                ),
                                             ],
                                             itemBuilder: filterItemBuilder,
                                             spawnIsolate: false,

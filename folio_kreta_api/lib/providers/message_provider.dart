@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/models/user.dart';
+import 'package:folio/helpers/seen_messages.dart';
 import 'package:folio_kreta_api/client/api.dart';
 import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio_kreta_api/demo/demo_data.dart';
@@ -42,6 +43,7 @@ class MessageProvider with ChangeNotifier {
               .userQuery
               .getMessages(userId: userId);
       _messages = dbMessages;
+      await _applySeen(_messages);
       notifyListeners();
     }
   }
@@ -88,7 +90,23 @@ class MessageProvider with ChangeNotifier {
       }();
     }));
 
+    await _applySeen(messages);
     await store(messages, type);
+  }
+
+  Future<void> _applySeen(List<Message> messages) async {
+    final seen = await SeenMessages.load();
+    for (final m in messages) {
+      if (seen.contains(m.id)) m.seen = true;
+    }
+  }
+
+  /// Marks a message read in Tinta (locally) and updates unread counts.
+  Future<void> markSeen(Message message) async {
+    if (message.seen) return;
+    message.seen = true;
+    notifyListeners();
+    await SeenMessages.add(message.id);
   }
 
   // Stores Messages in the database
