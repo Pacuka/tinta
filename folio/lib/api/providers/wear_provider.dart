@@ -129,8 +129,11 @@ class WearProvider with ChangeNotifier {
       final week = Week.fromDate(today);
       // Send the full week so the watch can filter for the current day itself.
       // This prevents stale "today-only" cache from showing wrong data next day.
-      final lessons = [...(timetable.lessons[week] ?? [])]
-        ..sort((a, b) => a.start.compareTo(b.start));
+      // KRÉTA also returns non-teaching days (e.g. autumn break) as
+      // subject-less "lessons"; the watch would show them as "0. 0:00".
+      final lessons = [
+        ...(timetable.lessons[week] ?? []).where((l) => l.subject.name.isNotEmpty)
+      ]..sort((a, b) => a.start.compareTo(b.start));
 
       return jsonEncode(
           lessons.map((l) => _lessonToWearJson(l, homeworks, exams)).toList());

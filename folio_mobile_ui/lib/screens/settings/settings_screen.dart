@@ -2474,22 +2474,22 @@ Container(
       // ── OTHER ────────────────────────────────────────────────
 
       // WearOS sync (Android only)
-      // if (Platform.isAndroid)
-      //   _SettingsSection(
-      //     category: 'other',
-      //     searchTerms: [
-      //       'wear',
-      //       'wearos',
-      //       'óra',
-      //       'watch',
-      //       'okosóra',
-      //       'szinkronizáció',
-      //       'sync',
-      //       'párosítás',
-      //       'pairing',
-      //     ],
-      //     widget: _buildWearSection(context),
-      //   ),
+      if (Platform.isAndroid)
+        _SettingsSection(
+          category: 'other',
+          searchTerms: [
+            'wear',
+            'wearos',
+            'óra',
+            'watch',
+            'okosóra',
+            'szinkronizáció',
+            'sync',
+            'párosítás',
+            'pairing',
+          ],
+          widget: _buildWearSection(context),
+        ),
 
       // Presentation mode
       _SettingsSection(
