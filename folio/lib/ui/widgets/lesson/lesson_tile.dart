@@ -63,12 +63,13 @@ class LessonTile extends StatelessWidget {
     Color onCardColor;
     // Changes are shown with a small label, not by flooding the whole card
     // (a full red/orange card was hard to read and didn't say what happened).
+    // A light tint makes changes stand out at a glance; the label says what.
     if (isCancelled) {
-      cardColor = colorScheme.surfaceContainerHigh.withValues(alpha: 0.5);
+      cardColor = AppColors.of(context).red.withValues(alpha: 0.14);
       accentColor = AppColors.of(context).red;
-      onCardColor = colorScheme.onSurface.withValues(alpha: 0.5);
+      onCardColor = colorScheme.onSurface.withValues(alpha: 0.6);
     } else if (isSubstitute) {
-      cardColor = colorScheme.surfaceContainerHigh;
+      cardColor = AppColors.of(context).orange.withValues(alpha: 0.14);
       accentColor = AppColors.of(context).orange;
       onCardColor = colorScheme.onSurface;
     } else if (isCurrent) {
