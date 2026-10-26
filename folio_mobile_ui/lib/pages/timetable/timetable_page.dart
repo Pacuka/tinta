@@ -159,6 +159,10 @@ class TimetablePageState extends State<TimetablePage>
     user = Provider.of<UserProvider>(context, listen: false);
     user.addListener(_userListener);
 
+    // A sync elsewhere (pull-to-refresh, resume) updates the provider; show it.
+    timetableProvider = Provider.of<TimetableProvider>(context, listen: false);
+    timetableProvider.addListener(_timetableListener);
+
     // listen for lesson customization
     db = Provider.of<DatabaseProvider>(context, listen: false);
     getCustom();
@@ -172,8 +176,13 @@ class TimetablePageState extends State<TimetablePage>
     _tabController.dispose();
     _controller.dispose();
     user.removeListener(_userListener);
+    timetableProvider.removeListener(_timetableListener);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _timetableListener() {
+    if (mounted) _controller.refreshDays(context);
   }
 
   String dayTitle(int index) {

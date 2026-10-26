@@ -118,6 +118,17 @@ class TimetableController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Re-reads the shown week from the provider (e.g. after a background sync).
+  void refreshDays(BuildContext context) {
+    // jump() is loading this week itself and will notify when done.
+    if (loadType == LoadType.loading || loadType == LoadType.initial) return;
+    final fresh = _sortDays(currentWeek, context: context);
+    if (fresh.isEmpty && (days?.isNotEmpty ?? false)) return;
+    days = fresh;
+    previousWeekId = currentWeekId; // keep the selected day, no jump to today
+    notifyListeners();
+  }
+
   bool _setWeek(Week week) {
     int id = getWeekId(week);
     if (id > 51) return true; // Max 52.

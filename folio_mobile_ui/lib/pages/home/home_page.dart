@@ -267,6 +267,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     statusProvider = Provider.of<StatusProvider>(context, listen: false);
     updateProvider = Provider.of<UpdateProvider>(context);
     _liveCard = Provider.of<LiveCardProvider>(context);
+    // Rebuild when synced data arrives; otherwise the visible list only
+    // updated after switching tabs.
+    Provider.of<GradeProvider>(context);
+    Provider.of<HomeworkProvider>(context);
+    Provider.of<AbsenceProvider>(context);
+    Provider.of<NoteProvider>(context);
+    Provider.of<EventProvider>(context);
+    Provider.of<TimetableProvider>(context);
     gradeProvider = Provider.of<GradeProvider>(context);
     if (_liveCard.show != _lastLiveCardShow) {
       _lastLiveCardShow = _liveCard.show;
