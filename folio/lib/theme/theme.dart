@@ -1,6 +1,7 @@
 import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/accent.dart';
 import 'package:folio/theme/colors/colors.dart';
+import 'package:folio/theme/colors/tinta_palettes.dart';
 import 'package:folio/theme/colors/utils.dart';
 import 'package:folio/theme/observer.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +13,11 @@ class AppTheme {
   // Dev note: All of these could be constant variables, but this is better for
   //           development (you don't have to hot-restart)
 
-  static const String _defaultFontFamily = "Montserrat";
+  static const String _defaultFontFamily = "Outfit";
 
   // Material You Expressive shape constants
   static const double _expressiveRadius = 28.0;
-  static const double _cardRadius = 24.0;
+  static const double _cardRadius = 14.0;
   static const double _buttonRadius = 50.0; // pill shape
   static const double _inputRadius = 16.0;
 
@@ -35,6 +36,8 @@ class AppTheme {
       palette != null ? Color(palette.neutralVariant.get(20)) : null;
 
   static Map<String, TextTheme?> googleFontsMap = {
+    // Helyben csomagolt betű (assets/fonts), null = a ThemeData.fontFamily-t használja
+    "Outfit": null,
     "Montserrat": GoogleFonts.montserratTextTheme(),
     "Figtree": GoogleFonts.figtreeTextTheme(),
   };
@@ -69,23 +72,31 @@ class AppTheme {
             ? settings.customHighlightColor
             : _paletteHighlightLight(palette)) ??
         lightColors.highlight;
+    final tinta = tintaPalette(accentColor, Brightness.light);
+    if (tinta != null) {
+      accent = tinta.accent;
+      backgroundColor = tinta.background;
+      highlightColor = tinta.highlight;
+    }
     Color textColor = lightColors.text;
 
     Color newSecondary = (accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
-                accentColor == AccentColor.ogfilc) ||
+                accentColor == AccentColor.ogfilc ||
+                tinta != null) ||
             !settings.newColors
         ? accent
         : ColorsUtils().darken(accent, amount: 0.4);
     Color newTertiary = (accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
-                accentColor == AccentColor.ogfilc) ||
+                accentColor == AccentColor.ogfilc ||
+                tinta != null) ||
             !settings.newColors
         ? accent
         : ColorsUtils().darken(accent, amount: 0.4);
 
     // Material You Expressive container colors (light)
-    Color primaryContainer = accent.withValues(alpha: 0.15);
+    Color primaryContainer = tinta?.container ?? accent.withValues(alpha: 0.15);
     Color onPrimaryContainer = ColorsUtils().darken(accent, amount: 0.35);
     Color secondaryContainer = newSecondary.withValues(alpha: 0.12);
     Color onSecondaryContainer =
@@ -108,7 +119,7 @@ class AppTheme {
       dividerColor: const Color(0x00000000),
       colorScheme: ColorScheme(
         primary: accent,
-        onPrimary:
+        onPrimary: tinta?.onAccent ??
             (accent.computeLuminance() > 0.5 ? Colors.black : Colors.white)
                 .withValues(alpha: .9),
         primaryContainer: primaryContainer,
@@ -326,24 +337,32 @@ class AppTheme {
             ? settings.customHighlightColor
             : _paletteHighlightDark(palette)) ??
         darkColors.highlight;
+    final tinta = tintaPalette(accentColor, Brightness.dark);
+    if (tinta != null) {
+      accent = tinta.accent;
+      backgroundColor = tinta.background;
+      highlightColor = tinta.highlight;
+    }
     Color textColor = darkColors.text;
 
     Color newSecondary = (accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
-                accentColor == AccentColor.ogfilc) ||
+                accentColor == AccentColor.ogfilc ||
+                tinta != null) ||
             !settings.newColors
         ? accent
         : ColorsUtils().lighten(accent, amount: 0.22);
     Color newTertiary = (accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
-                accentColor == AccentColor.ogfilc) ||
+                accentColor == AccentColor.ogfilc ||
+                tinta != null) ||
             !settings.newColors
         ? accent
         : ColorsUtils().darken(accent,
             amount: 0.1); // dark mode: tertiary is way darker than secondary
 
     // Material You Expressive container colors (dark)
-    Color primaryContainer = accent.withValues(alpha: 0.20);
+    Color primaryContainer = tinta?.container ?? accent.withValues(alpha: 0.20);
     Color onPrimaryContainer = ColorsUtils().lighten(accent, amount: 0.20);
     Color secondaryContainer = newSecondary.withValues(alpha: 0.15);
     Color onSecondaryContainer =
@@ -366,7 +385,7 @@ class AppTheme {
       dividerColor: const Color(0x00000000),
       colorScheme: ColorScheme(
         primary: accent,
-        onPrimary:
+        onPrimary: tinta?.onAccent ??
             (accent.computeLuminance() > 0.5 ? Colors.black : Colors.white)
                 .withValues(alpha: .9),
         primaryContainer: primaryContainer,

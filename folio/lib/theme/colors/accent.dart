@@ -13,10 +13,18 @@ enum AccentColor {
   none,
   ogfilc,
   adaptive,
-  custom
+  custom,
+  // Tinta témák: mindig a végére, hogy a mentett indexek ne csússzanak el
+  kobalt,
+  feketeSarga,
+  petrol,
 }
 
 Map<AccentColor, Color> accentColorMap = {
+  // Tinta témák elöl, hogy a színválasztóban ezek jöjjenek először
+  AccentColor.kobalt: const Color(0xFF2440C8),
+  AccentColor.feketeSarga: const Color(0xFFFFE14D),
+  AccentColor.petrol: const Color(0xFF0F5C66),
   AccentColor.filc: const Color(0xFFA7DC22),
   AccentColor.blue: Colors.blue.shade300,
   AccentColor.green: Colors.green.shade400,

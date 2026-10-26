@@ -46,6 +46,7 @@ class SettingsHelper {
   };
 
   static const List<String> fontList = [
+    "Outfit",
     "Montserrat",
     "Figtree",
   ];

@@ -326,7 +326,11 @@ class SettingsProvider extends ChangeNotifier {
       startPage: Pages.values[map["start_page"]],
       rounding: map["rounding"],
       theme: ThemeMode.values[map["theme"]],
-      accentColor: AccentColor.adaptive,
+      accentColor: (map["accent_color"] is int &&
+              map["accent_color"] >= 0 &&
+              map["accent_color"] < AccentColor.values.length)
+          ? AccentColor.values[map["accent_color"]]
+          : AccentColor.kobalt,
       gradeColors: [
         Color(map["grade_color1"]),
         Color(map["grade_color2"]),
@@ -521,7 +525,7 @@ class SettingsProvider extends ChangeNotifier {
       startPage: Pages.home,
       rounding: 5,
       theme: ThemeMode.system,
-      accentColor: AccentColor.adaptive,
+      accentColor: AccentColor.kobalt,
       gradeColors: [
         DarkMobileAppColors().gradeOne,
         DarkMobileAppColors().gradeTwo,
@@ -578,7 +582,7 @@ class SettingsProvider extends ChangeNotifier {
       pinSetPersonalize: '',
       pinSetNotify: '',
       pinSetExtras: '',
-      fontFamily: 'Figtree',
+      fontFamily: 'Outfit',
       titleOnlyFont: false,
       plusSessionId: '',
       calSyncRoomLocation: 'location',
