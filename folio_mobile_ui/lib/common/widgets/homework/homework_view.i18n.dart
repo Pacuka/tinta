@@ -5,12 +5,15 @@ extension Localization on String {
       {
         "en-US": {
           "deadline": "Deadline",
+          "entered": "Entered",
         },
         "hu-HU": {
           "deadline": "Határidő",
+          "entered": "Beírva",
         },
         "de-DE": {
           "deadline": "Termin",
+          "entered": "Eingetragen",
         }
       };
 

@@ -15,6 +15,7 @@ import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.da
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
 import 'package:folio_mobile_ui/common/widgets/homework/homework_attachment_tile.dart';
 import 'package:folio_mobile_ui/common/widgets/homework/homework_tile.dart';
+import 'homework_view.i18n.dart';
 
 class HomeworkViewable extends StatelessWidget {
   const HomeworkViewable(this.homework, {super.key});
@@ -199,10 +200,9 @@ class HomeworkPopup extends StatelessWidget {
                                     .withValues(alpha: .15),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
+                              // Exact time the teacher entered it.
                               child: Text(
-                                DateFormat('MMM d', I18n.locale.countryCode)
-                                    .format(homework.date)
-                                    .capital(),
+                                "${"entered".i18n}: ${DateFormat('MMM d. HH:mm', I18n.locale.countryCode).format(homework.date)}",
                                 style: TextStyle(
                                   height: 1.1,
                                   fontSize: 12.0,
@@ -238,10 +238,7 @@ class HomeworkPopup extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 3.0),
                                     Text(
-                                      DateFormat('MMM d',
-                                              I18n.locale.countryCode)
-                                          .format(homework.deadline)
-                                          .capital(),
+                                      "${"deadline".i18n}: ${DateFormat('MMM d.', I18n.locale.countryCode).format(homework.deadline)}",
                                       style: TextStyle(
                                         height: 1.1,
                                         fontSize: 12.0,
@@ -305,7 +302,7 @@ class HomeworkPopup extends StatelessWidget {
                     child: SelectableLinkify(
                       text: homework.content.escapeHtml(),
                       options:
-                          const LinkifyOptions(looseUrl: true, removeWww: true),
+                          const LinkifyOptions(removeWww: true),
                       onOpen: (link) {
                         launchUrl(
                           Uri.parse(link.url),

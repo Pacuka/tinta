@@ -212,7 +212,7 @@ class EventView extends StatelessWidget {
                       child: SelectableLinkify(
                         text: event.content.escapeHtml(),
                         options: const LinkifyOptions(
-                            looseUrl: true, removeWww: true),
+                            removeWww: true),
                         onOpen: (link) {
                           launchUrl(
                             Uri.parse(link.url),

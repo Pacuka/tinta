@@ -91,7 +91,8 @@ class HomeworkProvider with ChangeNotifier {
       homeworkJson = List.from(hwjson.map((model) => model));
     } catch (e) {
       if (kDebugMode) print(e);
-      // error fetcing homework (unknown error)
+      // Failed request: keep what we have instead of storing an empty list.
+      homeworkJson = null;
     }
 
     if (homeworkJson == null) {
@@ -114,6 +115,16 @@ class HomeworkProvider with ChangeNotifier {
         homework.add(hmwrk);
       }
     });
+
+    // Only the window from `from` is fetched; keep older homework so it isn't
+    // dropped from the database on every sync.
+    // Also keep listed items whose detail request failed this time.
+    final fetchedIds = homework.map((h) => h.id).toSet();
+    final listedIds = homeworkJson.cast<Map>().map((hw) => hw["Uid"]).toSet();
+    homework.addAll(_homework.where((h) =>
+        !fetchedIds.contains(h.id) &&
+        (listedIds.contains(h.id) ||
+            (from != null && h.lessonDate.isBefore(from)))));
 
     if (homework.isEmpty && _homework.isEmpty) return;
 

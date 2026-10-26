@@ -6,6 +6,8 @@ import 'package:folio_mobile_ui/common/detail.dart';
 import 'package:folio_mobile_ui/common/sliding_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/widgets/homework/homework_attachment_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:provider/provider.dart';
@@ -74,6 +76,14 @@ class HomeworkView extends StatelessWidget {
           ),
 
           // Details
+          // Exact time the teacher entered it (KRÉTA "RogzitesIdopontja").
+          if (homework.date.year != 0)
+            Detail(
+                title: "entered".i18n,
+                description: DateFormat.yMMMd(
+                        I18n.of(context).locale.toString())
+                    .add_Hm()
+                    .format(homework.date)),
           if (homework.deadline.year != 0)
             Detail(
                 title: "deadline".i18n,
@@ -83,7 +93,7 @@ class HomeworkView extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
             child: SelectableLinkify(
               text: homework.content.escapeHtml(),
-              options: const LinkifyOptions(looseUrl: true, removeWww: true),
+              options: const LinkifyOptions(removeWww: true),
               onOpen: (link) {
                 launchUrl(
                   Uri.parse(link.url),

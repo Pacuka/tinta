@@ -168,7 +168,7 @@ class MessageViewTile extends StatelessWidget {
             padding: const EdgeInsets.all(12.0),
             child: SelectableLinkify(
               text: message.content.escapeHtml(),
-              options: const LinkifyOptions(looseUrl: true, removeWww: true),
+              options: const LinkifyOptions(removeWww: true),
               onOpen: (link) {
                 launchUrl(
                   Uri.parse(link.url),

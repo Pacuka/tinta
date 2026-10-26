@@ -43,7 +43,7 @@ class NewsView extends StatelessWidget {
                     SelectableLinkify(
                       text: news.content.escapeHtml(),
                       options:
-                          const LinkifyOptions(looseUrl: true, removeWww: true),
+                          const LinkifyOptions(removeWww: true),
                       onOpen: (link) {
                         launchUrl(
                           Uri.parse(link.url),

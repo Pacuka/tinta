@@ -233,7 +233,7 @@ class NoteView extends StatelessWidget {
                       child: SelectableLinkify(
                         text: note.content.escapeHtml(),
                         options: const LinkifyOptions(
-                            looseUrl: true, removeWww: true),
+                            removeWww: true),
                         onOpen: (link) {
                           launchUrl(
                             Uri.parse(link.url),
