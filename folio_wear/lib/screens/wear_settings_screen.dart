@@ -5,7 +5,8 @@ import '../providers/wear_data_provider.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
 const _kCardBg = Color(0xFF1C1C1E);
-const _kHPad = 16.0;
+// Round screen: keep content away from the curved edge.
+const _kHPad = 22.0;
 const _kRadius = 14.0;
 const _kItemH = 52.0;
 
@@ -27,18 +28,21 @@ class WearSettingsScreen extends StatelessWidget {
               // Header
               SliverPadding(
                 padding: const EdgeInsets.only(
-                    top: 34.0, left: _kHPad, right: _kHPad + 8, bottom: 6.0),
-                sliver: const SliverToBoxAdapter(
-                  child: Text(
-                    'BEÁLLÍTÁSOK',
-                    style: TextStyle(
-                      color: Color(0x62FFFFFF),
-                      fontSize: 10.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.8,
-                    ),
+                    top: 30.0, left: 28.0, right: 28.0, bottom: 8.0),
+            sliver: const SliverToBoxAdapter(
+              child: SizedBox(
+                width: double.infinity,
+                child: Text(
+                  'Beállítások',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xD9FFFFFF),
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
+              ),
+            ),
               ),
 
               // Sync section
@@ -99,7 +103,7 @@ class WearSettingsScreen extends StatelessWidget {
                 ),
               ),
 
-              const SliverPadding(padding: EdgeInsets.only(bottom: 34.0)),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 52.0)),
             ],
           ),
         );
@@ -168,15 +172,19 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 2.0, bottom: 6.0, top: 2.0),
-      child: Text(
-        label.toUpperCase(),
+      padding: const EdgeInsets.only(bottom: 6.0, top: 6.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: Text(
+        label,
+        textAlign: TextAlign.center,
         style: const TextStyle(
           fontSize: 9.5,
           fontWeight: FontWeight.w600,
           color: Color(0x55FFFFFF),
           letterSpacing: 0.7,
         ),
+      ),
       ),
     );
   }
@@ -266,7 +274,7 @@ class _ItemBase extends StatelessWidget {
                             alpha: enabled ? 0.35 : 0.22),
                         height: 1.0,
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

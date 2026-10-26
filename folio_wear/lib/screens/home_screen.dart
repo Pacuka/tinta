@@ -7,7 +7,8 @@ import '../widgets/wear_curved_scrollbar.dart';
 
 // HyperOS WearOS design tokens
 const _kCardBg = Color(0xFF1C1C1E);
-const _kHPad = 16.0;
+// Round screen: keep content away from the curved edge.
+const _kHPad = 22.0;
 const _kRadius = 16.0;
 const _kItemSpacing = 4.0;
 
@@ -129,10 +130,12 @@ class _LessonList extends StatelessWidget {
           // Date header
           SliverPadding(
             padding: const EdgeInsets.only(
-                top: 34.0, left: _kHPad, right: _kHPad + 8, bottom: 6.0),
+                top: 30.0, left: 28.0, right: 28.0, bottom: 8.0),
             sliver: SliverToBoxAdapter(
               child: Text(
-                DateFormat('EEEE, MMM d', 'hu').format(now),
+                DateFormat('EEEE, MMM d', 'hu').format(now).replaceFirstMapped(
+                    RegExp(r'^.'), (m) => m[0]!.toUpperCase()),
+                textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.45),
                     fontSize: 10.5,
@@ -161,7 +164,7 @@ class _LessonList extends StatelessWidget {
               childCount: lessons.length,
             ),
           ),
-          const SliverPadding(padding: EdgeInsets.only(bottom: 34.0)),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 52.0)),
         ],
       ),
     );

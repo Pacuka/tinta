@@ -6,7 +6,8 @@ import '../providers/wear_data_provider.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
 const _kCardBg = Color(0xFF1C1C1E);
-const _kHPad = 16.0;
+// Round screen: keep content away from the curved edge.
+const _kHPad = 22.0;
 const _kRadius = 16.0;
 const _kItemSpacing = 4.0;
 
@@ -105,15 +106,18 @@ class _NotifList extends StatelessWidget {
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.only(
-                top: 34.0, left: _kHPad, right: _kHPad + 8, bottom: 6.0),
-            sliver: SliverToBoxAdapter(
-              child: Text(
-                'ÉRTESÍTÉSEK',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.38),
-                  fontSize: 10.0,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
+                top: 30.0, left: 28.0, right: 28.0, bottom: 8.0),
+            sliver: const SliverToBoxAdapter(
+              child: SizedBox(
+                width: double.infinity,
+                child: Text(
+                  'Értesítések',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xD9FFFFFF),
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -127,7 +131,7 @@ class _NotifList extends StatelessWidget {
               childCount: items.length,
             ),
           ),
-          const SliverPadding(padding: EdgeInsets.only(bottom: 34.0)),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 52.0)),
         ],
       ),
     );
