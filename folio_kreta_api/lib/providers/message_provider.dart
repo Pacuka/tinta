@@ -101,12 +101,28 @@ class MessageProvider with ChangeNotifier {
     }
   }
 
-  /// Marks a message read in Tinta (locally) and updates unread counts.
+  /// Marks a message read, locally and in KRÉTA (same call as the official
+  /// app: POST postaladaelemek/olvasott), and updates unread counts.
   Future<void> markSeen(Message message) async {
     if (message.seen) return;
     message.seen = true;
     notifyListeners();
     await SeenMessages.add(message.id);
+
+    final user = Provider.of<UserProvider>(_context, listen: false).user;
+    if (user == null || DemoData.isDemo(user.id)) return;
+    await Provider.of<KretaClient>(_context, listen: false).postAPI(
+      KretaAPI.messages("olvasott"),
+      json: false,
+      body: jsonEncode({
+        "isOlvasott": true,
+        "postaladaElemAzonositoLista": [message.id],
+      }),
+      headers: {
+        "content-type": "application/json",
+        "X-Uzenet-Lokalizacio": "hu-HU",
+      },
+    );
   }
 
   // Stores Messages in the database

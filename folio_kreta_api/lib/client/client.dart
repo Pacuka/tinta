@@ -196,7 +196,6 @@ class KretaClient {
       if (res == null) throw "Login error";
 
       if (json) {
-        print(jsonDecode(res.body));
         return jsonDecode(res.body);
       } else {
         return res.body;
