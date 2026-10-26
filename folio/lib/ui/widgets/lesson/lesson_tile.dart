@@ -61,14 +61,16 @@ class LessonTile extends StatelessWidget {
     Color cardColor;
     Color accentColor;
     Color onCardColor;
+    // Changes are shown with a small label, not by flooding the whole card
+    // (a full red/orange card was hard to read and didn't say what happened).
     if (isCancelled) {
-      cardColor = colorScheme.errorContainer;
-      accentColor = colorScheme.error;
-      onCardColor = colorScheme.onErrorContainer;
+      cardColor = colorScheme.surfaceContainerHigh.withValues(alpha: 0.5);
+      accentColor = AppColors.of(context).red;
+      onCardColor = colorScheme.onSurface.withValues(alpha: 0.5);
     } else if (isSubstitute) {
-      cardColor = AppColors.of(context).orange.withValues(alpha: 0.18);
+      cardColor = colorScheme.surfaceContainerHigh;
       accentColor = AppColors.of(context).orange;
-      onCardColor = Theme.of(context).colorScheme.onSurface;
+      onCardColor = colorScheme.onSurface;
     } else if (isCurrent) {
       cardColor = colorScheme.secondaryContainer;
       accentColor = colorScheme.secondary;
@@ -287,6 +289,9 @@ class LessonTile extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16.0,
                                   color: onCardColor,
+                                  decoration: isCancelled
+                                      ? TextDecoration.lineThrough
+                                      : null,
                                   fontStyle: lesson.subject.isRenamed &&
                                           settingsProvider.renamedSubjectsItalics
                                       ? FontStyle.italic
@@ -294,7 +299,26 @@ class LessonTile extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            if (!lesson.isEmpty && lesson.room.isNotEmpty) ...[
+                            if (isCancelled) ...[
+                              const SizedBox(width: 8.0),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 3.0),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Text(
+                                  "Elmarad",
+                                  style: TextStyle(
+                                    height: 1.2,
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: accentColor,
+                                  ),
+                                ),
+                              ),
+                            ] else if (!lesson.isEmpty && lesson.room.isNotEmpty) ...[
                               const SizedBox(width: 8.0),
                               Container(
                                 constraints:
@@ -321,6 +345,20 @@ class LessonTile extends StatelessWidget {
                             ],
                           ],
                         ),
+                        if (isSubstitute && !isCancelled)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              "Helyettesít: ${lesson.substituteTeacher!.renamedTo ?? lesson.substituteTeacher!.name}",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w600,
+                                color: accentColor,
+                              ),
+                            ),
+                          ),
                         // Description (if any)
                         if (!lesson.isEmpty && cleanDesc.isNotEmpty)
                           Padding(
