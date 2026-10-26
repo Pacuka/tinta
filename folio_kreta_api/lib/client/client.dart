@@ -404,7 +404,7 @@ class KretaClient {
     Map<String, String> headers = {
       "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
       "accept": "*/*",
-      "user-agent": "eKretaStudent/264745 CFNetwork/1494.0.7 Darwin/23.4.0",
+      "user-agent": userAgent ?? "",
     };
 
     if (_settings.presentationMode) {

@@ -27,6 +27,7 @@ import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/database/init.dart';
 import 'package:folio/models/settings.dart';
 import 'package:flutter/foundation.dart';
+import 'package:folio/models/config.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/app.dart';
 import 'package:flutter/services.dart';
@@ -54,6 +55,7 @@ void main() async {
     binding.renderView.automaticSystemUiAdjustment = false;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     setupLocator();
+    await Config.initDeviceUserAgent();
 
     if (!kIsWeb && kFirebaseEnabled) {
       try {

@@ -22,14 +22,12 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:folio/api/client.dart';
 import 'package:folio/api/providers/live_card_provider.dart';
 import 'package:folio/api/providers/news_provider.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/self_note_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
 import 'package:folio/helpers/notification_helper.dart';
-import 'package:folio/models/config.dart';
 import 'package:folio/providers/third_party_provider.dart';
 import 'package:folio/theme/observer.dart';
 import 'package:folio/theme/theme.dart';
@@ -121,9 +119,8 @@ class _AppState extends State<App> {
         TimetableProvider(user: user, database: database, kreta: kreta);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FilcAPI.getConfig(settings).then((Config? config) {
-        if (config != null) settings.update(config: config);
-      });
+      // Tinta: no config from the Firka server; the KRÉTA user agent is
+      // built locally (Config.initDeviceUserAgent).
       // Register device for push notifications if a user is already signed in
       if (user.user != null && settings.notificationsEnabled) {
         NotificationHelper.initialize(user.user!, database);
