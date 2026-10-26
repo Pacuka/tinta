@@ -26,6 +26,17 @@ A Tinta nem gyűjt semmilyen statisztikát, és nem küld hibajelentést. A tanu
 adataid csak a telefonod és a KRÉTA szerverei között közlekednek, titkosított
 kapcsolaton. A bejelentkezési adatok nem kerülnek a telefon felhőmentésébe.
 
+## Hogyan készül?
+
+A Tinta fejlesztésében mesterséges intelligencia (Claude) segít, de **emberi
+felügyelet mellett**, nem „vaktában összegenerálva”:
+
+- Arról, hogy mi kerüljön az appba, hogyan nézzen ki és mikor jelenjen meg, ember dönt.
+- Minden változtatást valódi telefonon, saját KRÉTA-fiókkal kipróbálunk, mielőtt kiadjuk.
+- Automatikus tesztek futnak, és a kód biztonsági átnézésen is átment
+  (pl. titkosított kapcsolat ellenőrzése, a bejelentkezési adatok védelme).
+- Az AI a kódírást gyorsítja, a felelősség és az ellenőrzés emberi.
+
 ## Honnan származik?
 
 A Tinta a [Folio](https://github.com/Zan1456/folio) (Zan) továbbfejlesztése, ami a
