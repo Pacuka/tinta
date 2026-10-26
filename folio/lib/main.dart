@@ -20,6 +20,7 @@ import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:folio/config.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/api/providers/database_provider.dart';
@@ -45,7 +46,7 @@ void main() async {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     setupLocator();
 
-    if (!kIsWeb) {
+    if (!kIsWeb && kFirebaseEnabled) {
       try {
         await Firebase.initializeApp(
           name: defaultFirebaseAppName,

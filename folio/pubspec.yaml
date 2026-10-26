@@ -47,6 +47,9 @@ dependencies:
 
 dependency_overrides:
   intl: 0.20.2
+  # Javított példány: a v1 Registrar API-t az új Flutter már nem ismeri
+  image_crop_plus:
+    path: ../third_party/image_crop_plus
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3

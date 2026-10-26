@@ -1,0 +1,23 @@
+name: image_crop_plus_example
+description: Demonstrates how to use the image_crop_plus plugin.
+
+version: 2.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  image_picker: ^0.7.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  image_crop_plus:
+    path: ../
+
+flutter:
+  uses-material-design: true

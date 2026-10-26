@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:folio/api/providers/database_provider.dart';
+import 'package:folio/config.dart';
 import 'package:folio/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:folio_kreta_api/client/api.dart';
@@ -45,6 +46,7 @@ class NotificationHelper {
   /// Call once at app startup (after Firebase.initializeApp).
   /// Requests permission, then registers/updates the subscription for [user].
   static Future<void> initialize(User user, DatabaseProvider database) async {
+    if (!kFirebaseEnabled) return;
     if (Platform.isLinux || Platform.isWindows) return;
 
     final messaging = FirebaseMessaging.instance;
@@ -64,6 +66,7 @@ class NotificationHelper {
   /// push notifications with the KRÉTA Global Notification API.
   static Future<void> subscribeIfNeeded(
       User user, DatabaseProvider database) async {
+    if (!kFirebaseEnabled) return;
     if (user.isDemo) return;
 
     final messaging = FirebaseMessaging.instance;
@@ -92,6 +95,7 @@ class NotificationHelper {
   /// Does not show any permission prompt.
   static Future<NotificationRegistrationStatus> checkStatus(
       User user, DatabaseProvider database) async {
+    if (!kFirebaseEnabled) return NotificationRegistrationStatus.notRegistered;
     if (Platform.isLinux || Platform.isWindows) {
       return NotificationRegistrationStatus.notRegistered;
     }

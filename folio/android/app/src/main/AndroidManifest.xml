@@ -3,7 +3,7 @@
     <!-- Allow HyperIsland-ToolKit (minSdk 26) in a minSdk-24 app.
          HyperOS devices are API 26+; the Kotlin code uses try/catch as fallback. -->
     <uses-sdk tools:overrideLibrary="io.github.d4viddf.hyperisland_kit" />
-    <application android:name="${applicationName}" android:label="Folio" tools:replace="android:label"
+    <application android:name="${applicationName}" android:label="Tinta" tools:replace="android:label"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:enableOnBackInvokedCallback="false">
@@ -32,14 +32,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="folio" android:host="folio.zan1456.dev" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="folio.zan1456.dev"
-                    android:pathPrefix="/app" />
+                <data android:scheme="tinta" android:host="app" />
             </intent-filter>
         </activity>
         <meta-data android:name="flutterEmbedding" android:value="2" />

@@ -1,0 +1,25 @@
+name: image_crop_plus
+description: A flutter plugin to crop image on iOS and Android. It processes image files off main thread natively. The plugin provides a Crop widget to display image cropping to a user.
+version: 1.0.0
+homepage: https://github.com/wrbl606/image_crop
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=1.12.13+hotfix.6"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: eu.wroblewscy.marcin.imagecrop
+        pluginClass: ImageCropPlugin
+      ios:
+        pluginClass: ImageCropPlugin
