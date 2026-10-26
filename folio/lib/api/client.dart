@@ -149,6 +149,10 @@ class FilcAPI {
   }
 
   static Future<List<News>?> getNews() async {
+    // Tinta: no news from the Firka server (a third party could show any
+    // popup inside the app, e.g. a fake login prompt).
+    return null;
+    // ignore: dead_code
     try {
       http.Response res = await http.get(Uri.parse(news));
 

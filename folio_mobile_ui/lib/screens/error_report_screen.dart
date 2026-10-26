@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:folio/helpers/dirtywords_helper.dart';
-import 'package:folio/api/client.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:folio_mobile_ui/common/widgets/app_logo.dart';
 import 'error_report_screen.i18n.dart';
 import 'package:folio/theme/colors/colors.dart';
@@ -171,15 +171,23 @@ class ErrorReportScreen extends StatelessWidget {
     );
   }
 
+  // Tinta: no automatic upload to a third-party server. Opens a prefilled
+  // GitHub issue instead, so the user sees exactly what is sent.
   Future reportProblem(BuildContext context) async {
-    final report = ErrorReport(
-      os: "${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
-      error: details.exceptionAsString(),
-      version: const String.fromEnvironment("APPVER", defaultValue: "?"),
-      stack: details.stack.toString(),
+    final stack = details.stack.toString();
+    final body = "**Hiba:** ${details.exceptionAsString()}\n"
+        "**Rendszer:** ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n"
+        "**Verzió:** ${const String.fromEnvironment("APPVER", defaultValue: "?")}\n\n"
+        "```\n${stack.length > 3000 ? stack.substring(0, 3000) : stack}\n```\n\n"
+        "**Mit csináltál, amikor történt?**\n";
+    await launchUrl(
+      Uri.https("github.com", "/Pacuka/tinta/issues/new", {
+        "title": "Hiba: ${details.exceptionAsString().split('\n').first}",
+        "body": body,
+      }),
+      mode: LaunchMode.externalApplication,
     );
-    FilcAPI.sendReport(report);
-    Navigator.pop(context);
+    if (context.mounted) Navigator.pop(context);
   }
 }
 

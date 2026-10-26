@@ -3,6 +3,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
@@ -47,8 +49,11 @@ class KretaClient {
     client = http.IOClient(ioclient);
   }
 
+  // Only called for certificates that FAILED validation. Accepting them would
+  // let anyone on the same Wi-Fi read the KRÉTA traffic (tokens included), so
+  // this is allowed only in debug builds.
   bool _checkCerts(X509Certificate cert, String host, int port) {
-    return _settings.developerMode;
+    return kDebugMode && _settings.developerMode;
   }
 
   Future<dynamic> getAPI(

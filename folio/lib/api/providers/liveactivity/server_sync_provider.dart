@@ -17,6 +17,9 @@ class ServerSyncProvider {
     required String liveActivityColor,
     required List<Lesson> todayLessons,
   }) async {
+    // Tinta: don't upload the timetable to the Firka Live Activity server.
+    return;
+    // ignore: dead_code
     _deviceId = deviceId;
 
     await _register(

@@ -541,7 +541,7 @@ class SettingsProvider extends ChangeNotifier {
       notificationsMessagesEnabled: true,
       notificationsLessonsEnabled: true,
       notificationsBitfield: 255,
-      developerMode: true,
+      developerMode: false,
       devLiveFakeLessons: false,
       vibrate: VibrationStrength.medium,
       abWeeks: false,
