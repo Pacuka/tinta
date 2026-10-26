@@ -21,6 +21,9 @@ class KretaClient {
   String? idpApplicationCookie;
   late http.Client client;
 
+  /// A hung request would keep the sync lock held forever (no more refreshes).
+  static const requestTimeout = Duration(seconds: 30);
+
   late final SettingsProvider _settings;
   late final UserProvider _user;
   late final DatabaseProvider _database;
@@ -91,7 +94,9 @@ class KretaClient {
           }
         }
 
-        res = await client.get(Uri.parse(url), headers: headerMap);
+        res = await client
+            .get(Uri.parse(url), headers: headerMap)
+            .timeout(requestTimeout);
         _status.triggerRequest(res);
 
         if (res.statusCode == 401) {
@@ -174,7 +179,9 @@ class KretaClient {
           }
         }
 
-        res = await client.post(Uri.parse(url), headers: headerMap, body: body);
+        res = await client
+            .post(Uri.parse(url), headers: headerMap, body: body)
+            .timeout(requestTimeout);
         if (res.statusCode == 401) {
           //await refreshLogin();
           headerMap.remove("authorization");
@@ -230,7 +237,9 @@ class KretaClient {
           }
         }
 
-        res = await client.delete(Uri.parse(url), headers: headerMap);
+        res = await client
+            .delete(Uri.parse(url), headers: headerMap)
+            .timeout(requestTimeout);
         _status.triggerRequest(res);
 
         if (res.statusCode == 401) {
@@ -290,8 +299,9 @@ class KretaClient {
                 "${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}")
             .join("&");
 
-        res = await client.post(Uri.parse(url),
-            headers: headerMap, body: encoded);
+        res = await client
+            .post(Uri.parse(url), headers: headerMap, body: encoded)
+            .timeout(requestTimeout);
         _status.triggerRequest(res);
 
         if (res.statusCode == 401) {
@@ -406,12 +416,6 @@ class KretaClient {
 
     refreshToken ??= loginUser.refreshToken;
 
-    print("REFRESH TOKEN BELOW");
-    print(refreshToken);
-
-    print(loginUser.accessTokenExpire);
-    print(DateTime.now().toIso8601String());
-
     if (!DateTime.now().isAfter(loginUser.accessTokenExpire)) {
       return 'success';
     }
@@ -424,8 +428,6 @@ class KretaClient {
             refreshToken: loginUser.refreshToken,
             instituteCode: loginUser.instituteCode,
           ));
-      print("REFRESH RESPONSE BELOW");
-      print(res);
       if (res != null) {
         if (res.containsKey("error")) {
           // remove user if refresh token expired

@@ -28,6 +28,19 @@ Future<void> syncAll(BuildContext context) async {
   if (lock) return Future.value();
   // Lock
   lock = true;
+  try {
+    // A hung or failed sync must never keep the lock, or the app silently
+    // stops refreshing until restart.
+    await _syncAll(context).timeout(const Duration(minutes: 2));
+  } catch (error) {
+    // ignore: avoid_print
+    print("ERROR syncAll: $error");
+  } finally {
+    lock = false;
+  }
+}
+
+Future<void> _syncAll(BuildContext context) async {
 
   // ignore: avoid_print
   print("INFO Syncing all");
@@ -48,7 +61,6 @@ Future<void> syncAll(BuildContext context) async {
       Provider.of<EventProvider>(context, listen: false).fetch(),
       Provider.of<AbsenceProvider>(context, listen: false).fetch(),
     ]);
-    lock = false;
     return Future.value();
   }
 
@@ -59,7 +71,6 @@ Future<void> syncAll(BuildContext context) async {
   // This avoids every parallel task getting a 401 + 1.5 s retry penalty.
   if (user.user == null) {
     Navigator.of(context).pushNamedAndRemoveUntil("login", (_) => false);
-    lock = false;
     return Future.value();
   }
 
@@ -70,7 +81,6 @@ Future<void> syncAll(BuildContext context) async {
         .store
         .removeUser(uid);
     Navigator.of(context).pushNamedAndRemoveUntil("login", (_) => false);
-    lock = false;
     return;
   }
 
@@ -80,7 +90,6 @@ Future<void> syncAll(BuildContext context) async {
         '';
     if (authRes != 'success') {
       if (kDebugMode) print('ERROR: failed to refresh login');
-      lock = false;
       return Future.value();
     } else {
       if (kDebugMode) print('INFO: access token refreshed');
@@ -132,7 +141,6 @@ Future<void> syncAll(BuildContext context) async {
   ];
 
   return Future.wait(tasks).then((_) {
-    lock = false;
     // Push fresh data to the paired WearOS watch (no-op if not paired/enabled)
     try {
       Provider.of<WearProvider>(context, listen: false).syncToWatch(context);

@@ -151,6 +151,7 @@ class NavigationScreenState extends State<NavigationScreen>
     });
 
     // initial sync
+    _lastSync = DateTime.now();
     syncAll(context);
     setupQuickActions();
 
@@ -167,6 +168,19 @@ class NavigationScreenState extends State<NavigationScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  DateTime _lastSync = DateTime.now();
+
+  // Android keeps the app alive in the background for days; without this the
+  // data would only refresh on a cold start or a manual pull-to-refresh.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        DateTime.now().difference(_lastSync) > const Duration(minutes: 5)) {
+      _lastSync = DateTime.now();
+      syncAll(context);
+    }
   }
 
   @override
