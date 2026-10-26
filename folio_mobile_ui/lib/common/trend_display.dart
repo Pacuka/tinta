@@ -21,15 +21,16 @@ class TrendDisplay<T extends num> extends StatelessWidget {
 
     double percentage;
 
+    // Change in average grade points (was shown as a bogus "%": diff*100).
     if (previous > 0) {
-      percentage = (current - previous) * 100.0;
+      percentage = (current - previous).toDouble();
     } else {
       percentage = 0.0;
     }
 
     final String percentageText = percentage
         .abs()
-        .toStringAsFixed(1)
+        .toStringAsFixed(2)
         .replaceAll(
             '.', I18n.of(context).locale.languageCode != 'en' ? ',' : '.');
 
@@ -41,7 +42,7 @@ class TrendDisplay<T extends num> extends StatelessWidget {
       icon = downIcon;
     }
 
-    if (percentage == 0) {
+    if (percentage.abs() < 0.005) {
       return const SizedBox();
     }
 
@@ -56,7 +57,7 @@ class TrendDisplay<T extends num> extends StatelessWidget {
               style: TextStyle(fontSize: 18.0, color: color),
             ),
           ),
-          Text("$percentageText%", style: TextStyle(color: color)),
+          Text(percentageText, style: TextStyle(color: color)),
         ],
       ),
     );

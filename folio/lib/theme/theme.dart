@@ -196,7 +196,10 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_buttonRadius),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle: const TextStyle(
+              fontFamily: _defaultFontFamily,
+              fontWeight: FontWeight.w600,
+              fontSize: 15),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -205,7 +208,10 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_buttonRadius),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle: const TextStyle(
+              fontFamily: _defaultFontFamily,
+              fontWeight: FontWeight.w600,
+              fontSize: 15),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -462,7 +468,10 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_buttonRadius),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle: const TextStyle(
+              fontFamily: _defaultFontFamily,
+              fontWeight: FontWeight.w600,
+              fontSize: 15),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -471,7 +480,10 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_buttonRadius),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle: const TextStyle(
+              fontFamily: _defaultFontFamily,
+              fontWeight: FontWeight.w600,
+              fontSize: 15),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(

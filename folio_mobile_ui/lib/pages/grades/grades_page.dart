@@ -120,7 +120,12 @@ class _GradesPageState extends State<GradesPage>
       (ctx) => RoundedBottomSheet(
         borderRadius: 14.0,
         showHandle: false,
-        child: GradeCalculator(subject),
+        // Keep the content above the floating navbar.
+        child: Padding(
+          padding: EdgeInsets.only(
+              bottom: 96.0 + MediaQuery.of(ctx).padding.bottom),
+          child: GradeCalculator(subject),
+        ),
       ),
       backgroundColor: const Color(0x00000000),
       elevation: 12.0,

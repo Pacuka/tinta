@@ -493,7 +493,7 @@ extension SettingsLocalization on String {
           "success": "Siker!",
           "versiontext": "v%s, módosítva a Firka csapat által",
           "packagetext": "A Tinta a Folio (Zan1456), a Firka és a Filc nyílt forráskódú munkájára épül. Licenc: AGPL-3.0",
-          "navbar_order": "Navbar testreszabása",
+          "navbar_order": "Menüsor testreszabása",
           "navbar_section": "NAVBAR ELEMEK",
           "more_section": "TÖBB MENÜ ELEMEK",
           "navbar_slots": "%s / %s navbar hely foglalt",

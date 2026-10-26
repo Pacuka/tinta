@@ -494,7 +494,7 @@ class ProfileScreenState extends State<ProfileScreen>
                       color: colorScheme.onPrimaryContainer,
                     ),
                   ),
-                  if (username.isNotEmpty) ...[
+                  if (username.isNotEmpty && username != displayName) ...[
                     const SizedBox(height: 4.0),
                     Text(
                       username,
