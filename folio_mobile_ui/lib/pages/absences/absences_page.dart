@@ -330,12 +330,9 @@ class AbsencesPageState extends State<AbsencesPage>
                             .withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(14.0),
                       ),
-                      overlayColor: WidgetStateProperty.all(
-                        Theme.of(context)
-                            .colorScheme
-                            .secondary
-                            .withValues(alpha: 0.08),
-                      ),
+                      overlayColor:
+                          WidgetStateProperty.all(const Color(0x00000000)),
+                      splashFactory: NoSplash.splashFactory,
                       onTap: (_) => performHapticFeedback(
                           Provider.of<SettingsProvider>(context, listen: false).vibrate),
                       padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),

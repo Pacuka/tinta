@@ -418,10 +418,9 @@ class TimetablePageState extends State<TimetablePage>
                               .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(14.0),
                         ),
-                        overlayColor: WidgetStateProperty.all(Theme.of(context)
-                            .colorScheme
-                            .secondary
-                            .withValues(alpha: 0.08)),
+                        overlayColor:
+                            WidgetStateProperty.all(const Color(0x00000000)),
+                        splashFactory: NoSplash.splashFactory,
                         onTap: (_) =>
                             performHapticFeedback(settingsProvider.vibrate),
                         padding:

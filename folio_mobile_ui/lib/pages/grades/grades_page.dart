@@ -41,7 +41,7 @@ class GradesPage extends StatefulWidget {
 }
 
 class _GradesPageState extends State<GradesPage>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with TickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
 
@@ -66,18 +66,19 @@ class _GradesPageState extends State<GradesPage>
     _tabController.addListener(() {
       if (mounted) setState(() {});
     });
-    WidgetsBinding.instance.addObserver(this);
+    NavigationScreen.tabBackHandler = _handleBack;
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    if (NavigationScreen.tabBackHandler == _handleBack) {
+      NavigationScreen.tabBackHandler = null;
+    }
     _tabController.dispose();
     super.dispose();
   }
 
-  @override
-  Future<bool> didPopRoute() async {
+  Future<bool> _handleBack() async {
     if (!mounted) return false;
     // 1. Close calculator sheet if open
     if (_sheetController != null) {
@@ -445,9 +446,9 @@ class _GradesPageState extends State<GradesPage>
                       color: colorScheme.secondary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14.0),
                     ),
-                    overlayColor: WidgetStateProperty.all(
-                      colorScheme.secondary.withValues(alpha: 0.08),
-                    ),
+                    overlayColor:
+                        WidgetStateProperty.all(const Color(0x00000000)),
+                    splashFactory: NoSplash.splashFactory,
                     padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),
                     tabs: [
                       Tab(text: 'subjects_tab'.i18n),

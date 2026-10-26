@@ -38,6 +38,10 @@ class NavigationScreen extends StatefulWidget {
   static NavigationScreenState? of(BuildContext context) =>
       context.findAncestorStateOfType<NavigationScreenState>();
 
+  /// Set by the visible tab page to handle back itself (e.g. subject detail
+  /// -> subject list) before the navbar falls back to the home tab.
+  static Future<bool> Function()? tabBackHandler;
+
   @override
   NavigationScreenState createState() => NavigationScreenState();
 }
@@ -219,6 +223,10 @@ class NavigationScreenState extends State<NavigationScreen>
 
     return WillPopScope(
       onWillPop: () async {
+        if (await NavigationScreen.tabBackHandler?.call() ?? false) {
+          return false;
+        }
+
         if (_navigatorState.currentState?.canPop() ?? false) {
           _navigatorState.currentState?.pop();
           return false;
