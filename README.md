@@ -15,6 +15,9 @@
   (`arm64` a legtöbb mai telefonra, `armeabi` a régebbiekre).
 - **iPhone:** a `Tinta.ipa` ugyanott; telepítés AltStore-ral, lásd az
   [iPhone-os útmutatót](ipa-sideloading.md).
+- **Wear OS óra** (pl. Galaxy Watch): a Tinta óra-app a telefonos Tintától kapja az
+  adatokat – a párosítás a telefonos app *Beállítások → Egyéb → WearOS* menüjében,
+  az órán megjelenő kóddal történik.
 
 Androidon az app magától szól, ha új verzió érhető el.
 
@@ -26,11 +29,15 @@ Androidon az app magától szól, ha új verzió érhető el.
 
 - Jegyek, átlagok, statisztika, jegykalkulátor
 - Órarend, házik (a beírás pontos idejével), számonkérések, hiányzások, üzenetek
+- Elmaradó óra és helyettesítés jól láthatóan jelölve (ki tartja az órát)
 - Értesítés új jegyről, üzenetről, házi feladatról és órarend-változásról –
-  push-szerver nélkül, minden a telefonon fut
+  push-szerver nélkül, minden a telefonon fut, órák előtt is ránéz
+- Belépés a KRÉTA hivatalos oldalán (a jelszót nem a Tinta kéri be), captchával is
 - Az appban megnyitott üzenet a KRÉTÁ-ban is olvasottá válik
-- Belépés captchával is (ha a KRÉTA ellenőrzést kér)
-- Saját témák (Kobalt, Fekete-sárga, Petrol, Material You), névnapi és szülinapi köszöntés
+- Saját dizájn: tintacsík minden oldalon, amit egy kis toll rajzol meg; témák
+  (Kobalt, Fekete-sárga, Petrol, Material You)
+- Névnapi és szülinapi köszöntés, vicces napi köszöntések
+- Wear OS óra-app: mai órák, értesítések a csuklón
 
 ## Adatvédelem
 
