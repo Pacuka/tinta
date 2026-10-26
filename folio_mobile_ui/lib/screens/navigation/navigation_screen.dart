@@ -28,6 +28,7 @@ import 'package:provider/provider.dart';
 import 'package:folio_mobile_ui/common/screens.i18n.dart';
 import 'package:folio/api/providers/news_provider.dart';
 import 'package:folio/api/providers/sync.dart';
+import 'package:folio/helpers/update_notifier.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:folio/providers/goal_provider.dart';
 import 'dart:io' show Platform;
@@ -149,6 +150,9 @@ class NavigationScreenState extends State<NavigationScreen>
         });
       }
     });
+
+    // Local notifications need the Android 13+ permission.
+    if (settings.notificationsEnabled) UpdateNotifier.requestPermission();
 
     // initial sync
     _lastSync = DateTime.now();

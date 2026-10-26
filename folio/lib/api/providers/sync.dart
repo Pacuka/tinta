@@ -17,6 +17,7 @@ import 'package:folio_kreta_api/providers/message_provider.dart';
 import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:folio/api/providers/wear_provider.dart';
+import 'package:folio/helpers/update_notifier.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -141,6 +142,30 @@ Future<void> _syncAll(BuildContext context) async {
   ];
 
   return Future.wait(tasks).then((_) {
+    // What the app now shows needs no notification later.
+    try {
+      final week = Provider.of<TimetableProvider>(context, listen: false)
+          .getWeek(Week.current());
+      UpdateNotifier.markSeenInApp(
+        userId: user.user!.id,
+        grades: Provider.of<GradeProvider>(context, listen: false)
+            .grades
+            .map((g) => g.id),
+        exams: Provider.of<ExamProvider>(context, listen: false)
+            .exams
+            .map((e) => e.id),
+        absences: Provider.of<AbsenceProvider>(context, listen: false)
+            .absences
+            .map((a) => a.id),
+        messages: Provider.of<MessageProvider>(context, listen: false)
+            .messages
+            .map((m) => "${m.id}"),
+        homework: Provider.of<HomeworkProvider>(context, listen: false)
+            .homework
+            .map((h) => h.id),
+        lessons: week ?? const [],
+      );
+    } catch (_) {}
     // Push fresh data to the paired WearOS watch (no-op if not paired/enabled)
     try {
       Provider.of<WearProvider>(context, listen: false).syncToWatch(context);

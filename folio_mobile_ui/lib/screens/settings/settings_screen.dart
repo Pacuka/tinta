@@ -21,6 +21,7 @@
 import 'dart:io';
 
 import 'package:folio/helpers/notification_helper.dart';
+import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/wear_provider.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -1287,9 +1288,11 @@ class SettingsScreenState extends State<SettingsScreen>
                   _haptic();
                   settings.update(
                       notificationsEnabled: !settings.notificationsEnabled);
+                  if (settings.notificationsEnabled) {
+                    UpdateNotifier.requestPermission();
+                  }
                   setState(() {});
                 },
-                onLongPress: () => _checkFirebaseStatus(context),
                 title: Text(
                   'push_notifications'.i18n,
                   style: TextStyle(
@@ -1309,6 +1312,7 @@ class SettingsScreenState extends State<SettingsScreen>
                   onChanged: (v) {
                     _haptic();
                     settings.update(notificationsEnabled: v);
+                    if (v) UpdateNotifier.requestPermission();
                     setState(() {});
                   },
                   value: settings.notificationsEnabled,

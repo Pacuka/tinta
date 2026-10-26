@@ -32,6 +32,7 @@ import 'package:folio/providers/third_party_provider.dart';
 import 'package:folio/theme/observer.dart';
 import 'package:folio/theme/theme.dart';
 import 'package:folio_kreta_api/client/client.dart';
+import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio_kreta_api/providers/grade_provider.dart';
 import 'package:folio/providers/goal_provider.dart';
 import 'package:folio_kreta_api/providers/share_provider.dart';
@@ -117,6 +118,7 @@ class _AppState extends State<App> {
         user: user, settings: settings, database: database, status: status);
     final timetable =
         TimetableProvider(user: user, database: database, kreta: kreta);
+    UpdateNotifier.attach(kreta: kreta, user: user, settings: settings);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Tinta: no config from the Firka server; the KRÉTA user agent is

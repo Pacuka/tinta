@@ -28,6 +28,7 @@ import 'package:folio/database/init.dart';
 import 'package:folio/models/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:folio/models/config.dart';
+import 'package:folio/helpers/update_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/app.dart';
 import 'package:flutter/services.dart';
@@ -205,6 +206,9 @@ Future<void> initAdditionalBackgroundFetch() async {
     }
     LiveActivityHelper liveActivityHelper = LiveActivityHelper();
     liveActivityHelper.backgroundJob();
+    if (taskId != "com.transistorsoft.folioliveactivity") {
+      await UpdateNotifier.onBackgroundEvent();
+    }
     BackgroundFetch.finish(taskId);
   }, (String taskId) async {
     if (kDebugMode) {
@@ -225,7 +229,7 @@ Future<void> initAdditionalBackgroundFetch() async {
 }
 
 @pragma('vm:entry-point')
-void backgroundHeadlessTask(HeadlessTask task) {
+void backgroundHeadlessTask(HeadlessTask task) async {
   String taskId = task.taskId;
   bool isTimeout = task.timeout;
   if (isTimeout) {
@@ -239,8 +243,10 @@ void backgroundHeadlessTask(HeadlessTask task) {
     print('[BackgroundFetch] Headless event received.');
   }
   if (taskId == "com.transistorsoft.folioliveactivity") {
-    if (!Platform.isIOS) return;
-    LiveActivityHelper().backgroundJob();
+    if (Platform.isIOS) LiveActivityHelper().backgroundJob();
+  } else {
+    // App process was dead: check KRÉTA for new data and notify.
+    await UpdateNotifier.runHeadless();
   }
   BackgroundFetch.finish(task.taskId);
 }
