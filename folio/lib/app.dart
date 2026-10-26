@@ -33,6 +33,7 @@ import 'package:folio/theme/observer.dart';
 import 'package:folio/theme/theme.dart';
 import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio/helpers/update_notifier.dart';
+import 'package:folio_mobile_ui/common/ink_motion.dart';
 import 'package:folio_kreta_api/providers/grade_provider.dart';
 import 'package:folio/providers/goal_provider.dart';
 import 'package:folio_kreta_api/providers/share_provider.dart';
@@ -242,7 +243,7 @@ class _AppState extends State<App> {
                   return I18n(
                     initialLocale: Locale(
                         settings.language, settings.language.toUpperCase()),
-                    child: MediaQuery(
+                    child: InkSplashIntro(child: MediaQuery(
                       data: MediaQuery.of(context)
                           .copyWith(textScaleFactor: textScaleFactor),
                       child: child ??
@@ -252,7 +253,7 @@ class _AppState extends State<App> {
                                 child: Text("Route error - child is null",
                                     style: TextStyle(color: Colors.white))),
                           ),
-                    ),
+                    )),
                   );
                 },
                 title: "Tinta",

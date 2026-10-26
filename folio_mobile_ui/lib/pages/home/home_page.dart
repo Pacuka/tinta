@@ -34,6 +34,7 @@ import 'package:folio_mobile_ui/pages/home/live_card/live_card.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
+import 'package:folio_mobile_ui/common/ink_motion.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'home_page.i18n.dart';
@@ -205,6 +206,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     greeting = customWelcome
         ? greeting
         : Localization(greeting.i18n).fill([firstName]);
+  }
+
+  bool _refreshing = false;
+
+  Future<void> _refreshWithPulse() async {
+    setState(() => _refreshing = true);
+    try {
+      await syncAll(context);
+    } finally {
+      if (mounted) setState(() => _refreshing = false);
+    }
   }
 
   int _upcomingExamCount(BuildContext context) {
@@ -520,12 +532,21 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 updateProvider.releases.first),
                                           ),
                                         ),
+                                      // Breathing ink blot while syncing.
+                                      AnimatedSize(
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        child: _refreshing
+                                            ? const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 8.0),
+                                                child: InkPulse(),
+                                              )
+                                            : const SizedBox(width: double.infinity),
+                                      ),
                                       Expanded(
-                                        child: RefreshIndicator(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                          onRefresh: () => syncAll(context),
+                                        child: RefreshIndicator.noSpinner(
+                                          onRefresh: _refreshWithPulse,
                                           child: ImplicitlyAnimatedList<Widget>(
                                             items: [
                                               if (index == 0)
