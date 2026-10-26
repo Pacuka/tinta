@@ -153,6 +153,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } else if (now.month == user.student?.birth.month &&
         now.day == user.student?.birth.day) {
       greeting = "happybirthday";
+      final age = now.year - user.student!.birth.year;
+      if (age > 0 && age < 100) {
+        greeting =
+            Localization("happybirthday_age".i18n).fill([age, firstName]);
+        customWelcome = true;
+      }
       if (_hasLessonsToday(now)) greetingSub = "noschoolruin".i18n;
 
       _celebrate(const Duration(seconds: 3));
