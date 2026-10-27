@@ -16,13 +16,23 @@ KretaType? findTmgiType(List<KretaType> types) {
   return null;
 }
 
+const networkErrorMessage = "Nem sikerült elérni a KRÉTA-t.";
+
+/// The request may or may not have reached KRÉTA: never invite a blind resend.
+const uncertainSubmitMessage =
+    "Nem biztos, hogy megérkezett. Nézd meg a listát, mielőtt újraküldöd!";
+
 /// null = accepted; otherwise a message for the user.
+/// [status] null means no response at all (timeout / network error).
 String? parseSubmitError(int? status, String? body) {
-  if (status == null) return "Nem sikerült elérni a KRÉTA-t.";
+  if (status == null) return uncertainSubmitMessage;
+  final hasBody = body != null && body.trim().isNotEmpty;
   dynamic decoded;
-  if (body != null && body.trim().isNotEmpty) {
+  bool isJson = false;
+  if (hasBody) {
     try {
       decoded = jsonDecode(body);
+      isJson = true;
     } catch (_) {}
   }
   if (decoded is Map) {
@@ -34,7 +44,52 @@ String? parseSubmitError(int? status, String? body) {
     if (code != null) return code.toString();
   }
   if (status >= 300) return "A KRÉTA hibát adott vissza ($status).";
+  // 2xx with something that isn't JSON (e.g. a maintenance page).
+  if (hasBody && !isJson) return uncertainSubmitMessage;
   return null;
+}
+
+class CaseLoadResult {
+  final List<KretaType> justificationTypes;
+  final KretaType? tmgiType;
+  final ChildData? child;
+  final List<JustificationCase> cases;
+  final String? error;
+
+  const CaseLoadResult({
+    this.justificationTypes = const [],
+    this.tmgiType,
+    this.child,
+    this.cases = const [],
+    this.error,
+  });
+}
+
+/// Turns the 4 GET results (null = request failed) into provider state.
+CaseLoadResult interpretLoad(
+    dynamic tmgiTypes, dynamic caseTypes, dynamic child, dynamic cases) {
+  if (tmgiTypes is! List ||
+      caseTypes is! List ||
+      child is! Map ||
+      cases is! List) {
+    return const CaseLoadResult(error: networkErrorMessage);
+  }
+  List<KretaType> types(List v) =>
+      v.whereType<Map>().map(KretaType.fromJson).toList();
+  final justificationTypes = types(tmgiTypes);
+  final tmgiType = findTmgiType(types(caseTypes));
+  final list = cases.whereType<Map>().map(JustificationCase.fromJson).toList()
+    ..sort((a, b) =>
+        (b.start ?? DateTime(0)).compareTo(a.start ?? DateTime(0)));
+  return CaseLoadResult(
+    justificationTypes: justificationTypes,
+    tmgiType: tmgiType,
+    child: ChildData.fromJson(child),
+    cases: list,
+    error: tmgiType == null || justificationTypes.isEmpty
+        ? "Ennél az iskolánál nem érhető el az igazolás."
+        : null,
+  );
 }
 
 /// Absence justifications (e-ügyintézés cases) of a parent account.
@@ -59,9 +114,11 @@ class CaseProvider with ChangeNotifier {
   KretaClient get _kreta => Provider.of<KretaClient>(_context, listen: false);
 
   Future<void> load() async {
+    // Never show the previous account's data while loading.
+    _apply(const CaseLoadResult());
     _loading = true;
-    _error = null;
     notifyListeners();
+    CaseLoadResult result;
     try {
       final r = await Future.wait([
         _kreta.getAPI(KretaAPI.tmgiTypes),
@@ -69,28 +126,21 @@ class CaseProvider with ChangeNotifier {
         _kreta.getAPI(KretaAPI.childData),
         _kreta.getAPI(KretaAPI.cases),
       ]);
-      List<KretaType> types(dynamic v) =>
-          v is List ? v.whereType<Map>().map(KretaType.fromJson).toList() : [];
-      _justificationTypes = types(r[0]);
-      _tmgiType = findTmgiType(types(r[1]));
-      _child = r[2] is Map ? ChildData.fromJson(r[2]) : null;
-      _cases = r[3] is List
-          ? (r[3] as List)
-              .whereType<Map>()
-              .map(JustificationCase.fromJson)
-              .toList()
-          : [];
-      _cases.sort((a, b) => (b.start ?? DateTime(0)).compareTo(a.start ?? DateTime(0)));
-      if (_tmgiType == null || _justificationTypes.isEmpty) {
-        _error = "Ennél az iskolánál nem érhető el az igazolás.";
-      } else if (_child == null) {
-        _error = "Nem sikerült betölteni a gyermek adatait.";
-      }
+      result = interpretLoad(r[0], r[1], r[2], r[3]);
     } catch (_) {
-      _error = "Nem sikerült elérni a KRÉTA-t.";
+      result = const CaseLoadResult(error: networkErrorMessage);
     }
+    _apply(result);
     _loading = false;
     notifyListeners();
+  }
+
+  void _apply(CaseLoadResult r) {
+    _justificationTypes = r.justificationTypes;
+    _tmgiType = r.tmgiType;
+    _child = r.child;
+    _cases = r.cases;
+    _error = r.error;
   }
 
   /// Sends the justification to the school. Returns null on success,
@@ -122,7 +172,8 @@ class CaseProvider with ChangeNotifier {
     final error = res is http.Response
         ? parseSubmitError(res.statusCode, res.body)
         : parseSubmitError(null, null);
-    if (error == null) await load();
+    // Reload on success and when unsure, so the list shows what KRÉTA has.
+    if (error == null || error == uncertainSubmitMessage) await load();
     return error;
   }
 }

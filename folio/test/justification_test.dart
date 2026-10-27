@@ -125,7 +125,39 @@ void main() {
       expect(parseSubmitError(400, '{"Message": "Hibás kérés"}'), "Hibás kérés");
       expect(parseSubmitError(500, '<html>'),
           "A KRÉTA hibát adott vissza (500).");
-      expect(parseSubmitError(null, null), "Nem sikerült elérni a KRÉTA-t.");
+      expect(parseSubmitError(null, null), uncertainSubmitMessage);
+      expect(parseSubmitError(200, '<html>karbantartás</html>'),
+          uncertainSubmitMessage);
+    });
+  });
+
+  group('interpretLoad', () {
+    final tmgi = [{"kod": "TMGI", "nev": "x"}];
+    final types = [{"kod": "ORVOSI", "nev": "Orvosi igazolás"}];
+    final child = {"vezetekNev": "A", "keresztNev": "B"};
+
+    test('all fine', () {
+      final r = interpretLoad(types, tmgi, child, []);
+      expect(r.error, isNull);
+      expect(r.tmgiType?.code, "TMGI");
+      expect(r.justificationTypes.length, 1);
+    });
+
+    test('any failed request is a network error, not "no cases"', () {
+      for (final args in [
+        [null, tmgi, child, []],
+        [types, null, child, []],
+        [types, tmgi, null, []],
+        [types, tmgi, child, null],
+      ]) {
+        final r = interpretLoad(args[0], args[1], args[2], args[3]);
+        expect(r.error, networkErrorMessage);
+      }
+    });
+
+    test('school without TMGI', () {
+      final r = interpretLoad(types, [{"kod": "EGYEB"}], child, []);
+      expect(r.error, "Ennél az iskolánál nem érhető el az igazolás.");
     });
   });
 }
