@@ -1,6 +1,6 @@
 # Igazolás beküldése (szülői fiók) – design
 
-Dátum: 2026-10-27 · Állapot: jóváhagyásra vár
+Dátum: 2026-10-27 · Állapot: jóváhagyva
 
 ## Cél
 
@@ -68,7 +68,7 @@ a terv szerint igazítjuk.
 ## Tinta – felépítés
 
 - `folio_kreta_api`: új modellek (`TmgiType`, `CaseItem`), `KretaAPI` útvonalak, és egy
-  `CaseProvider` (vagy a meglévő minták szerinti helper) a fenti hívásokkal. A POST body
+  `CaseProvider` (ChangeNotifier, a `MessageProvider` mintájára) a fenti hívásokkal. A POST body
   összerakása **külön, tiszta függvény** (`buildTmgiBody(...)`) → unit-tesztelhető.
 - UI (`folio_mobile_ui`):
   - Hiányzások oldal: lebegő **„Igazolás”** gomb, csak `Role.parent`-nél.
@@ -97,5 +97,10 @@ a terv szerint igazítjuk.
   `tipusKod`).
 - Telefonon (kamu KRÉTA, szülői kamu fiók): gomb látszik szülőnél / nem látszik diáknál;
   beküldés → kamu napló + lista; hibás űrlap nem küldhető; megerősítő ablak megjelenik.
-- Valódi KRÉTA: csak olvasó hívások (típusok, gyerekadatok, kérelemlista) próbálhatók a
-  felhasználó engedélyével; **beküldés soha** engedély nélkül.
+- Valódi KRÉTA, 1. lépés (biztonságos): a valódi szülői fiókkal csak az olvasó hívások
+  (típusok, gyerekadatok, kérelemlista) – ellenőrizzük, hogy a valódi válaszok alakja
+  egyezik a modellekkel. Ez semmit nem küld az iskolának.
+- Valódi KRÉTA, 2. lépés (éles beküldés): csak akkor, amikor **ténylegesen van**
+  igazolandó hiányzás, és a fiók tulajdonosa (szülő) ezt kéri. Előtte a kamu-tesztnek
+  zöldnek kell lennie. Próba-/kamu-igazolást valódi iskolához soha nem küldünk.
+- Állapot: jóváhagyva 2026-10-27.
