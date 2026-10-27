@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio_kreta_api/models/lesson.dart';
+import 'package:folio_kreta_api/models/consulting_hour.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Lesson lesson({
   String id = "L1",
@@ -66,5 +68,74 @@ void main() {
     s.lessonChange(lesson(id: "L1"));
     expect(s.lessonChange(lesson(id: "L2", status: "Elmaradt")),
         "Elmarad: Matematika");
+  });
+
+  group('consultingNotes', () {
+    setUpAll(() => initializeDateFormatting("hu"));
+
+    ConsultingHour hour({bool mine = false, DateTime? start}) {
+      final s = start ?? DateTime(2026, 11, 5, 16);
+      return ConsultingHour(
+        id: "FO1",
+        teacherId: "TA",
+        teacherName: "Kamu Tanár Anna",
+        start: s,
+        end: s.add(const Duration(hours: 1)),
+        signupEnabled: true,
+        room: "12",
+        slots: [
+          ConsultingSlot(
+              id: "FO1-1",
+              start: s.add(const Duration(minutes: 10)),
+              end: s.add(const Duration(minutes: 20)),
+              mine: mine),
+        ],
+      );
+    }
+
+    test('new consultation hour once', () {
+      final s = NotifyState.empty(file);
+      final now = DateTime(2026, 11, 1, 10);
+      final first = consultingNotes([hour()], s, now, enabled: true);
+      expect(first.length, 1);
+      expect(first.single.$1, "Új fogadóóra: Kamu Tanár Anna");
+      expect(first.single.$2, contains("16:00–17:00"));
+      expect(consultingNotes([hour()], s, now, enabled: true), isEmpty);
+    });
+
+    test('morning reminder on the day of a booking', () {
+      final s = NotifyState.empty(file);
+      final h = hour(mine: true);
+      s.add("consulting", h.id); // already announced
+      expect(consultingNotes([h], s, DateTime(2026, 11, 5, 6), enabled: true),
+          isEmpty);
+      final notes =
+          consultingNotes([h], s, DateTime(2026, 11, 5, 7, 30), enabled: true);
+      expect(notes.single.$1, "Ma fogadóóra: Kamu Tanár Anna");
+      expect(notes.single.$2, "16:10 · 12");
+      expect(
+          consultingNotes([h], s, DateTime(2026, 11, 5, 8), enabled: true),
+          isEmpty);
+    });
+
+    test('no reminder after the slot started, nothing when disabled', () {
+      final s = NotifyState.empty(file);
+      final h = hour(mine: true);
+      expect(
+          consultingNotes([h], s, DateTime(2026, 11, 5, 16, 15), enabled: true)
+              .where((n) => n.$1.startsWith("Ma ")),
+          isEmpty);
+      final s2 = NotifyState.empty(file);
+      expect(consultingNotes([h], s2, DateTime(2026, 11, 5, 8), enabled: false),
+          isEmpty);
+    });
+
+    test('past hours are recorded silently', () {
+      final s = NotifyState.empty(file);
+      expect(
+          consultingNotes([hour(start: DateTime(2026, 10, 1, 16))], s,
+              DateTime(2026, 11, 1), enabled: true),
+          isEmpty);
+    });
   });
 }

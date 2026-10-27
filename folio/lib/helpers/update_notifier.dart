@@ -14,6 +14,8 @@ import 'package:folio_kreta_api/client/api.dart';
 import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio_kreta_api/models/absence.dart';
 import 'package:folio_kreta_api/models/exam.dart';
+import 'package:folio_kreta_api/models/consulting_hour.dart';
+import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_kreta_api/models/grade.dart';
 import 'package:folio_kreta_api/models/homework.dart';
 import 'package:folio_kreta_api/models/lesson.dart';
@@ -173,6 +175,18 @@ class UpdateNotifier {
       }
     }
 
+    // Consultation hours
+    final (cFrom, cTo) = consultingRange(now);
+    final consultingJson =
+        await kreta.getAPI(KretaAPI.consultingHours(iss, cFrom, cTo));
+    if (consultingJson is List) {
+      for (final (title, body) in consultingNotes(
+          ConsultingHour.listFromJson(consultingJson), state, now,
+          enabled: settings.notificationsLessonsEnabled)) {
+        notes.add(_Note(title, body));
+      }
+    }
+
     // Absences
     final absJson = await kreta.getAPI(KretaAPI.absences(iss));
     if (absJson is List) {
@@ -321,6 +335,38 @@ class UpdateNotifier {
   }
 
   static String _day(DateTime d) => DateFormat("MMM d.", "hu").format(d);
+}
+
+/// Notifications for consultation hours: a new hour once, and a reminder on
+/// the morning (from 07:00) of an own booking. Records what it has seen.
+List<(String, String)> consultingNotes(
+    List<ConsultingHour> hours, NotifyState state, DateTime now,
+    {required bool enabled}) {
+  final hm = DateFormat("HH:mm");
+  final notes = <(String, String)>[];
+  for (final h in hours) {
+    if (state.add("consulting", h.id) && enabled && h.end.isAfter(now)) {
+      notes.add((
+        "Új fogadóóra: ${h.teacherName}",
+        "${UpdateNotifier._day(h.start)} · ${hm.format(h.start)}–${hm.format(h.end)}",
+      ));
+    }
+    final slot = h.myBooking;
+    if (slot != null &&
+        slot.start.year == now.year &&
+        slot.start.month == now.month &&
+        slot.start.day == now.day &&
+        now.hour >= 7 &&
+        now.isBefore(slot.start) &&
+        state.add("consultingReminder", slot.id) &&
+        enabled) {
+      notes.add((
+        "Ma fogadóóra: ${h.teacherName}",
+        "${hm.format(slot.start)}${h.room.isNotEmpty ? " · ${h.room}" : ""}",
+      ));
+    }
+  }
+  return notes;
 }
 
 class _Note {
