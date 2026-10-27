@@ -9,20 +9,24 @@ SnackBar CustomSnackBar({
   Color? backgroundColor,
   Duration? duration,
 }) {
-  // backgroundColor > Brightness > Theme Background
+  // backgroundColor > Brightness > current theme (follows the Tinta themes,
+  // not Folio's fixed palette)
+  final scheme = Theme.of(context).colorScheme;
   // ignore: no_leading_underscores_for_local_identifiers
   Color _backgroundColor = backgroundColor ??
-      (AppColors.fromBrightness(brightness ?? Theme.of(context).brightness)
-          .highlight);
-  Color textColor =
-      AppColors.fromBrightness(brightness ?? Theme.of(context).brightness).text;
+      (brightness != null
+          ? AppColors.fromBrightness(brightness).highlight
+          : scheme.surfaceContainerHigh);
+  Color textColor = brightness != null
+      ? AppColors.fromBrightness(brightness).text
+      : scheme.onSurface;
 
   return SnackBar(
     duration: duration ?? const Duration(seconds: 4),
     content: Container(
       decoration: BoxDecoration(
         color: _backgroundColor,
-        borderRadius: BorderRadius.circular(6.0),
+        borderRadius: BorderRadius.circular(14.0),
         boxShadow: [
           BoxShadow(color: Colors.black.withValues(alpha: .15), blurRadius: 4.0)
         ],

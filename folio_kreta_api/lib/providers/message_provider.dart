@@ -250,7 +250,7 @@ class MessageProvider with ChangeNotifier {
       "cimzettLista": recipientList,
       "csatolmanyok": [],
       "azonosito": (Random().nextInt(10000) + 10000),
-      "feladoNev": user.name,
+      "feladoNev": user.senderName,
       "feladoTitulus": user.role == Role.parent ? "Szülő" : "Diák",
       "kuldesDatum": DateTime.now().toIso8601String(),
       "targy": subject,

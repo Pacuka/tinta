@@ -1,3 +1,4 @@
+import 'package:folio/utils/jwt.dart';
 import 'dart:convert';
 import 'package:folio_kreta_api/client/api.dart';
 import 'package:folio_kreta_api/models/school.dart';
@@ -48,6 +49,16 @@ class User {
   // String qwidRefreshToken;
 
   String get displayName => nickname != '' ? nickname : name;
+
+  /// Sender name on outgoing messages: the parent's own name (token `name`
+  /// claim) on parent accounts, otherwise the student's name.
+  String get senderName {
+    if (role == Role.parent) {
+      final n = JwtUtils.decodeJwt(accessToken)?["name"];
+      if (n is String && n.trim().isNotEmpty) return n.trim();
+    }
+    return name;
+  }
 
   /// Name for the home greeting: the parent on parent accounts (when known),
   /// otherwise the student's first name.
