@@ -1,10 +1,9 @@
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 
 /// Üveg theme: three soft, static colour glows (blue, violet, teal) laid
 /// over the app like ambient light, so the glass navbar and cards pick up a
-/// faint tint. Painted once (RepaintBoundary) and never animates.
+/// faint tint. Each glow is a radial gradient fading to transparent, so no
+/// blur filter has to run on every scroll frame. Never animates.
 class GlassBackdrop extends StatelessWidget {
   const GlassBackdrop({super.key});
 
@@ -16,30 +15,36 @@ class GlassBackdrop extends StatelessWidget {
       child: RepaintBoundary(
         child: LayoutBuilder(builder: (context, c) {
           final w = c.maxWidth, h = c.maxHeight;
-          Widget blob(Color color, double size, double left, double top,
-                  double alpha) =>
-              Positioned(
-                left: left,
-                top: top,
-                child: Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color.withValues(alpha: alpha * k),
-                  ),
+          // The blurred circles of the mockup reach about twice their size.
+          Widget glow(Color color, double size, double cx, double cy,
+              double alpha) {
+            final r = size;
+            return Positioned(
+              left: cx - r,
+              top: cy - r,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(colors: [
+                    color.withValues(alpha: alpha * k),
+                    color.withValues(alpha: alpha * k * 0.45),
+                    color.withValues(alpha: 0),
+                  ], stops: const [0.0, 0.45, 1.0]),
                 ),
-              );
-          return ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-            child: Stack(children: [
-              blob(const Color(0xFF3B5BFF), 160 * w / 240, -50, -40, 0.14),
-              blob(const Color(0xFF8A3BFF), 130 * w / 240, w * 0.6, h * 0.4,
-                  0.10),
-              blob(const Color(0xFF00B3A4), 120 * w / 240, -30, h * 0.75,
-                  0.09),
-            ]),
-          );
+                child: SizedBox(width: r * 2, height: r * 2),
+              ),
+            );
+          }
+
+          final s = w / 240;
+          return Stack(clipBehavior: Clip.hardEdge, children: [
+            glow(const Color(0xFF3B5BFF), 160 * s, -50 * s + 80 * s,
+                -40 * s + 80 * s, 0.14),
+            glow(const Color(0xFF8A3BFF), 130 * s, w * 0.6 + 65 * s,
+                h * 0.4 + 65 * s, 0.10),
+            glow(const Color(0xFF00B3A4), 120 * s, -30 * s + 60 * s,
+                h * 0.75 + 60 * s, 0.09),
+          ]);
         }),
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:folio/theme/glass.dart';
 import 'package:folio/api/providers/update_provider.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/ui/date_widget.dart';
@@ -229,7 +230,9 @@ Widget filterItemBuilder(
                     : const EdgeInsets.symmetric(vertical: 4.0),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16.0),
+                  borderRadius:
+                      BorderRadius.circular(glassRadius(context, 16.0)),
+                  border: Border.fromBorderSide(glassHairline(context)),
                 ),
                 child: wrappedItem,
               ),

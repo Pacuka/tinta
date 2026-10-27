@@ -431,14 +431,7 @@ class LessonTile extends StatelessWidget {
 /// Rounded card; the Üveg theme adds a hairline of light around it.
 ShapeBorder _cardShape(BuildContext context) => RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(18.0),
-      side: isGlassTheme(context)
-          ? BorderSide(
-              width: 0.8,
-              color: Colors.white.withValues(
-                  alpha: Theme.of(context).brightness == Brightness.dark
-                      ? 0.07
-                      : 0.8))
-          : BorderSide.none,
+      side: glassHairline(context),
     );
 
 enum LessonSubtileType { homework, exam, absence }

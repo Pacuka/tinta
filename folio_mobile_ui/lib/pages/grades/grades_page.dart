@@ -437,8 +437,13 @@ Container(
                         horizontal: 8.0, vertical: 6.0),
                     isScrollable: false,
                     indicator: BoxDecoration(
-                      color: colorScheme.secondary.withValues(alpha: 0.15),
+                      color: colorScheme.secondary.withValues(
+                          alpha: isGlassTheme(context) ? 0.24 : 0.15),
                       borderRadius: BorderRadius.circular(14.0),
+                      border: isGlassTheme(context)
+                          ? Border.all(
+                              color: Colors.white.withValues(alpha: 0.12))
+                          : null,
                     ),
                     overlayColor:
                         WidgetStateProperty.all(const Color(0x00000000)),
@@ -610,16 +615,8 @@ class _SubjectsTab extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius:
-                        BorderRadius.circular(isGlassTheme(context) ? 18 : 16),
-                    border: isGlassTheme(context)
-                        ? Border.all(
-                            width: 0.8,
-                            color: Colors.white.withValues(
-                                alpha: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? 0.07
-                                    : 0.8))
-                        : null,
+                        BorderRadius.circular(glassRadius(context, 16)),
+                    border: Border.fromBorderSide(glassHairline(context)),
                     boxShadow: settings.shadowEffect
                         ? [
                             BoxShadow(
