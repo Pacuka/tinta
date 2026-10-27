@@ -104,3 +104,62 @@ a terv szerint igazítjuk.
   igazolandó hiányzás, és a fiók tulajdonosa (szülő) ezt kéri. Előtte a kamu-tesztnek
   zöldnek kell lennie. Próba-/kamu-igazolást valódi iskolához soha nem küldünk.
 - Állapot: jóváhagyva 2026-10-27.
+
+---
+
+## 2. kör – teljes e-Ügyintézés igazolás (a hivatalos szülői app minden funkciója)
+
+Felhasználói kérés (2026-10-27): „amit tud, ne hagyjuk ki”. A hivatalos app (5.17.0)
+visszafejtése alapján ezek hiányoznak az 1. körből. **Az 1. kör „nincs fájlcsatolás”
+pontja téves volt**: a csatolás rész a típus kiválasztása után jelenik meg.
+
+### 2.1 Csatolás az űrlapon
+- Típusonként kötelező dokumentum (a hivatalos `TmgiType.codeToUpload`):
+  ORVOSI → 36, HIVATALOS_TAVOLLET → 39, SZOLGALTATOI → 40, KIKERO → 41;
+  GONDVISELOI, PALYAVALASZTASI_CELU, HAZIRENDBEN_ROGZITETT_EGYEB → nincs kötelező, csak
+  „Egyéb csatolt dokumentumok”. (A típus `kod`-ja alapján; a kamu szerver is ezeket a
+  valódi kódokat kapja.)
+- Kötelezőnél: „Kötelezően csatolandó dokumentumok” rész, Küldés tiltva amíg nincs
+  csatolva („A kérelemhez kötelező dokumentumot csatolni.”). Egyéb csatolmány: több is
+  lehet, bármelyik típusnál.
+- Forrás: kamera, galéria (kép), fájl (PDF). Feltöltés azonnal a kiválasztás után:
+  `POST /ideiglenesfajlok` multipart → `TemporaryFileDto`; hiba esetén „Feltöltés
+  újrapróbálása”; csatolmány törölhető (megerősítéssel). Nem támogatott típus → üzenet.
+- Body: kötelező → `kerelemKotelezoDokumentumLista: [{tipus: {azonosito: <codeToUpload>…},
+  fajl: {ideiglenesFajlAzonosito}, fajlNev}]`; egyéb → `csatolmanyok: [{fajl:
+  {ideiglenesFajlAzonosito}, fajlNev}]`. A pontos mezőket (ApplicationDocumentTypeDto,
+  TemporaryFileDto mező-sorrend) az implementáció első lépése ellenőrzi a visszafejtett
+  kódban.
+- Kilépés kitöltött űrlapról → „Az oldalon megadott adatok törlésre kerülnek! Biztosan
+  félbeszakítod?”; megerősítő szöveg kiegészül: „A beküldés után a kérelem már nem
+  módosítható.”
+
+### 2.2 Ügy részletei (lista elemre koppintva) – `GET ugy/kerelmek/{id}`
+- Állapot, ügyintéző neve, beküldés időpontja, tanuló neve + oktatási azonosító,
+  kérelmezett időszak, típus, indoklás, kötelező és egyéb csatolmányok (megnyitás),
+  nyomtatható változat letöltése/megnyitása (ha van).
+- Döntések (`hatarozatLista`): Elfogadva / Elfogadva módosítással / Elutasítva /
+  Hiánypótlás határozattal / üzenettel; döntés dátuma, szövege, aláíró neve
+  (`GET ugy/alkalmazott/{kerelemAzonosito}/{kretaAzonosito}`), igazolt távollét napjai.
+- A listán állapot-jelzés: Feldolgozásra vár / Elfogadva / Elutasítva / Hiánypótlás
+  szükséges / Hiánypótlás beküldve.
+
+### 2.3 Hiánypótlás – `POST ugy/kerelmek/{ugyId}` (RectificationPostDto)
+- Ha a döntés hiánypótlást kér: „Hiánypótló dokumentum csatolása” + beküldés
+  (dokumentum kötelező), ugyanazzal a feltöltéssel és megerősítéssel.
+
+### 2.4 Lista
+- „Lezártak is” kapcsoló (`isLezartakIs`), hogy a régi/elfogadott igazolások is látszanak.
+
+### Kamu KRÉTA
+- Valódi típuskódok; `ideiglenesfajlok` multipart fogadás + naplózás; `ugy/kerelmek/{id}`
+  részletek; egy kamu ügy hiánypótlást kérő döntéssel, hogy a 2.3 tesztelhető legyen;
+  `ugy/alkalmazott/...`.
+
+### Biztonság / tesztelés
+- Ugyanazok a szabályok: valódi iskolához semmi, csak kamu. Unit teszt a body-ra
+  (kötelező + egyéb csatolmány, hiánypótlás body), a feltöltés-válasz értelmezésére és a
+  döntés-állapotok leképezésére; telefonon végigjárva kamuval (kép + PDF csatolás,
+  részletek, hiánypótlás).
+- Az 1. kör review-jából elhalasztott apróságok (KretaType ==, dupla koppintás védelem,
+  azonnali „beküldve” visszajelzés) ebben a körben javulnak, mert az űrlap átépül.
