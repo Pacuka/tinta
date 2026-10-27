@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
+import 'package:folio/api/providers/sync.dart';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -323,7 +324,14 @@ class ProfileScreenState extends State<ProfileScreen>
       return;
     }
 
-    restore().then((_) => user.setUser(account.id));
+    // Show what is stored first, then fetch fresh data: an account that was
+    // never synced on this phone (or whose cache is empty) would otherwise
+    // stay blank until a manual pull-to-refresh.
+    final appContext = Navigator.of(context, rootNavigator: true).context;
+    restore().then((_) {
+      user.setUser(account.id);
+      if (appContext.mounted) syncAll(appContext);
+    });
     Navigator.of(context).pop();
   }
 
