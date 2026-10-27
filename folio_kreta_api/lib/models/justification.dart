@@ -274,9 +274,12 @@ class CaseDetail {
     required this.raw,
   });
 
-  bool get needsRectification =>
-      (stateCode?.startsWith("HIANYPOTLAS") ?? false) ||
-      decisions.any((d) => d.code?.startsWith("HIANYPOTLAS") ?? false);
+  /// The case's own state decides; the decision list is only a fallback
+  /// (an old "hiánypótlás" decision stays there after it was answered).
+  bool get needsRectification => stateCode != null
+      ? stateCode!.startsWith("HIANYPOTLAS")
+      : decisions.isNotEmpty &&
+          (decisions.last.code?.startsWith("HIANYPOTLAS") ?? false);
 
   factory CaseDetail.fromJson(Map json) {
     final names = [json["tanuloCsaladiNev"], json["tanuloKeresztNev"]]

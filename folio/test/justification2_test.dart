@@ -153,6 +153,14 @@ void main() {
       expect(d.needsRectification, isTrue);
     });
 
+    test('rectification already sent: state wins over the old decision', () {
+      final sent = Map.of(full)
+        ..["statusz"] = {"kod": "FOLYAMATBAN", "nev": "Hiánypótlás beküldve"};
+      expect(CaseDetail.fromJson(sent).needsRectification, isFalse);
+      final noState = Map.of(full)..remove("statusz");
+      expect(CaseDetail.fromJson(noState).needsRectification, isTrue);
+    });
+
     test('rectification body + guard', () {
       final d = CaseDetail.fromJson(full);
       final b = buildRectificationBody(d, [_f2]);
