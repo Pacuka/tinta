@@ -150,14 +150,15 @@ class _CaseTile extends StatelessWidget {
       ),
       child: Row(children: [
         Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(formatRange(item.start, item.end),
                 style: const TextStyle(
                     fontSize: 16.0, fontWeight: FontWeight.w700)),
             const SizedBox(height: 2),
             Text(item.typeName,
-                style: TextStyle(
-                    color: scheme.onSurface.withValues(alpha: 0.7))),
+                style:
+                    TextStyle(color: scheme.onSurface.withValues(alpha: 0.7))),
           ]),
         ),
         const SizedBox(width: 8),
