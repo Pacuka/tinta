@@ -28,7 +28,8 @@ class MessageProvider with ChangeNotifier {
     List<Message> initialMessages = const [],
     required BuildContext context,
   }) {
-    _messages = List.castFrom(initialMessages);
+    // Growable copy: the default const [] can't be modified by store().
+    _messages = List.of(initialMessages);
     _recipients = [];
     _context = context;
 
@@ -47,7 +48,7 @@ class MessageProvider with ChangeNotifier {
               .userQuery
               .getMessages(userId: userId);
       if (gen != _storeGen) return;
-      _messages = dbMessages;
+      _messages = List.of(dbMessages);
       await _applySeen(_messages);
       notifyListeners();
     }
