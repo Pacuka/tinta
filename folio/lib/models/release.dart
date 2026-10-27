@@ -54,6 +54,28 @@ class Release {
   }
 }
 
+/// (stable update, pre-release preview) newer than [current]. A preview is
+/// only offered when it is newer than the stable update too.
+(Release?, Release?) pickUpdates(List<Release> releases, Version current) {
+  Release? newest(bool pre) {
+    Release? best;
+    for (final r in releases.where((r) => r.prerelease == pre)) {
+      if (best == null || r.version.compareTo(best.version) == 1) best = r;
+    }
+    return best;
+  }
+
+  Release? stable = newest(false);
+  Release? preview = newest(true);
+  if (stable != null && stable.version.compareTo(current) != 1) stable = null;
+  if (preview != null &&
+      (preview.version.compareTo(current) != 1 ||
+          (stable != null && preview.version.compareTo(stable.version) != 1))) {
+    preview = null;
+  }
+  return (stable, preview);
+}
+
 class Version {
   final int major;
   final int minor;

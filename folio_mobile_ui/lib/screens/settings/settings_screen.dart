@@ -18,6 +18,8 @@
 
 // ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously, deprecated_member_use
 
+import 'package:folio_mobile_ui/common/widgets/update/update_dialog.dart';
+import 'package:folio_mobile_ui/common/widgets/update/preview_banner.dart';
 import 'dart:io';
 
 import 'package:folio/helpers/notification_helper.dart';
@@ -984,7 +986,14 @@ Container(
 
                         // Update banner (always at top)
                         if (!isSearching && updateProvider.available)
-                          UpdateViewable(updateProvider.releases.first),
+                          UpdateViewable(updateProvider.update!)
+                        else if (!isSearching &&
+                            updateProvider.preview != null)
+                          PreviewBanner(
+                            updateProvider.preview!,
+                            onTap: () => UpdateDialog.show(
+                                context, updateProvider.preview!),
+                          ),
 
                         // Content
                         if (isSearching) ...[

@@ -1,3 +1,4 @@
+import 'package:folio_mobile_ui/common/widgets/update/preview_banner.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -157,7 +158,9 @@ class _UpdateDialogState extends State<UpdateDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Új verzió elérhető',
+                      widget.release.prerelease
+                          ? 'Előzetes, nem tesztelt verzió'
+                          : 'Új verzió elérhető',
                       style: tt.titleMedium!.copyWith(
                           fontWeight: FontWeight.w700, color: cs.onSurface),
                     ),
@@ -173,6 +176,32 @@ class _UpdateDialogState extends State<UpdateDialog> {
           ),
 
           const SizedBox(height: 16.0),
+
+          if (widget.release.prerelease) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                color: cs.errorContainer,
+                borderRadius: BorderRadius.circular(14.0),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.warning_amber_rounded,
+                      color: cs.onErrorContainer),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(previewWarning,
+                        style: tt.bodySmall!.copyWith(
+                            color: cs.onErrorContainer,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12.0),
+          ],
 
           // Release notes
           if (widget.release.body.trim().isNotEmpty) ...[

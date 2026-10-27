@@ -8,8 +8,17 @@ import 'package:package_info_plus/package_info_plus.dart';
 class UpdateProvider extends ChangeNotifier {
   // Private
   late List<Release> _releases;
-  bool _available = false;
-  bool get available => _available && _releases.isNotEmpty;
+  Release? _update;
+  Release? _preview;
+
+  /// A newer stable release: popup, badge, home tile.
+  bool get available => _update != null;
+
+  /// The stable release to offer.
+  Release? get update => _update;
+
+  /// A newer, untested pre-release: only a small warning in Settings.
+  Release? get preview => _preview;
 
   // Public
   List<Release> get releases => _releases;
@@ -22,27 +31,20 @@ class UpdateProvider extends ChangeNotifier {
   }
 
   Future<void> fetch() async {
-    late String currentVersion;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    currentVersion = packageInfo.version;
+    final current = Version.fromString(packageInfo.version);
 
     if (!Platform.isAndroid) return;
 
     _releases = await FilcAPI.getReleases() ?? [];
     _releases.sort((a, b) => -a.version.compareTo(b.version));
+    final (update, preview) = pickUpdates(_releases, current);
+    _update = update;
+    _preview = preview;
 
-    // Check for new releases
-    if (_releases.isNotEmpty) {
-      if (!_releases.first.prerelease) {
-        _available = _releases.first.version
-                .compareTo(Version.fromString(currentVersion)) ==
-            1;
-      }
-
-      // ignore: avoid_print
-      if (_available) print("INFO: New update: ${releases.first.version}");
-      notifyListeners();
-    }
+    // ignore: avoid_print
+    if (_update != null) print("INFO: New update: ${_update!.version}");
+    notifyListeners();
   }
 
   Future<Map> installedVersion() async {

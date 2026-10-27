@@ -538,11 +538,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           padding: const EdgeInsets.fromLTRB(
                                               24.0, 4.0, 24.0, 4.0),
                                           child: UpdateTile(
-                                            updateProvider.releases.first,
+                                            updateProvider.update!,
                                             padding: EdgeInsets.zero,
                                             onTap: () => UpdateDialog.show(
                                                 context,
-                                                updateProvider.releases.first),
+                                                updateProvider.update!),
                                           ),
                                         ),
                                       // Breathing ink blot while syncing.

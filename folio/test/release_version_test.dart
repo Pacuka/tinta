@@ -23,4 +23,38 @@ void main() {
         endsWith("armeabi.apk"));
     expect(pickApk([d("Tinta.ipa")]), isNull);
   });
+
+  group('pickUpdates', () {
+    Release r(String tag, {bool pre = false}) => Release.fromJson(
+        {"tag_name": tag, "prerelease": pre, "assets": []});
+
+    test('stable newer than current is the update', () {
+      final (stable, preview) =
+          pickUpdates([r("v1.2.0"), r("v1.3.0")], Version.fromString("1.2.0"));
+      expect(stable?.tag, "v1.3.0");
+      expect(preview, isNull);
+    });
+
+    test('a newer pre-release is only a preview, the stable still counts', () {
+      final (stable, preview) = pickUpdates(
+          [r("v1.4.0", pre: true), r("v1.3.0"), r("v1.2.0")],
+          Version.fromString("1.2.0"));
+      expect(stable?.tag, "v1.3.0");
+      expect(preview?.tag, "v1.4.0");
+    });
+
+    test('a pre-release older than the stable update is ignored', () {
+      final (stable, preview) = pickUpdates(
+          [r("v1.3.0"), r("v1.2.5", pre: true)], Version.fromString("1.2.0"));
+      expect(stable?.tag, "v1.3.0");
+      expect(preview, isNull);
+    });
+
+    test('nothing newer', () {
+      final (stable, preview) = pickUpdates(
+          [r("v1.3.0", pre: true), r("v1.2.0")], Version.fromString("1.3.0"));
+      expect(stable, isNull);
+      expect(preview, isNull);
+    });
+  });
 }

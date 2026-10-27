@@ -167,7 +167,7 @@ Future<List<DateWidget>> getFilterWidgets(FilterType activeData,
     // Updates
     case FilterType.updates:
       if (updateProvider.available) {
-        items = [update_filter.getWidget(updateProvider.releases.first)];
+        items = [update_filter.getWidget(updateProvider.update!)];
       }
       break;
 

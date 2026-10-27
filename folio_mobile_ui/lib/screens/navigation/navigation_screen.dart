@@ -149,7 +149,7 @@ class NavigationScreenState extends State<NavigationScreen>
     updateProvider.fetch().then((_) {
       if (updateProvider.available && mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          UpdateDialog.show(context, updateProvider.releases.first);
+          UpdateDialog.show(context, updateProvider.update!);
         });
       }
     });
