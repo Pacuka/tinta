@@ -5,6 +5,8 @@ import 'package:folio_mobile_ui/common/empty.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio_mobile_ui/pages/consulting/consulting_sheet.dart';
 import 'package:intl/intl.dart';
+
+import 'consulting.i18n.dart';
 import 'package:provider/provider.dart';
 
 /// Teacher consultation hours: own bookings on top, then every hour by day.
@@ -54,7 +56,7 @@ class _ConsultingPageState extends State<ConsultingPage> {
                 const SizedBox(width: 12.0),
                 Expanded(
                   child: Text(
-                    "Fogadóórák",
+                    "consulting".i18n,
                     style: TextStyle(
                       color: scheme.onPrimaryContainer,
                       fontSize: 28.0,
@@ -89,20 +91,18 @@ class _ConsultingPageState extends State<ConsultingPage> {
     if (provider.error != null && hours.isEmpty) {
       return ListView(padding: const EdgeInsets.all(24.0), children: [
         const SizedBox(height: 60),
-        Text(provider.error!,
+        Text(consultingErrorText(provider.error!),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16.0)),
         const SizedBox(height: 16),
         Center(
           child: TextButton(
-              onPressed: provider.fetch, child: const Text("Újra")),
+              onPressed: provider.fetch, child: Text("retry".i18n)),
         ),
       ]);
     }
     if (hours.isEmpty) {
-      return ListView(children: const [
-        Empty(subtitle: "Most nincs meghirdetett fogadóóra."),
-      ]);
+      return ListView(children: [Empty(subtitle: "empty".i18n)]);
     }
 
     final now = DateTime.now();
@@ -122,7 +122,7 @@ class _ConsultingPageState extends State<ConsultingPage> {
           padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
           child: TextField(
             decoration: InputDecoration(
-              hintText: "Tanár keresése",
+              hintText: "search".i18n,
               prefixIcon: const Icon(Icons.search_rounded),
               filled: true,
               border: OutlineInputBorder(
@@ -153,9 +153,9 @@ class _ConsultingPageState extends State<ConsultingPage> {
       children.add(_HourTile(h));
     }
     if (shown.isEmpty) {
-      children.add(const Padding(
-        padding: EdgeInsets.all(24.0),
-        child: Text("Nincs ilyen nevű tanár.", textAlign: TextAlign.center),
+      children.add(Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Text("no_match".i18n, textAlign: TextAlign.center),
       ));
     }
 
@@ -169,8 +169,8 @@ class _ConsultingPageState extends State<ConsultingPage> {
 String _dayTitle(DateTime day, DateTime now) {
   final today = DateUtils.dateOnly(now);
   final diff = day.difference(today).inDays;
-  if (diff == 0) return "Ma";
-  if (diff == 1) return "Holnap";
+  if (diff == 0) return "today".i18n;
+  if (diff == 1) return "tomorrow".i18n;
   final s = consultingDay(day);
   return s[0].toUpperCase() + s.substring(1);
 }
@@ -195,7 +195,7 @@ class _MyBookings extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("A te foglalásaid",
+          Text("my_bookings".i18n,
               style: TextStyle(
                   color: scheme.onPrimaryContainer,
                   fontWeight: FontWeight.w800,

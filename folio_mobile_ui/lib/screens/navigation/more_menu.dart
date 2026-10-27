@@ -9,6 +9,8 @@ import 'package:folio_mobile_ui/common/profile_image/profile_image.dart';
 import 'package:folio_mobile_ui/common/screens.i18n.dart';
 import 'package:folio_mobile_ui/pages/absences/absences_page.dart';
 import 'package:folio_mobile_ui/pages/consulting/consulting_page.dart';
+import 'package:folio_mobile_ui/pages/consulting/consulting.i18n.dart'
+    show consultingTitle;
 import 'package:folio_mobile_ui/pages/messages/messages_page.dart';
 import 'package:folio_mobile_ui/pages/notes/notes_page.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_screen.dart';
@@ -193,7 +195,7 @@ class MoreMenu extends StatelessWidget {
           // Consultation hours (not a navbar page)
           _WideTile(
             icon: Icons.event_available_rounded,
-            title: "Fogadóórák",
+            title: consultingTitle,
             onTap: () {
               performHapticFeedback(settings.vibrate);
               Navigator.of(context).pop();

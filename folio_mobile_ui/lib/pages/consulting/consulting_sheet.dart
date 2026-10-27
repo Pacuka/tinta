@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:folio_kreta_api/models/consulting_hour.dart';
+import 'package:folio_kreta_api/providers/case_provider.dart';
 import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/pages/consulting/ics.dart';
+import 'package:i18n_extension/i18n_extension.dart' show I18n;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'consulting.i18n.dart';
 
 String _hm(DateTime d) => DateFormat("HH:mm").format(d);
 
 String consultingStateLabel(ConsultingHour hour, DateTime now) {
   switch (hour.state(now)) {
     case ConsultingState.booked:
-      return "Jelentkezés leadva · ${_hm(hour.myBooking!.start)}";
+      return "state_booked".i18n.fill([_hm(hour.myBooking!.start)]);
     case ConsultingState.noSignup:
-      return "Nem kell jelentkezni";
+      return "state_no_signup".i18n;
     case ConsultingState.closed:
-      return "Lezárult";
+      return "state_closed".i18n;
     case ConsultingState.full:
-      return "Nincs szabad hely";
+      return "state_full".i18n;
     case ConsultingState.open:
-      return "Szabad jelentkezés";
+      return "state_open".i18n;
   }
 }
 
@@ -32,19 +36,33 @@ String? deadlineHint(ConsultingHour hour, DateTime now) {
   final days = DateUtils.dateOnly(deadline)
       .difference(DateUtils.dateOnly(now))
       .inDays;
-  if (days <= 0) return "Ma még jelentkezhetsz";
-  return "Még $days napig jelentkezhetsz";
+  if (days <= 0) return "hint_today".i18n;
+  return "hint_days".i18n.fill([days]);
 }
 
-String consultingDay(DateTime d) =>
-    DateFormat("MMMM d., EEEE", "hu_HU").format(d);
+String consultingDay(DateTime d) => I18n.locale.languageCode == "hu"
+    ? DateFormat("MMMM d., EEEE", "hu_HU").format(d)
+    : DateFormat("EEEE, MMMM d", I18n.locale.toString()).format(d);
+
+/// The provider's (Hungarian) messages in the app's language.
+String consultingErrorText(String error) {
+  const keys = {
+    consultingTakenMessage: "err_taken",
+    consultingAlreadyMessage: "err_already",
+    consultingFailedMessage: "err_failed",
+    uncertainSubmitMessage: "err_uncertain",
+    networkErrorMessage: "err_network",
+  };
+  return keys[error]?.i18n ?? error;
+}
 
 /// Details + booking / cancelling, wired to [ConsultingProvider].
 Future<void> showConsultingSheet(BuildContext context, ConsultingHour hour) {
   final provider = Provider.of<ConsultingProvider>(context, listen: false);
   final messenger = ScaffoldMessenger.of(context);
   void report(String? error, String ok) {
-    messenger.showSnackBar(SnackBar(content: Text(error ?? ok)));
+    messenger.showSnackBar(SnackBar(
+        content: Text(error != null ? consultingErrorText(error) : ok)));
   }
 
   return showRoundedModalBottomSheet(
@@ -53,12 +71,12 @@ Future<void> showConsultingSheet(BuildContext context, ConsultingHour hour) {
       hour: hour,
       onBook: (slot) async {
         final error = await provider.book(slot, hour);
-        report(error, "Sikeres jelentkezés!");
+        report(error, "booked_ok".i18n);
         return error;
       },
       onCancel: (slot) async {
         final error = await provider.cancel(slot, hour);
-        report(error, "Lemondva.");
+        report(error, "cancelled_ok".i18n);
         return error;
       },
     ),
@@ -98,12 +116,12 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text("Mégse"),
+            child: Text("no".i18n),
           ),
           TextButton(
             key: const Key("consulting-confirm"),
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text("Igen"),
+            child: Text("yes".i18n),
           ),
         ],
       ),
@@ -134,7 +152,7 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
     if (slot == null || _busy) return;
     _busy = true; // block a second tap before the dialog is up
     final ok = await _confirm(
-        "Biztosan jelentkezel erre az időpontra?", _slotText(slot));
+        "confirm_book".i18n, _slotText(slot));
     _busy = false;
     if (!ok || !mounted) return;
     await _run(() => widget.onBook(slot));
@@ -145,10 +163,10 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
     final late = (hour.deadline ?? hour.end).isBefore(DateTime.now());
     _busy = true;
     final ok = await _confirm(
-        "Biztosan lemondod a foglalást?",
+        "confirm_cancel".i18n,
         _slotText(slot) +
             (late
-                ? "\n\nA jelentkezési határidő lejárt, utána már nem tudsz újra jelentkezni."
+                ? "\n\n${"late_cancel".i18n}"
                 : ""));
     _busy = false;
     if (!ok || !mounted) return;
@@ -177,10 +195,13 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
           Text(
               "${consultingDay(hour.start)}, ${_hm(hour.start)}–${_hm(hour.end)}",
               style: muted),
-          if (hour.room.isNotEmpty) Text("Terem: ${hour.room}", style: muted),
+          if (hour.room.isNotEmpty)
+            Text("room".i18n.fill([hour.room]), style: muted),
           if (hour.deadline != null && hour.signupEnabled)
             Text(
-                "Jelentkezési határidő: ${consultingDay(hour.deadline!)}, ${_hm(hour.deadline!)}",
+                "deadline".i18n.fill([
+                  "${consultingDay(hour.deadline!)}, ${_hm(hour.deadline!)}"
+                ]),
                 style: muted),
           const SizedBox(height: 12),
           _StateChip(text: consultingStateLabel(hour, now), state: state),
@@ -198,7 +219,7 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
                   key: const Key("consulting-calendar"),
                   onPressed: () => shareIcs(hour, mine),
                   icon: const Icon(Icons.event_rounded),
-                  label: const Text("Naptárba"),
+                  label: Text("calendar".i18n),
                 ),
               ),
               const SizedBox(width: 10),
@@ -207,13 +228,13 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
                   key: const Key("consulting-cancel"),
                   onPressed: _busy ? null : () => _cancel(mine),
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text("Lemondás"),
+                  label: Text("cancel_booking".i18n),
                 ),
               ),
             ]),
           ] else if (state == ConsultingState.open) ...[
-            const Text("Válassz időpontot:",
-                style: TextStyle(fontWeight: FontWeight.w700)),
+            Text("pick_slot".i18n,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -241,7 +262,7 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
                         height: 18,
                         width: 18,
                         child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text("Foglalás"),
+                    : Text("book".i18n),
               ),
             ),
           ],

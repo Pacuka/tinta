@@ -5,6 +5,8 @@ import 'package:folio_mobile_ui/common/type_tag.dart';
 import 'package:folio_mobile_ui/pages/consulting/consulting_sheet.dart';
 import 'package:intl/intl.dart';
 
+import 'consulting.i18n.dart';
+
 /// Home feed item for an own consultation booking (looks like ExamTile).
 class ConsultingTile extends StatelessWidget {
   const ConsultingTile(this.hour, {super.key});
@@ -43,7 +45,7 @@ class ConsultingTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
           ),
-          trailing: const TypeTag("Fogadóóra"),
+          trailing: TypeTag("consulting_tag".i18n),
           minLeadingWidth: 0,
         ),
       ),

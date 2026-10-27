@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:folio_kreta_api/models/consulting_hour.dart';
 import 'package:folio_mobile_ui/pages/consulting/consulting_sheet.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:folio_kreta_api/providers/consulting_provider.dart';
 
 ConsultingHour _hour({
   bool signup = true,
@@ -37,7 +39,26 @@ ConsultingHour _hour({
 final _now = DateTime(2026, 11, 2, 10);
 
 void main() {
-  setUpAll(() => initializeDateFormatting("hu_HU"));
+  setUpAll(() async {
+    await initializeDateFormatting("hu_HU");
+    await initializeDateFormatting("en_US");
+  });
+  setUp(() => I18n.define(const Locale("hu", "HU")));
+
+  test('English labels', () {
+    I18n.define(const Locale("en", "US"));
+    expect(consultingStateLabel(_hour(), _now), "Open for sign-up");
+    expect(consultingStateLabel(_hour(mine: true), _now), "Booked · 16:10");
+    expect(deadlineHint(_hour(), _now), "You can sign up for 2 more days");
+    expect(consultingErrorText(consultingTakenMessage),
+        "Someone just took this time, pick another one!");
+  });
+
+  test('error texts are translated, unknown ones pass through', () {
+    expect(consultingErrorText(consultingAlreadyMessage),
+        "Már van foglalásod ennél a tanárnál.");
+    expect(consultingErrorText("valami más"), "valami más");
+  });
 
   group('consultingStateLabel', () {
     test('each state', () {
