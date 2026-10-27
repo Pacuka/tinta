@@ -150,6 +150,8 @@ class KretaClient {
     bool autoHeader = true,
     bool json = true,
     Object? body,
+    // Return the raw http.Response (status + body) instead of the body.
+    bool rawResponse = false,
   }) async {
     Map<String, String> headerMap;
 
@@ -207,6 +209,7 @@ class KretaClient {
 
       if (res == null) throw "Login error";
 
+      if (rawResponse) return res;
       if (json) {
         return jsonDecode(res.body);
       } else {

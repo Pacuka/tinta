@@ -91,6 +91,13 @@ class KretaAPI {
       BaseKreta.kretaAdmin + KretaAdminEndpoints.recipientTeachers;
   static String get recipientDirectorate =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.recipientDirectorate;
+  static String get tmgiTypes =>
+      BaseKreta.kretaAdmin + KretaAdminEndpoints.tmgiTypes;
+  static String get caseTypes =>
+      BaseKreta.kretaAdmin + KretaAdminEndpoints.caseTypes;
+  static String get childData =>
+      BaseKreta.kretaAdmin + KretaAdminEndpoints.childData;
+  static String get cases => BaseKreta.kretaAdmin + KretaAdminEndpoints.cases;
   static String get uploadAttachment =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.uploadAttachment;
   static String downloadAttachment(String id) =>
@@ -166,6 +173,11 @@ class KretaAdminEndpoints {
   static const recipientTeachers = "/api/v1/kreta/alkalmazottak/tanar";
   static const recipientDirectorate = "/api/v1/kreta/alkalmazottak/igazgatosag";
   static const uploadAttachment = "/ideiglenesfajlok";
+  // absence justification (TMGI case), parent accounts
+  static const tmgiTypes = "/api/v1/adatszotarak/tmgiigazolastipusok";
+  static const caseTypes = "/api/v1/adatszotarak/kerelemtipusok";
+  static const childData = "/api/v1/kreta/gyerekemadatok";
+  static const cases = "/api/v1/ugy/kerelmek";
   static String downloadAttachment(String id) =>
       "/api/v1/dokumentumok/uzenetek/$id";
   static const trashMessage = "/api/v1/kommunikacio/postaladaelemek/kuka";

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:folio_kreta_api/models/justification.dart';
+import 'package:folio_kreta_api/providers/case_provider.dart';
 
 final _caseType = KretaType.fromJson(
     {"azonosito": 1, "kod": "TMGI", "nev": "Tanulói mulasztás igazolása"});
@@ -103,5 +104,28 @@ void main() {
     expect(c.typeName, "Orvosi igazolás");
     expect(c.stateName, "Beküldve");
     expect(c.sent, isNotNull);
+  });
+
+  group('CaseProvider helpers', () {
+    test('findTmgiType', () {
+      final types = [
+        KretaType.fromJson({"kod": "EGYEB", "nev": "x"}),
+        KretaType.fromJson({"kod": "TMGI", "nev": "y"}),
+      ];
+      expect(findTmgiType(types)?.name, "y");
+      expect(findTmgiType([types.first]), isNull);
+    });
+
+    test('parseSubmitError', () {
+      expect(parseSubmitError(200, '{"azonosito": 1}'), isNull);
+      expect(parseSubmitError(200, ''), isNull);
+      expect(parseSubmitError(204, null), isNull);
+      expect(parseSubmitError(200, '{"hibakod": "X", "uzenet": "Rossz dátum"}'),
+          "Rossz dátum");
+      expect(parseSubmitError(400, '{"Message": "Hibás kérés"}'), "Hibás kérés");
+      expect(parseSubmitError(500, '<html>'),
+          "A KRÉTA hibát adott vissza (500).");
+      expect(parseSubmitError(null, null), "Nem sikerült elérni a KRÉTA-t.");
+    });
   });
 }
