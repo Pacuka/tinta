@@ -116,6 +116,20 @@ kell, és mindegyiknél él a **7 napos** frissítés meg a **max. 3 app** szab�
 | **Sideloadly** – https://sideloadly.io | igen (Windows/Mac) | a legegyszerűbb: csak behúzod a `Tinta.ipa`-t a programba, beírod az Apple ID-t, kész. Be lehet állítani, hogy magától frissítsen, ha a telefon ugyanazon a wifin van. Windowson ugyanúgy az Apple oldaláról letöltött iTunes + iCloud kell hozzá. |
 | **SideStore** – https://sidestore.io | csak **egyszer**, az elején | utána a 7 napos frissítés a telefonon megy, gép nélkül (egy kis „VPN” appot kell hozzá bekapcsolni). Haladóbbaknak, a beállítás kicsit macerásabb. |
 
+## „Nem akarok 7 naponta frissíteni” – mik a lehetőségek?
+
+Érthető. Ezek léteznek, de mindegyiknek ára van:
+
+| Megoldás | Meddig megy? | Mennyibe kerül? | Mi a gond vele? |
+|---|---|---|---|
+| **Fizetős tanúsítvány** (webshopok árulják, a telefonod azonosítóját /UDID/ felveszik egy fejlesztői fiókba) | kb. 1 év | kb. 10–25 €/év | Egy idegen cég fiókjától függsz: ha az Apple letiltja, minden app leáll (a jobb boltok ilyenkor adnak újat). Elfogadható, ha tudod, mit veszel. |
+| **Ingyenes, közös tanúsítványok + „DNS profil”** (pl. WSF, ESign „anti-revoke”, Scarlet, GBox) | ahogy épp sikerül – hetek, hónapok | ingyen | **Nem ajánlott.** Ezek több ezer ember között megosztott, gyakran kiszivárgott céges tanúsítványok, bármikor letilthatják őket. A DNS profil telepítése után ráadásul **minden** weboldal-cím, amit a telefonod megnyit, egy ismeretlen szerveren megy át. A Tintában KRÉTA-belépés van – ide ez nem való. |
+| **Saját Apple fejlesztői fiók** | 1 év | 99 $/év | Átlagfelhasználónak nem éri meg. (Ha a Tintának egyszer lesz ilyen, a barátok kaphatnak 1 évig működő verziót – ha így lesz, ide beírom.) |
+
+**Tipp, hogy a 7 nap ne legyen macera:** az AltStore és a Sideloadly is tud **magától**
+frissíteni, ha a gépen fut a program, és a telefon ugyanazon a wifin van (pl. otthon
+este). Ha ezt beállítod, gyakorlatilag nem kell vele foglalkoznod.
+
 ## És az EU-s megoldások?
 
 Az EU-s szabályozás (DMA) miatt az EU-ban vett/használt iPhone-okon (iOS 17.4-től)
@@ -132,6 +146,6 @@ odakerül, ide beírom. Addig a fenti módszerek közül válassz.
 
 Írj nekem, vagy nyiss hibajegyet: https://github.com/Pacuka/tinta/issues
 
-> 🔒 Csak a fenti, hivatalos AltStore-t használd. Az „ESign”, „Scarlet”, „GBox” és
-> hasonló „gép nélkül, örökre” megoldások kiszivárgott céges tanúsítványokkal
-> működnek: bármikor letilthatják őket, és nem tudhatod, ki fér hozzá az appjaidhoz.
+> 🔒 A „gép nélkül, örökre, ingyen” megoldásokról (ESign, WSF, Scarlet, GBox…) lásd
+> fent: bármikor leállhatnak, és a DNS profiljuk miatt nem tudhatod, ki látja, mit
+> csinálsz a telefonon. Ha teheted, maradj az AltStore-nál vagy a Sideloadly-nél.
