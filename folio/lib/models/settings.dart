@@ -20,6 +20,11 @@ enum UpdateChannel { stable, beta, dev }
 
 enum VibrationStrength { off, light, medium, strong }
 
+/// Fresh installs: iPhones start with the Üveg (Liquid Glass) theme, other
+/// phones with Kobalt. Users can change it in the settings.
+AccentColor defaultAccent({required bool isIOS}) =>
+    isIOS ? AccentColor.uveg : AccentColor.kobalt;
+
 class SettingsProvider extends ChangeNotifier {
   final DatabaseProvider? _database;
 
@@ -330,7 +335,7 @@ class SettingsProvider extends ChangeNotifier {
               map["accent_color"] >= 0 &&
               map["accent_color"] < AccentColor.values.length)
           ? AccentColor.values[map["accent_color"]]
-          : AccentColor.kobalt,
+          : defaultAccent(isIOS: Platform.isIOS),
       gradeColors: [
         Color(map["grade_color1"]),
         Color(map["grade_color2"]),
@@ -525,7 +530,7 @@ class SettingsProvider extends ChangeNotifier {
       startPage: Pages.home,
       rounding: 5,
       theme: ThemeMode.system,
-      accentColor: AccentColor.kobalt,
+      accentColor: defaultAccent(isIOS: Platform.isIOS),
       gradeColors: [
         DarkMobileAppColors().gradeOne,
         DarkMobileAppColors().gradeTwo,

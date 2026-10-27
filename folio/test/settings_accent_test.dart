@@ -8,6 +8,11 @@ void main() {
     expect(SettingsProvider.defaultSettings().accentColor, AccentColor.kobalt);
   });
 
+  test('iPhone starts with Üveg, other phones with Kobalt', () {
+    expect(defaultAccent(isIOS: true), AccentColor.uveg);
+    expect(defaultAccent(isIOS: false), AccentColor.kobalt);
+  });
+
   test('fromMap keeps the saved accent color', () {
     final map = SettingsProvider.defaultSettings().toMap();
     map['accent_color'] = AccentColor.petrol.index;
