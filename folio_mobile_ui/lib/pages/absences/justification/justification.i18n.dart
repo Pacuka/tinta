@@ -56,6 +56,7 @@ extension JustificationLocalization on String {
           "rectification_confirm":
               "This document goes to the school as a reply to the request:",
           "rectification_sent": "Missing document sent.",
+          "attached_docs": "Attached documents",
         },
         "hu-HU": {
           "justify": "Igazolás",
@@ -110,6 +111,7 @@ extension JustificationLocalization on String {
           "rectification_confirm":
               "Ez a dokumentum a kérelemre válaszként megy az iskolához:",
           "rectification_sent": "Hiánypótlás beküldve.",
+          "attached_docs": "Csatolt dokumentumok",
         },
       };
 

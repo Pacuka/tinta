@@ -250,7 +250,7 @@ class _RectificationPageState extends State<_RectificationPage> {
             child: Text(t, style: const TextStyle(fontSize: 16)),
           ),
         AttachmentSection(
-          title: "attach_new".i18n,
+          title: "attached_docs".i18n,
           controller: _files,
           enabled: !_sending,
         ),
