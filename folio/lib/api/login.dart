@@ -114,6 +114,10 @@ Future newLoginAPI({
                 DateTime.now().add(Duration(seconds: (res["expires_in"] - 30))),
             refreshToken: res["refresh_token"],
           );
+          if (role == Role.parent) {
+            user.parentFirstName = parentFirstNameFromFullName(
+                JwtUtils.decodeJwt(res["access_token"])?["name"]);
+          }
           user.idpApplication = idpApplication ?? '';
           user.idpRememberBrowser = idpRememberBrowser ?? '';
 

@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:folio/utils/jwt.dart';
+import 'package:folio/models/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
@@ -132,6 +134,12 @@ Future<void> _syncAll(BuildContext context) async {
 
       user.user?.name = student.name;
       user.user?.student = student;
+
+      // Parent accounts: the guardian's first name for the home greeting
+      if (user.user?.role == Role.parent) {
+        user.user?.parentFirstName = parentFirstNameFromFullName(
+            JwtUtils.decodeJwt(user.user!.accessToken)?["name"]);
+      }
 
       // Store user
       await Provider.of<DatabaseProvider>(context, listen: false)

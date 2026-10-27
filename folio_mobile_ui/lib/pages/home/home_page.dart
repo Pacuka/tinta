@@ -1,4 +1,5 @@
 // ignore_for_file: dead_code
+import 'package:folio/models/user.dart';
 import 'dart:math';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -137,9 +138,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void setGreeting() {
     DateTime now = DateTime.now();
-    List<String> nameParts = user.displayName?.split(" ") ?? ["?"];
+    final isParent = user.user?.role == Role.parent;
     if (!settings.presentationMode) {
-      firstName = nameParts.length > 1 ? nameParts[1] : nameParts[0];
+      firstName = user.user?.greetingFirstName ?? "?";
     } else {
       firstName = "János";
     }
@@ -152,7 +153,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       greeting = "goodrest";
 
       _celebrate(const Duration(seconds: 1));
-    } else if (now.month == user.student?.birth.month &&
+    } else if (!isParent &&
+        now.month == user.student?.birth.month &&
         now.day == user.student?.birth.day) {
       greeting = "happybirthday";
       final age = now.year - user.student!.birth.year;
@@ -165,7 +167,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       _celebrate(const Duration(seconds: 3));
     } else if (!settings.presentationMode &&
-        NameDay.isNameDay(nameParts.skip(1), now)) {
+        !isParent &&
+        NameDay.isNameDay(
+            (user.displayName ?? "").split(" ").skip(1), now)) {
       greeting = "happynameday";
       if (_hasLessonsToday(now)) greetingSub = "noschoolruin".i18n;
       _celebrate(const Duration(seconds: 2));
@@ -191,7 +195,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
 
       customWelcome = true;
-    } else if (_dayNumber(now) % 2 == 0 && now.hour >= 6 && now.hour < 21) {
+    } else if (!isParent &&
+        _dayNumber(now) % 2 == 0 &&
+        now.hour >= 6 &&
+        now.hour < 21) {
       greeting = "fun_${(_dayNumber(now) ~/ 2) % 8}";
     } else if (now.hour >= 21 || now.hour < 4) {
       greeting = "goodnight";
@@ -382,10 +389,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   const SizedBox(height: 2.0),
                                   Text(
                                     greetingSub ??
-                                        DateFormat('EEEE, MMM d',
-                                                I18n.locale.countryCode)
-                                            .format(DateTime.now())
-                                            .capital(),
+                                        // Parents see whose data this is
+                                        (user.user?.role == Role.parent
+                                            ? "${user.user!.displayName.split(" ").skip(1).join(" ")} · "
+                                            : "") +
+                                            DateFormat('EEEE, MMM d',
+                                                    I18n.locale.countryCode)
+                                                .format(DateTime.now())
+                                                .capital(),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                       fontSize: 14.0,

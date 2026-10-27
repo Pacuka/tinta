@@ -86,6 +86,7 @@ const usersDB = DatabaseStruct("users", {
   "id": String, "name": String, "username": String, "password": String,
   "institute_code": String, "student": String, "role": int,
   "nickname": String, "picture": String, // premium only (it's now plus btw)
+  "parent_first_name": String,
   "grade_streak": int,
   "access_token": String, "access_token_expire": String,
   "refresh_token": String,
@@ -166,6 +167,7 @@ Future<Database> initDB(DatabaseProvider database) async {
       defaultValues: {
         "role": 0,
         "nickname": "",
+        "parent_first_name": "",
         "picture": "",
         "grade_streak": 0,
         "access_token": "",

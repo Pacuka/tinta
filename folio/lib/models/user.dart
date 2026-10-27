@@ -8,6 +8,19 @@ const String demoUserId = 'demo-user-00000000-0000-0000-0000-000000000000';
 
 enum Role { student, parent }
 
+/// Parent accounts: KRÉTA puts the guardian's own name ("Pintér István",
+/// family name first) in the token's `name` claim; we keep the first name.
+String parentFirstNameFromFullName(Object? fullName) {
+  final parts = (fullName ?? '')
+      .toString()
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((p) => p.isNotEmpty && !p.endsWith('.'))
+      .toList();
+  if (parts.isEmpty) return '';
+  return parts.length > 1 ? parts[1] : parts[0];
+}
+
 class User {
   late String id;
   String username;
@@ -17,6 +30,10 @@ class User {
   Student student;
   Role role;
   String nickname;
+
+  /// Parent accounts: the guardian's own first name (from the KRÉTA guardian
+  /// profile), used only in the home greeting. Empty otherwise.
+  String parentFirstName;
   String picture;
   int gradeStreak;
   // new login method
@@ -31,6 +48,16 @@ class User {
   // String qwidRefreshToken;
 
   String get displayName => nickname != '' ? nickname : name;
+
+  /// Name for the home greeting: the parent on parent accounts (when known),
+  /// otherwise the student's first name.
+  String get greetingFirstName {
+    if (role == Role.parent && parentFirstName.isNotEmpty) {
+      return parentFirstName;
+    }
+    final parts = displayName.split(" ");
+    return parts.length > 1 ? parts[1] : parts[0];
+  }
   bool get hasStreak => gradeStreak > 0;
 
   User({
@@ -42,6 +69,7 @@ class User {
     required this.student,
     required this.role,
     this.nickname = "",
+    this.parentFirstName = "",
     this.picture = "",
     this.gradeStreak = 0,
     required this.accessToken,
@@ -80,6 +108,7 @@ class User {
             ),
       role: Role.values[map["role"] ?? 0],
       nickname: map["nickname"] ?? "",
+      parentFirstName: map["parent_first_name"] ?? "",
       picture: map["picture"] ?? "",
       gradeStreak: map["grade_streak"] ?? 0,
       accessToken: map["access_token"] ?? "",
@@ -107,6 +136,7 @@ class User {
       "student": jsonEncode(student.json),
       "role": role.index,
       "nickname": nickname,
+      "parent_first_name": parentFirstName,
       "picture": picture,
       "grade_streak": gradeStreak,
       "access_token": accessToken,
