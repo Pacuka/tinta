@@ -5,6 +5,7 @@ import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio/helpers/average_helper.dart';
 import 'package:folio/helpers/grade_insights.dart';
 import 'package:folio/helpers/motion_once.dart';
+import 'package:folio/theme/glass.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/ui/widgets/grade/grade_tile.dart';
 import 'package:folio/utils/format.dart';
@@ -608,7 +609,17 @@ class _SubjectsTab extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                        BorderRadius.circular(isGlassTheme(context) ? 18 : 16),
+                    border: isGlassTheme(context)
+                        ? Border.all(
+                            width: 0.8,
+                            color: Colors.white.withValues(
+                                alpha: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? 0.07
+                                    : 0.8))
+                        : null,
                     boxShadow: settings.shadowEffect
                         ? [
                             BoxShadow(

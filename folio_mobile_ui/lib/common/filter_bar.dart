@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:folio/theme/colors/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
 
 class FilterBar extends StatefulWidget implements PreferredSizeWidget {
   const FilterBar({
@@ -67,10 +68,17 @@ class _FilterBarState extends State<FilterBar> {
           ? TabBarIndicatorSize.tab
           : TabBarIndicatorSize.label,
       indicator: widget.pillStyle
-          ? BoxDecoration(
-              color: colorScheme.secondary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14.0),
-            )
+          ? (isGlassTheme(context)
+              ? BoxDecoration(
+                  color: colorScheme.secondary.withValues(alpha: 0.24),
+                  borderRadius: BorderRadius.circular(14.0),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.12)),
+                )
+              : BoxDecoration(
+                  color: colorScheme.secondary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14.0),
+                ))
           : null,
       indicatorPadding: widget.pillStyle
           ? const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0)

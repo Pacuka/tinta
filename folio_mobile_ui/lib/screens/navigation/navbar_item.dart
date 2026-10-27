@@ -15,11 +15,15 @@ class NavbarItem extends StatelessWidget {
     required this.item,
     required this.active,
     required this.onTap,
+    this.glass = false,
   });
 
   final NavItem item;
   final bool active;
   final void Function() onTap;
+
+  /// Üveg theme: the active pill is a light "lens" instead of a solid chip.
+  final bool glass;
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +45,15 @@ class NavbarItem extends StatelessWidget {
                 ? const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0)
                 : const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             decoration: BoxDecoration(
-              color: active ? colorScheme.secondaryContainer : Colors.transparent,
+              color: !active
+                  ? Colors.transparent
+                  : glass
+                      ? colorScheme.secondary.withValues(alpha: 0.20)
+                      : colorScheme.secondaryContainer,
               borderRadius: BorderRadius.circular(50.0),
+              border: glass && active
+                  ? Border.all(color: Colors.white.withValues(alpha: 0.25))
+                  : null,
             ),
             child: IconTheme(
               data: IconThemeData(

@@ -12,6 +12,7 @@ import 'package:folio_mobile_ui/common/widgets/exam/exam_viewable.dart';
 import 'package:folio_mobile_ui/common/widgets/homework/homework_viewable.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/helpers/timetable_insights.dart';
+import 'package:folio/theme/glass.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'lesson_tile.i18n.dart';
@@ -142,7 +143,7 @@ class LessonTile extends StatelessWidget {
         padding: padding ?? const EdgeInsets.only(bottom: 6.0),
         child: Material(
           color: cardColor,
-          borderRadius: BorderRadius.circular(18.0),
+          shape: _cardShape(context),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
@@ -262,7 +263,7 @@ class LessonTile extends StatelessWidget {
             Expanded(
               child: Material(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(18.0),
+                shape: _cardShape(context),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: onTap,
@@ -426,6 +427,19 @@ class LessonTile extends StatelessWidget {
     );
   }
 }
+
+/// Rounded card; the Üveg theme adds a hairline of light around it.
+ShapeBorder _cardShape(BuildContext context) => RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18.0),
+      side: isGlassTheme(context)
+          ? BorderSide(
+              width: 0.8,
+              color: Colors.white.withValues(
+                  alpha: Theme.of(context).brightness == Brightness.dark
+                      ? 0.07
+                      : 0.8))
+          : BorderSide.none,
+    );
 
 enum LessonSubtileType { homework, exam, absence }
 

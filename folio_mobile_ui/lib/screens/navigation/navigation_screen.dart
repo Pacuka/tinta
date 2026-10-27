@@ -23,6 +23,8 @@ import 'package:folio_mobile_ui/screens/settings/live_activity_consent_dialog.da
 import 'package:folio_mobile_ui/common/widgets/update/update_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
+import 'package:folio_mobile_ui/common/glass_backdrop.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:folio_mobile_ui/common/screens.i18n.dart';
@@ -267,7 +269,12 @@ class NavigationScreenState extends State<NavigationScreen>
               initialRoute: selected.name,
               onGenerateRoute: (settings) => navigationRouteHandler(settings),
             ),
-            // A lista elhalványul a lebegő menüsor mögött
+            // Üveg: halvány színes fények az egész app fölött
+            if (isGlassTheme(context))
+              const Positioned.fill(child: GlassBackdrop()),
+            // A lista elhalványul a lebegő menüsor mögött (üvegnél a
+            // menüsor maga mossa el, ami mögötte van)
+            if (!isGlassTheme(context))
             IgnorePointer(
               child: Container(
                 height: 96.0 + MediaQuery.of(context).padding.bottom,
