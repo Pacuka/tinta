@@ -386,7 +386,7 @@ Container(
               ),
             ),
           ),
-  const InkStroke(),
+  const InkStroke(style: InkStyle.blot, motionKey: "notes"),
 ]),
           Expanded(
             child: RefreshIndicator(

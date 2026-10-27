@@ -437,7 +437,7 @@ Container(
               ),
             ),
           ),
-  const InkStroke(),
+  const InkStroke(style: InkStyle.still),
 ]),
           Expanded(
             child: TabBarView(

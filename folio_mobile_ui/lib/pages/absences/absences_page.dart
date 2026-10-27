@@ -352,7 +352,7 @@ Container(
               ),
             ),
           ),
-  const InkStroke(),
+  const InkStroke(style: InkStyle.blot, motionKey: "absences"),
 ]),
           // ─── Content ─────────────────────────────────────────────────
           Expanded(

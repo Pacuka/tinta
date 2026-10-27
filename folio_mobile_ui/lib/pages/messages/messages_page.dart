@@ -219,7 +219,7 @@ Container(
               ),
             ),
           ),
-  const InkStroke(),
+  const InkStroke(style: InkStyle.drop, motionKey: "messages"),
 ]),
           Expanded(
             child: TabBarView(

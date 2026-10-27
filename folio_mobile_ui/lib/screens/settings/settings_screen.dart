@@ -962,7 +962,7 @@ Container(
               ),
             ),
           ),
-  const InkStroke(),
+  const InkStroke(style: InkStyle.still),
 ]),
 
           // ── Scrollable content ────────────────────────────────

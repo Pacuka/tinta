@@ -248,7 +248,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const InkStroke(padding: EdgeInsets.fromLTRB(24.0, 0, 24.0, 4.0)),
+            const InkStroke(
+                padding: EdgeInsets.fromLTRB(24.0, 0, 24.0, 4.0),
+                motionKey: "home"),
             bar,
           ],
         ),
