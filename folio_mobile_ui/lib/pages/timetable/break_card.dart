@@ -36,7 +36,7 @@ class BreakCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
         decoration: BoxDecoration(
-          color: AppColors.of(context).highlight,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
