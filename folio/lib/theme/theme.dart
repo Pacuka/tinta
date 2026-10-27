@@ -1,3 +1,4 @@
+import 'package:folio/theme/glass.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/accent.dart';
 import 'package:folio/theme/colors/colors.dart';
@@ -53,8 +54,12 @@ class AppTheme {
         accentColorMap[accentColor] ??
         const Color(0x00000000);
 
-    if (accentColor == AccentColor.adaptive) {
-      final userSeed = settings.adaptiveSeedColor;
+    final followsSystem =
+        followsSystemColors(accentColor, hasSystemPalette: palette != null);
+    if (followsSystem) {
+      final userSeed = accentColor == AccentColor.adaptive
+          ? settings.adaptiveSeedColor
+          : null;
       if (userSeed != null) {
         accent = userSeed;
       } else if (palette != null) {
@@ -72,7 +77,8 @@ class AppTheme {
             ? settings.customHighlightColor
             : _paletteHighlightLight(palette)) ??
         lightColors.highlight;
-    final tinta = tintaPalette(accentColor, Brightness.light);
+    final tinta =
+        followsSystem ? null : tintaPalette(accentColor, Brightness.light);
     if (tinta != null) {
       accent = tinta.accent;
       backgroundColor = tinta.background;
@@ -80,14 +86,16 @@ class AppTheme {
     }
     Color textColor = lightColors.text;
 
-    Color newSecondary = (accentColor == AccentColor.adaptive ||
+    Color newSecondary = (followsSystem ||
+                accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
                 accentColor == AccentColor.ogfilc ||
                 tinta != null) ||
             !settings.newColors
         ? accent
         : ColorsUtils().darken(accent, amount: 0.4);
-    Color newTertiary = (accentColor == AccentColor.adaptive ||
+    Color newTertiary = (followsSystem ||
+                accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
                 accentColor == AccentColor.ogfilc ||
                 tinta != null) ||
@@ -324,8 +332,12 @@ class AppTheme {
         accentColorMap[accentColor] ??
         const Color(0x00000000);
 
-    if (accentColor == AccentColor.adaptive) {
-      final userSeed = settings.adaptiveSeedColor;
+    final followsSystem =
+        followsSystemColors(accentColor, hasSystemPalette: palette != null);
+    if (followsSystem) {
+      final userSeed = accentColor == AccentColor.adaptive
+          ? settings.adaptiveSeedColor
+          : null;
       if (userSeed != null) {
         accent = userSeed;
       } else if (palette != null) {
@@ -343,7 +355,8 @@ class AppTheme {
             ? settings.customHighlightColor
             : _paletteHighlightDark(palette)) ??
         darkColors.highlight;
-    final tinta = tintaPalette(accentColor, Brightness.dark);
+    final tinta =
+        followsSystem ? null : tintaPalette(accentColor, Brightness.dark);
     if (tinta != null) {
       accent = tinta.accent;
       backgroundColor = tinta.background;
@@ -351,14 +364,16 @@ class AppTheme {
     }
     Color textColor = darkColors.text;
 
-    Color newSecondary = (accentColor == AccentColor.adaptive ||
+    Color newSecondary = (followsSystem ||
+                accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
                 accentColor == AccentColor.ogfilc ||
                 tinta != null) ||
             !settings.newColors
         ? accent
         : ColorsUtils().lighten(accent, amount: 0.22);
-    Color newTertiary = (accentColor == AccentColor.adaptive ||
+    Color newTertiary = (followsSystem ||
+                accentColor == AccentColor.adaptive ||
                 accentColor == AccentColor.custom ||
                 accentColor == AccentColor.ogfilc ||
                 tinta != null) ||

@@ -20,3 +20,10 @@ BorderSide glassHairline(BuildContext context) => isGlassTheme(context)
 /// Card corner radius: a little rounder in the Üveg theme.
 double glassRadius(BuildContext context, double normal) =>
     isGlassTheme(context) ? 18.0 : normal;
+
+/// Whether the theme takes its colours from the phone (wallpaper / system
+/// theme, e.g. HyperOS or Material You). Üveg does when the phone offers
+/// them; otherwise (iPhone, older Android) it keeps its own blue palette.
+bool followsSystemColors(AccentColor c, {required bool hasSystemPalette}) =>
+    c == AccentColor.adaptive ||
+    (c == AccentColor.uveg && hasSystemPalette);
