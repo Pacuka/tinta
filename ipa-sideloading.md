@@ -123,7 +123,7 @@ kell, és mindegyiknél él a **7 napos** frissítés meg a **max. 3 app** szab�
 | Megoldás | Meddig megy? | Mennyibe kerül? | Mi a gond vele? |
 |---|---|---|---|
 | **Fizetős tanúsítvány** (webshopok árulják, a telefonod azonosítóját /UDID/ felveszik egy fejlesztői fiókba) | kb. 1 év | kb. 10–25 €/év | Egy idegen cég fiókjától függsz: ha az Apple letiltja, minden app leáll (a jobb boltok ilyenkor adnak újat). Elfogadható, ha tudod, mit veszel. |
-| **Ingyenes, közös tanúsítványok + „DNS profil”** (pl. WSF, ESign „anti-revoke”, Scarlet, GBox) | ahogy épp sikerül – hetek, hónapok | ingyen | **Nem ajánlott.** Ezek több ezer ember között megosztott, gyakran kiszivárgott céges tanúsítványok, bármikor letilthatják őket. A DNS profil telepítése után ráadásul **minden** weboldal-cím, amit a telefonod megnyit, egy ismeretlen szerveren megy át. A Tintában KRÉTA-belépés van – ide ez nem való. |
+| **Ingyenes, közös tanúsítványok + konfigurációs profil** (pl. WSF, ESign „anti-revoke”, Scarlet, GBox) | amíg az Apple rá nem jön – hetek, hónapok | ingyen | **Nem ajánlott.** A profil letiltja, hogy a telefon elérje az Apple ellenőrző szervereit, és vele együtt az **iOS-frissítéseket is** (biztonsági javításokat sem kapsz). Egyes változatok minden címkérést a **saját DNS-szerverükön** visznek át. A tanúsítványok idegenek, sokan használják őket közösen. Ha mégis letiltják, a javítás sokszor a telefon visszaállítása vagy törlése. A Tintában KRÉTA-belépés van, ide ez nem való. |
 | **Saját Apple fejlesztői fiók** | 1 év | 99 $/év | Átlagfelhasználónak nem éri meg. (Ha a Tintának egyszer lesz ilyen, a barátok kaphatnak 1 évig működő verziót – ha így lesz, ide beírom.) |
 
 **Tipp, hogy a 7 nap ne legyen macera:** az AltStore és a Sideloadly is tud **magától**
@@ -147,5 +147,5 @@ odakerül, ide beírom. Addig a fenti módszerek közül válassz.
 Írj nekem, vagy nyiss hibajegyet: https://github.com/Pacuka/tinta/issues
 
 > 🔒 A „gép nélkül, örökre, ingyen” megoldásokról (ESign, WSF, Scarlet, GBox…) lásd
-> fent: bármikor leállhatnak, és a DNS profiljuk miatt nem tudhatod, ki látja, mit
-> csinálsz a telefonon. Ha teheted, maradj az AltStore-nál vagy a Sideloadly-nél.
+> fent: bármikor leállhatnak, és a profiljuk letiltja az iOS-frissítéseket. Ha
+> teheted, maradj az AltStore-nál vagy a Sideloadly-nél.
