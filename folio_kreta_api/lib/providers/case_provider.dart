@@ -81,8 +81,8 @@ CaseLoadResult interpretLoad(
   final justificationTypes = types(tmgiTypes);
   final tmgiType = findTmgiType(types(caseTypes));
   final list = cases.whereType<Map>().map(JustificationCase.fromJson).toList()
-    ..sort((a, b) =>
-        (b.start ?? DateTime(0)).compareTo(a.start ?? DateTime(0)));
+    ..sort(
+        (a, b) => (b.start ?? DateTime(0)).compareTo(a.start ?? DateTime(0)));
   return CaseLoadResult(
     justificationTypes: justificationTypes,
     tmgiType: tmgiType,

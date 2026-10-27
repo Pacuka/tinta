@@ -240,7 +240,9 @@ class KretaClient {
       request.headers["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
       request.files.add(http.MultipartFile.fromBytes("fajl", bytes,
           filename: Uri.encodeComponent(fileName)));
-      final streamed = await client.send(request).timeout(requestTimeout);
+      // Sending the body is part of send(): give slow mobile uplinks time.
+      const uploadTimeout = Duration(minutes: 3);
+      final streamed = await client.send(request).timeout(uploadTimeout);
       return await http.Response.fromStream(streamed).timeout(requestTimeout);
     } catch (error) {
       print("ERROR: KretaClient.uploadFile ($url) ${error.runtimeType}");

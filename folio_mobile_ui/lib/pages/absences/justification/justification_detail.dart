@@ -37,7 +37,12 @@ class _JustificationDetailPageState extends State<JustificationDetailPage> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final d = await _cases.loadDetail(widget.caseId);
+    CaseDetail? d;
+    try {
+      d = await _cases.loadDetail(widget.caseId);
+    } catch (_) {
+      d = null;
+    }
     if (!mounted) return;
     setState(() {
       _detail = d;
@@ -254,6 +259,9 @@ class _RectificationPageState extends State<_RectificationPage> {
           controller: _files,
           enabled: !_sending,
         ),
+        if (_files.hasFailed)
+          Text("failed_hint".i18n,
+              style: TextStyle(color: Theme.of(context).colorScheme.error)),
         const SizedBox(height: 24),
         FilledButton.icon(
           onPressed:

@@ -49,7 +49,10 @@ class _JustificationFormState extends State<JustificationForm> {
         rangeOk: isValidRange(_start, _end),
         type: _type,
         hasMandatory: _mandatory.uploaded.isNotEmpty,
-        uploading: _mandatory.uploading || _others.uploading,
+        uploading:
+            (_needsMandatory && _mandatory.uploading) || _others.uploading,
+        hasFailed:
+            (_needsMandatory && _mandatory.hasFailed) || _others.hasFailed,
       );
 
   bool get _dirty =>

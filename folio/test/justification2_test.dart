@@ -84,6 +84,33 @@ void main() {
     expect(c(type: _gondv, up: true), isFalse);
     expect(c(type: null), isFalse);
     expect(c(type: _gondv, range: false), isFalse);
+    expect(
+        canSubmit(
+            rangeOk: true,
+            type: _gondv,
+            hasMandatory: false,
+            uploading: false,
+            hasFailed: true),
+        isFalse);
+  });
+
+  test('attachment size cap', () {
+    expect(attachmentTooLarge(10 * 1024 * 1024), isFalse);
+    expect(attachmentTooLarge(10 * 1024 * 1024 + 1), isTrue);
+  });
+
+  test('non-string codes do not crash parsing', () {
+    final odd = {
+      "azonosito": 1,
+      "statusz": {"kod": 5, "nev": "x"},
+      "hatarozatLista": [
+        {"dontes": {"kod": 7}}
+      ]
+    };
+    expect(JustificationCase.fromJson(odd).stateCode, isNull);
+    final d = CaseDetail.fromJson(odd);
+    expect(d.stateCode, isNull);
+    expect(d.decisions.single.code, isNull);
   });
 
   test('KretaType equality by code and id', () {
@@ -177,6 +204,7 @@ void main() {
       expect(canSubmitRectification([], false), isFalse);
       expect(canSubmitRectification([_f2], true), isFalse);
       expect(canSubmitRectification([_f2], false), isTrue);
+      expect(canSubmitRectification([_f2], false, hasFailed: true), isFalse);
     });
   });
 }

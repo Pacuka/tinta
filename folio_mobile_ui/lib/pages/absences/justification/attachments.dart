@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:folio_kreta_api/models/justification.dart';
@@ -10,7 +12,7 @@ import 'justification.i18n.dart';
 /// A picked file on its way to KRÉTA's temporary storage.
 class PendingAttachment {
   final String name;
-  final List<int> bytes;
+  Uint8List? bytes; // dropped once uploaded
   UploadedFile? uploaded;
   bool uploading = true;
 
@@ -25,6 +27,7 @@ class AttachmentController extends ChangeNotifier {
   final List<PendingAttachment> items = [];
 
   bool get uploading => items.any((a) => a.uploading);
+  bool get hasFailed => items.any((a) => a.failed);
   List<UploadedFile> get uploaded => [
         for (final a in items)
           if (a.uploaded != null) a.uploaded!
@@ -33,6 +36,11 @@ class AttachmentController extends ChangeNotifier {
   Future<void> pickAndUpload(BuildContext context) async {
     final picked = await _pick(context);
     if (picked == null || !context.mounted) return;
+    if (attachmentTooLarge(picked.$2.length)) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("too_large".i18n)));
+      return;
+    }
     final item = PendingAttachment(picked.$1, picked.$2);
     items.add(item);
     notifyListeners();
@@ -52,12 +60,22 @@ class AttachmentController extends ChangeNotifier {
 
   Future<void> _upload(BuildContext context, PendingAttachment item) async {
     final provider = Provider.of<CaseProvider>(context, listen: false);
-    item.uploaded = await provider.upload(item.bytes, item.name);
+    item.uploaded =
+        await provider.upload(item.bytes ?? Uint8List(0), item.name);
+    if (item.uploaded != null) item.bytes = null;
     item.uploading = false;
-    notifyListeners();
+    if (!_disposed) notifyListeners();
   }
 
-  static Future<(String, List<int>)?> _pick(BuildContext context) async {
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  static Future<(String, Uint8List)?> _pick(BuildContext context) async {
     final source = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -90,7 +108,7 @@ class AttachmentController extends ChangeNotifier {
       );
       final f = res?.files.single;
       if (f == null || f.bytes == null) return null;
-      return (f.name, f.bytes!.toList());
+      return (f.name, f.bytes!);
     }
     final image = await ImagePicker().pickImage(
       source: source == "camera" ? ImageSource.camera : ImageSource.gallery,

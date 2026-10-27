@@ -57,6 +57,9 @@ extension JustificationLocalization on String {
               "This document goes to the school as a reply to the request:",
           "rectification_sent": "Missing document sent.",
           "attached_docs": "Attached documents",
+          "failed_hint":
+              "Retry or delete the attachment that failed to upload.",
+          "too_large": "This file is too big (max. 10 MB).",
         },
         "hu-HU": {
           "justify": "Igazolás",
@@ -112,6 +115,8 @@ extension JustificationLocalization on String {
               "Ez a dokumentum a kérelemre válaszként megy az iskolához:",
           "rectification_sent": "Hiánypótlás beküldve.",
           "attached_docs": "Csatolt dokumentumok",
+          "failed_hint": "Próbáld újra vagy töröld a sikertelen csatolmányt.",
+          "too_large": "Ez a fájl túl nagy (max. 10 MB).",
         },
       };
 

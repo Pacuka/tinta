@@ -79,7 +79,7 @@ class JustificationCase {
       end: _parseDate(json["igazoltTavolletVegeDatum"]),
       typeName: text(map(json["igazolasTipus"])?["nev"]),
       stateName: text(state?["nev"] ?? state?["leiras"]),
-      stateCode: state?["kod"],
+      stateCode: _str(state?["kod"]),
       sent: _parseDate(json["bekuldesDatum"], local: true),
       reason: text(json["indoklas"]),
     );
@@ -175,8 +175,9 @@ bool canSubmit({
   required KretaType? type,
   required bool hasMandatory,
   required bool uploading,
+  bool hasFailed = false,
 }) {
-  if (!rangeOk || type == null || uploading) return false;
+  if (!rangeOk || type == null || uploading || hasFailed) return false;
   return mandatoryDocTypeId(type.code) == null || hasMandatory;
 }
 
@@ -200,6 +201,7 @@ String stateLabel(String? kod, String? fallback) {
 String _text(dynamic v) =>
     (v is String && v.trim().isNotEmpty) ? v.trim() : "–";
 Map? _map(dynamic v) => v is Map ? v : null;
+String? _str(dynamic v) => v is String ? v : null;
 List<Map> _maps(dynamic v) => v is List ? v.whereType<Map>().toList() : [];
 
 class CaseDocument {
@@ -238,7 +240,7 @@ class Decision {
     final d = _map(json["dontes"]);
     final signer = json["alairoKretaAzonosito"];
     return Decision(
-      code: d?["kod"],
+      code: _str(d?["kod"]),
       label: _text(d?["nev"] ?? d?["leiras"]),
       date: _parseDate(json["hatarozatDatum"], local: true),
       text: _text(json["dontesSzovege"]),
@@ -290,7 +292,7 @@ class CaseDetail {
         .where((s) => s.trim().isNotEmpty);
     return CaseDetail(
       summary: JustificationCase.fromJson(json),
-      stateCode: _map(json["statusz"])?["kod"],
+      stateCode: _str(_map(json["statusz"])?["kod"]),
       handlerName: _text(_map(json["ugyintezo"])?["nev"]),
       studentName: names.isEmpty ? "–" : names.join(" "),
       educationId: _text(json["tanuloOktatasiAzonosito"]?.toString()),
@@ -317,5 +319,11 @@ Map<String, dynamic> buildRectificationBody(
       "statusz": c.raw["statusz"],
     };
 
-bool canSubmitRectification(List<UploadedFile> files, bool uploading) =>
-    files.isNotEmpty && !uploading;
+bool canSubmitRectification(List<UploadedFile> files, bool uploading,
+        {bool hasFailed = false}) =>
+    files.isNotEmpty && !uploading && !hasFailed;
+
+/// Upload cap (KRÉTA's real limit is unknown; keeps memory and upload time sane).
+const maxAttachmentBytes = 10 * 1024 * 1024;
+
+bool attachmentTooLarge(int bytes) => bytes > maxAttachmentBytes;
