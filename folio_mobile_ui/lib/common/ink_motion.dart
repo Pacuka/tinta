@@ -45,7 +45,11 @@ class _InkSplashIntroState extends State<InkSplashIntro>
 
   @override
   Widget build(BuildContext context) {
-    if (!_visible) return widget.child;
+    // Always the same Stack, so the app below is never remounted when the
+    // intro ends (a remount drops focus: the keyboard would close).
+    if (!_visible) {
+      return Stack(children: [widget.child, const SizedBox.shrink()]);
+    }
     final dark = Theme.of(context).brightness == Brightness.dark;
     final splat = CurvedAnimation(
         parent: _c, curve: const Interval(0.0, 0.6, curve: Curves.elasticOut));
