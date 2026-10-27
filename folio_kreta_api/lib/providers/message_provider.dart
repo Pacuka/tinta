@@ -17,6 +17,9 @@ class MessageProvider with ChangeNotifier {
   late List<Message> _messages;
   late List<SendRecipient> _recipients;
   late BuildContext _context;
+  // Bumped on every store(); a restore() that started before a store must
+  // not overwrite the fresher in-memory list with an older DB snapshot.
+  int _storeGen = 0;
 
   List<Message> get messages => _messages;
   List<SendRecipient> get recipients => _recipients;
@@ -38,10 +41,12 @@ class MessageProvider with ChangeNotifier {
 
     // Load messages from the database
     if (userId != null) {
+      final gen = _storeGen;
       var dbMessages =
           await Provider.of<DatabaseProvider>(_context, listen: false)
               .userQuery
               .getMessages(userId: userId);
+      if (gen != _storeGen) return;
       _messages = dbMessages;
       await _applySeen(_messages);
       notifyListeners();
@@ -133,6 +138,7 @@ class MessageProvider with ChangeNotifier {
 
   // Stores Messages in the database
   Future<void> store(List<Message> messages, MessageType type) async {
+    _storeGen++;
     // Only store the specified type
     _messages.removeWhere((m) => m.type == type);
     _messages.addAll(messages);
