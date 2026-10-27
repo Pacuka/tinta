@@ -223,6 +223,31 @@ class KretaClient {
     }
   }
 
+  /// Uploads one file to KRÉTA's temporary storage the way the official app
+  /// does (multipart part "fajl", URL-encoded filename). null = no response.
+  Future<http.Response?> uploadFile(
+    String url, {
+    required List<int> bytes,
+    required String fileName,
+  }) async {
+    final token = accessToken?.isNotEmpty == true
+        ? accessToken
+        : _user.user?.accessToken;
+    try {
+      final request = http.MultipartRequest("POST", Uri.parse(url));
+      if (token != null) request.headers["authorization"] = "Bearer $token";
+      if (_roleUserAgent != null) request.headers["user-agent"] = _roleUserAgent!;
+      request.headers["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+      request.files.add(http.MultipartFile.fromBytes("fajl", bytes,
+          filename: Uri.encodeComponent(fileName)));
+      final streamed = await client.send(request).timeout(requestTimeout);
+      return await http.Response.fromStream(streamed).timeout(requestTimeout);
+    } catch (error) {
+      print("ERROR: KretaClient.uploadFile ($url) ${error.runtimeType}");
+      return null;
+    }
+  }
+
   Future<dynamic> deleteAPI(
     String url, {
     Map<String, String>? headers,

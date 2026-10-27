@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:folio_kreta_api/client/api.dart';
 import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio_kreta_api/models/justification.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 /// The "TMGI" (absence justification) entry of kerelemtipusok, if the school
@@ -105,6 +107,15 @@ class CaseProvider with ChangeNotifier {
   ChildData? _child;
   bool _loading = false;
   String? _error;
+  bool _includeClosed = false;
+
+  bool get includeClosed => _includeClosed;
+
+  void setIncludeClosed(bool value) {
+    if (value == _includeClosed) return;
+    _includeClosed = value;
+    load();
+  }
 
   List<JustificationCase> get cases => _cases;
   List<KretaType> get justificationTypes => _justificationTypes;
@@ -124,7 +135,7 @@ class CaseProvider with ChangeNotifier {
         _kreta.getAPI(KretaAPI.tmgiTypes),
         _kreta.getAPI(KretaAPI.caseTypes),
         _kreta.getAPI(KretaAPI.childData),
-        _kreta.getAPI(KretaAPI.cases),
+        _kreta.getAPI(KretaAPI.casesWithClosed(_includeClosed)),
       ]);
       result = interpretLoad(r[0], r[1], r[2], r[3]);
     } catch (_) {
@@ -150,6 +161,8 @@ class CaseProvider with ChangeNotifier {
     required DateTime start,
     required DateTime end,
     String reason = "",
+    UploadedFile? mandatory,
+    List<UploadedFile> others = const [],
   }) async {
     final caseType = _tmgiType;
     final child = _child;
@@ -166,6 +179,8 @@ class CaseProvider with ChangeNotifier {
         start: start,
         end: end,
         reason: reason.trim(),
+        mandatory: mandatory,
+        others: others,
       )),
       headers: {"content-type": "application/json"},
     );
@@ -173,7 +188,60 @@ class CaseProvider with ChangeNotifier {
         ? parseSubmitError(res.statusCode, res.body)
         : parseSubmitError(null, null);
     // Reload on success and when unsure, so the list shows what KRÉTA has.
-    if (error == null || error == uncertainSubmitMessage) await load();
+    // Not awaited: the caller can report success right away.
+    if (error == null || error == uncertainSubmitMessage) load();
     return error;
+  }
+
+  /// Uploads a file to KRÉTA's temporary storage. null = failed.
+  Future<UploadedFile?> upload(List<int> bytes, String fileName) async {
+    final res = await _kreta.uploadFile(KretaAPI.uploadTemp,
+        bytes: bytes, fileName: fileName);
+    if (res == null || res.statusCode >= 300) return null;
+    try {
+      return parseTempFile(jsonDecode(res.body), fileName);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<CaseDetail?> loadDetail(String id) async {
+    final json = await _kreta.getAPI(KretaAPI.caseDetail(id));
+    return json is Map ? CaseDetail.fromJson(json) : null;
+  }
+
+  Future<String?> signerName(String caseId, int signerId) async {
+    final json =
+        await _kreta.getAPI(KretaAPI.signer(caseId, signerId.toString()));
+    final name = json is Map ? json["nev"] : null;
+    return name is String && name.trim().isNotEmpty ? name : null;
+  }
+
+  Future<String?> submitRectification(
+      CaseDetail detail, List<UploadedFile> files) async {
+    final id = detail.raw["azonosito"]?.toString();
+    if (id == null) return "Hiányzik az ügy azonosítója.";
+    final res = await _kreta.postAPI(
+      KretaAPI.caseDetail(id),
+      rawResponse: true,
+      body: jsonEncode(buildRectificationBody(detail, files)),
+      headers: {"content-type": "application/json"},
+    );
+    final error = res is http.Response
+        ? parseSubmitError(res.statusCode, res.body)
+        : parseSubmitError(null, null);
+    if (error == null || error == uncertainSubmitMessage) load();
+    return error;
+  }
+
+  /// Downloads a KRÉTA document into the temp folder. null = failed.
+  Future<File?> download(String url, String fileName) async {
+    final bytes = await _kreta.getAPI(url, rawResponse: true);
+    if (bytes is! List<int> || bytes.isEmpty) return null;
+    final dir = await getTemporaryDirectory();
+    final safe = fileName.replaceAll(RegExp(r'[\\/:*?"<>|]'), "_");
+    final file = File("${dir.path}/$safe");
+    await file.writeAsBytes(bytes);
+    return file;
   }
 }

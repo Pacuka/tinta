@@ -98,6 +98,17 @@ class KretaAPI {
   static String get childData =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.childData;
   static String get cases => BaseKreta.kretaAdmin + KretaAdminEndpoints.cases;
+  static String casesWithClosed(bool closed) =>
+      closed ? "$cases?isLezartakIs=true" : cases;
+  static String caseDetail(String id) => "$cases/$id";
+  static String signer(String caseId, String kretaId) =>
+      "${BaseKreta.kretaAdmin}/api/v1/ugy/alkalmazott/$caseId/$kretaId";
+  static String printableCase(String id) =>
+      "${BaseKreta.kretaAdmin}/api/v1/dokumentumok/kerelmek/$id";
+  static String printableDecision(String id) =>
+      "${BaseKreta.kretaAdmin}/api/v1/dokumentumok/hatarozatok/$id";
+  static String get uploadTemp =>
+      "${BaseKreta.kretaAdmin}/api/v1/ideiglenesfajlok";
   static String get uploadAttachment =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.uploadAttachment;
   static String downloadAttachment(String id) =>
