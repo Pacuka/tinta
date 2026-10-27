@@ -126,6 +126,11 @@ kell, és mindegyiknél él a **7 napos** frissítés meg a **max. 3 app** szab�
 | **Ingyenes, közös tanúsítványok + konfigurációs profil** (pl. WSF, ESign „anti-revoke”, Scarlet, GBox) | amíg az Apple rá nem jön – hetek, hónapok | ingyen | **Nem ajánlott.** A profil letiltja, hogy a telefon elérje az Apple ellenőrző szervereit, és vele együtt az **iOS-frissítéseket is** (biztonsági javításokat sem kapsz). Egyes változatok minden címkérést a **saját DNS-szerverükön** visznek át. A tanúsítványok idegenek, sokan használják őket közösen. Ha mégis letiltják, a javítás sokszor a telefon visszaállítása vagy törlése. A Tintában KRÉTA-belépés van, ide ez nem való. |
 | **Saját Apple fejlesztői fiók** | 1 év | 99 $/év | Átlagfelhasználónak nem éri meg. (Ha a Tintának egyszer lesz ilyen, a barátok kaphatnak 1 évig működő verziót – ha így lesz, ide beírom.) |
 
+> ℹ️ **Más módszerek is vannak.** Gép nélküli, hosszabb ideig működő megoldásokat
+> gyűjt össze például a WSF: https://wsfteam.xyz/ – ezeket nem a Tinta fejlesztője
+> készíti és nem is ellenőrzi. **Ha ilyet használsz, az teljes egészében a saját
+> felelősséged** (a fenti kockázatokkal együtt).
+
 **Tipp, hogy a 7 nap ne legyen macera:** az AltStore és a Sideloadly is tud **magától**
 frissíteni, ha a gépen fut a program, és a telefon ugyanazon a wifin van (pl. otthon
 este). Ha ezt beállítod, gyakorlatilag nem kell vele foglalkoznod.
