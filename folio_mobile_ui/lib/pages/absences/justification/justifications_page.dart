@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'justification.i18n.dart';
+import 'justification_detail.dart';
 import 'justification_form.dart';
 
 /// Parent accounts: earlier absence justifications + "new" button.
@@ -77,6 +78,13 @@ class _JustificationsPageState extends State<JustificationsPage> {
             ),
           ),
           const InkStroke(style: InkStyle.pen),
+          SwitchListTile(
+            dense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+            title: Text("show_closed".i18n),
+            value: cases.includeClosed,
+            onChanged: cases.loading ? null : cases.setIncludeClosed,
+          ),
           Expanded(
             child: RefreshIndicator(
               color: scheme.secondary,
@@ -141,40 +149,45 @@ class _CaseTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: Row(children: [
-        Expanded(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(formatRange(item.start, item.end),
-                style: const TextStyle(
-                    fontSize: 16.0, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 2),
-            Text(item.typeName,
-                style:
-                    TextStyle(color: scheme.onSurface.withValues(alpha: 0.7))),
-          ]),
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(CupertinoPageRoute(
+          builder: (_) => JustificationDetailPage(caseId: item.id))),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16.0),
         ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-          decoration: BoxDecoration(
-            color: scheme.secondary.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(10.0),
+        child: Row(children: [
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(formatRange(item.start, item.end),
+                  style: const TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text(item.typeName,
+                  style: TextStyle(
+                      color: scheme.onSurface.withValues(alpha: 0.7))),
+            ]),
           ),
-          child: Text(item.stateName,
-              style: TextStyle(
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w600,
-                  color: scheme.secondary)),
-        ),
-      ]),
+          const SizedBox(width: 8),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+            decoration: BoxDecoration(
+              color: scheme.secondary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Text(stateLabel(item.stateCode, item.stateName),
+                style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w600,
+                    color: scheme.secondary)),
+          ),
+        ]),
+      ),
     );
   }
 }

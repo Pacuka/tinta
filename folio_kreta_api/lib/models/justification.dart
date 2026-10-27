@@ -53,6 +53,7 @@ class JustificationCase {
   DateTime? end;
   String typeName;
   String stateName;
+  String? stateCode;
   DateTime? sent;
   String reason;
 
@@ -62,6 +63,7 @@ class JustificationCase {
     this.end,
     required this.typeName,
     required this.stateName,
+    this.stateCode,
     this.sent,
     required this.reason,
   });
@@ -77,6 +79,7 @@ class JustificationCase {
       end: _parseDate(json["igazoltTavolletVegeDatum"]),
       typeName: text(map(json["igazolasTipus"])?["nev"]),
       stateName: text(state?["nev"] ?? state?["leiras"]),
+      stateCode: state?["kod"],
       sent: _parseDate(json["bekuldesDatum"], local: true),
       reason: text(json["indoklas"]),
     );
