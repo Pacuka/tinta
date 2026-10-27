@@ -104,14 +104,29 @@ Ha lejárt és nem indul a Tinta: semmi baj, csak csináld meg a Refresh All-t.
 | Nem indul a Tinta egy hét után | Lejárt a 7 nap → AltStore → My Apps → Refresh All. |
 | Fejlesztői mód menü nincs | Előbb telepítsd az AltStore-t (2. lépés), utána jelenik meg. |
 
-## És az EU-s AltStore PAL?
+## Más módszerek
 
-Az EU-ban az App Store mellett hivatalosan van egy másik „bolt” is, az **AltStore PAL**
-(évi kb. 1,5 €). **A Tintát közvetlenül nem lehet vele feltenni**, mert oda csak az Apple
-által ellenőrzött („hitelesített”) appok kerülhetnek, ahhoz pedig fizetős Apple
-fejlesztői fiók kellene. A PAL-ból fel lehet tenni a sima AltStore-t gép nélkül, de a
-Tinta aláírásához és a 7 napos frissítéshez ott is kell egyszer egy számítógép.
-**Úgyhogy a fenti, gépes út a legegyszerűbb.**
+A fenti AltStore-os út a legbiztosabb, de van más is. Mindegyikhez **ingyenes Apple ID**
+kell, és mindegyiknél él a **7 napos** frissítés meg a **max. 3 app** szabály
+(ezt az Apple szabja meg, nem a programok).
+
+| Módszer | Gép kell? | Mire jó? |
+|---|---|---|
+| **AltStore** (fent leírva) | első telepítéshez + frissítéshez (wifin is megy) | a legismertebb, sok leírás van hozzá |
+| **Sideloadly** – https://sideloadly.io | igen (Windows/Mac) | a legegyszerűbb: csak behúzod a `Tinta.ipa`-t a programba, beírod az Apple ID-t, kész. Be lehet állítani, hogy magától frissítsen, ha a telefon ugyanazon a wifin van. Windowson ugyanúgy az Apple oldaláról letöltött iTunes + iCloud kell hozzá. |
+| **SideStore** – https://sidestore.io | csak **egyszer**, az elején | utána a 7 napos frissítés a telefonon megy, gép nélkül (egy kis „VPN” appot kell hozzá bekapcsolni). Haladóbbaknak, a beállítás kicsit macerásabb. |
+
+## És az EU-s megoldások?
+
+Az EU-s szabályozás (DMA) miatt az EU-ban vett/használt iPhone-okon (iOS 17.4-től)
+vannak **alternatív app boltok** (pl. **AltStore PAL**, évi kb. 1,5 €), és appot
+weboldalról is lehet telepíteni. **A Tinta ezekkel sajnos (még) nem tehető fel:**
+oda csak olyan app kerülhet, amit az Apple előtte ellenőrzött („hitelesített”), ehhez
+pedig a fejlesztőnek fizetős Apple fejlesztői fiók kell (évi ~99 $). Ha a Tinta egyszer
+odakerül, ide beírom. Addig a fenti módszerek közül válassz.
+
+> Az AltStore PAL-ból fel lehet tenni a sima AltStore-t gép nélkül, de a Tinta
+> aláírásához ott is kell egyszer egy számítógép, úgyhogy nem lesz tőle egyszerűbb.
 
 ## Kérdés, hiba?
 
