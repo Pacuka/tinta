@@ -8,6 +8,7 @@ import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.da
 import 'package:folio_mobile_ui/common/profile_image/profile_image.dart';
 import 'package:folio_mobile_ui/common/screens.i18n.dart';
 import 'package:folio_mobile_ui/pages/absences/absences_page.dart';
+import 'package:folio_mobile_ui/pages/consulting/consulting_page.dart';
 import 'package:folio_mobile_ui/pages/messages/messages_page.dart';
 import 'package:folio_mobile_ui/pages/notes/notes_page.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_screen.dart';
@@ -189,8 +190,25 @@ class MoreMenu extends StatelessWidget {
 
           const SizedBox(height: 12.0),
 
+          // Consultation hours (not a navbar page)
+          _WideTile(
+            icon: Icons.event_available_rounded,
+            title: "Fogadóórák",
+            onTap: () {
+              performHapticFeedback(settings.vibrate);
+              Navigator.of(context).pop();
+              Navigator.of(outsideContext, rootNavigator: true).push(
+                CupertinoPageRoute(builder: (_) => const ConsultingPage()),
+              );
+            },
+          ),
+
+          const SizedBox(height: 12.0),
+
           // Settings button
-          GestureDetector(
+          _WideTile(
+            icon: Icons.settings_rounded,
+            title: "settings".i18n,
             onTap: () {
               performHapticFeedback(settings.vibrate);
               Navigator.of(context).pop();
@@ -199,46 +217,6 @@ class MoreMenu extends StatelessWidget {
                     builder: (context) => const SettingsScreen()),
               );
             },
-            child: Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(22.0),
-              ),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0, vertical: 18.0),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      color: colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.circular(14.0),
-                    ),
-                    child: Icon(
-                      Icons.settings_rounded,
-                      size: 22.0,
-                      color: colorScheme.onSecondaryContainer,
-                    ),
-                  ),
-                  const SizedBox(width: 16.0),
-                  Expanded(
-                    child: Text(
-                      "settings".i18n,
-                      style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_right_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 20.0,
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -356,6 +334,59 @@ class _ActionCard extends StatelessWidget {
                 fontSize: 12.0,
                 fontWeight: FontWeight.w600,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WideTile extends StatelessWidget {
+  const _WideTile(
+      {required this.icon, required this.title, required this.onTap});
+
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(22.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(14.0),
+              ),
+              child: Icon(icon,
+                  size: 22.0, color: colorScheme.onSecondaryContainer),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_right_rounded,
+              color: colorScheme.onSurfaceVariant,
+              size: 20.0,
             ),
           ],
         ),
