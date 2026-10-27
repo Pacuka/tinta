@@ -64,6 +64,7 @@ import 'package:folio_kreta_api/providers/exam_provider.dart';
 import 'package:folio_kreta_api/providers/homework_provider.dart';
 import 'package:folio_kreta_api/providers/message_provider.dart';
 import 'package:folio_kreta_api/providers/case_provider.dart';
+import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
@@ -175,6 +176,9 @@ class _AppState extends State<App> {
         ),
         ChangeNotifierProvider<CaseProvider>(
           create: (context) => CaseProvider(context: context),
+        ),
+        ChangeNotifierProvider<ConsultingProvider>(
+          create: (context) => ConsultingProvider(context: context)..restore(),
         ),
         ChangeNotifierProvider<NoteProvider>(
           create: (context) => NoteProvider(context: context),

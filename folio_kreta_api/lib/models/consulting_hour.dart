@@ -101,7 +101,7 @@ class ConsultingHour {
             .toList(),
       );
 
-  /// Flattens List<ConsultingHourListDto> (one entry per teacher), sorted by
+  /// Flattens `List<ConsultingHourListDto>` (one entry per teacher), sorted by
   /// start time.
   static List<ConsultingHour> listFromJson(List json) {
     final out = <ConsultingHour>[];

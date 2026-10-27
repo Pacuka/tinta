@@ -32,6 +32,14 @@ class KretaAPI {
           : "");
   static String exams(String iss) =>
       BaseKreta.kreta(iss) + KretaApiEndpoints.exams;
+  static String consultingHours(String iss, DateTime from, DateTime to) =>
+      "${BaseKreta.kreta(iss)}${KretaApiEndpoints.consultingHours}"
+      "?datumTol=${from.toUtc().toIso8601String()}"
+      "&datumIg=${to.toUtc().toIso8601String()}";
+  static String consultingHour(String iss, String uid) =>
+      "${BaseKreta.kreta(iss)}${KretaApiEndpoints.consultingHours}/$uid";
+  static String consultingReservation(String iss, String slotUid) =>
+      "${BaseKreta.kreta(iss)}${KretaApiEndpoints.consultingReservation}/$slotUid";
   static String homework(String iss, {DateTime? start, String? id}) =>
       BaseKreta.kreta(iss) +
       KretaApiEndpoints.homework +
@@ -150,6 +158,9 @@ class KretaApiEndpoints {
   static const student = "/ellenorzo/V3/Sajat/TanuloAdatlap";
   static const grades = "/ellenorzo/V3/Sajat/Ertekelesek";
   static const absences = "/ellenorzo/V3/Sajat/Mulasztasok";
+  static const consultingHours = "/ellenorzo/V3/Sajat/Fogadoorak";
+  static const consultingReservation =
+      "/ellenorzo/V3/Sajat/Fogadoorak/Idopontok/Jelentkezesek";
   static const groups = "/ellenorzo/V3/Sajat/OsztalyCsoportok";
   static const groupAverages =
       "/ellenorzo/V3/Sajat/Ertekelesek/Atlagok/OsztalyAtlagok";
