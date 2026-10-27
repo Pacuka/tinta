@@ -5,8 +5,14 @@ class NavItem {
   final Widget icon;
   final Widget activeIcon;
 
+  /// SF Symbol name for the native iPhone (Liquid Glass) tab bar.
+  final String sfSymbol;
+
   const NavItem(
-      {required this.title, required this.icon, required this.activeIcon});
+      {required this.title,
+      required this.icon,
+      required this.activeIcon,
+      this.sfSymbol = 'circle'});
 }
 
 class NavbarItem extends StatelessWidget {

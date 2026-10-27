@@ -22,6 +22,7 @@ import 'package:folio_mobile_ui/screens/news/news_view.dart';
 import 'package:folio_mobile_ui/screens/settings/live_activity_consent_dialog.dart';
 import 'package:folio_mobile_ui/common/widgets/update/update_dialog.dart';
 import 'package:flutter/foundation.dart';
+import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
 import 'package:folio_mobile_ui/common/glass_backdrop.dart';
@@ -266,6 +267,7 @@ class NavigationScreenState extends State<NavigationScreen>
           children: [
             Navigator(
               key: _navigatorState,
+              observers: [CNTabBarRouteObserver()],
               initialRoute: selected.name,
               onGenerateRoute: (settings) => navigationRouteHandler(settings),
             ),
@@ -314,6 +316,7 @@ class NavigationScreenState extends State<NavigationScreen>
                       user: user,
                     )),
                 NavItem(
+                  sfSymbol: 'person.crop.circle',
                   title: "more".i18n,
                   icon: ProfileImage(
                     name: navFirstName,
@@ -353,6 +356,7 @@ class NavigationScreenState extends State<NavigationScreen>
     switch (page) {
       case "home":
         return NavItem(
+          sfSymbol: 'house',
           title: "home".i18n,
           icon: Stack(
             alignment: AlignmentDirectional.center,
@@ -399,6 +403,7 @@ class NavigationScreenState extends State<NavigationScreen>
         );
       case "grades":
         return NavItem(
+          sfSymbol: 'bookmark',
           title: "grades".i18n,
           icon: SvgPicture.asset(
             'assets/svg/menu_icons/grades.svg',
@@ -413,6 +418,7 @@ class NavigationScreenState extends State<NavigationScreen>
         );
       case "timetable":
         return NavItem(
+          sfSymbol: 'calendar',
           title: "timetable".i18n,
           icon: SvgPicture.asset(
             'assets/svg/menu_icons/timetable.svg',
@@ -427,6 +433,7 @@ class NavigationScreenState extends State<NavigationScreen>
         );
       case "messages":
         return NavItem(
+          sfSymbol: 'tray',
           title: "messages".i18n,
           icon: SvgPicture.asset(
             'assets/svg/menu_icons/inbox.svg',
@@ -441,6 +448,7 @@ class NavigationScreenState extends State<NavigationScreen>
         );
       case "absences":
         return NavItem(
+          sfSymbol: 'calendar.badge.exclamationmark',
           title: "absences".i18n,
           icon: SvgPicture.asset(
             'assets/svg/menu_icons/absences.svg',
@@ -455,6 +463,7 @@ class NavigationScreenState extends State<NavigationScreen>
         );
       case "notes":
         return NavItem(
+          sfSymbol: 'note.text',
           title: "notes".i18n,
           icon: SvgPicture.asset(
             'assets/svg/menu_icons/notes.svg',
@@ -469,6 +478,7 @@ class NavigationScreenState extends State<NavigationScreen>
         );
       default:
         return NavItem(
+          sfSymbol: 'square.grid.2x2',
           title: page,
           icon: const Icon(Icons.circle_outlined),
           activeIcon: const Icon(Icons.circle),

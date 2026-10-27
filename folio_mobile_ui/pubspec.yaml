@@ -55,6 +55,7 @@ dependencies:
   file_picker: ^10.3.10
   wakelock_plus: ^1.5.1
   open_filex: ^4.6.0
+  cupertino_native_better: ^1.7.0
 
 dependency_overrides:
   webview_flutter_wkwebview: 3.17.0

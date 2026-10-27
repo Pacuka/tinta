@@ -1,5 +1,7 @@
+import 'dart:io' show Platform;
 import 'dart:ui' show ImageFilter;
 
+import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
 import 'package:folio_mobile_ui/screens/navigation/navbar_item.dart';
@@ -35,6 +37,26 @@ class Navbar extends StatelessWidget {
         ),
       ),
     );
+
+    if (glass && Platform.isIOS) {
+      // Üveg on iPhone: Apple's own tab bar (real Liquid Glass on iOS 26+,
+      // the classic bar on older iOS).
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12.0, 4.0, 12.0, 0.0),
+          child: CNTabBar(
+            items: [
+              for (final i in items)
+                CNTabBarItem(label: i.title, icon: CNSymbol(i.sfSymbol)),
+            ],
+            currentIndex: selectedIndex,
+            onTap: onSelected,
+            tint: colorScheme.secondary,
+          ),
+        ),
+      );
+    }
 
     if (glass) {
       // Üveg: floating frosted capsule with a rim of light on top.
