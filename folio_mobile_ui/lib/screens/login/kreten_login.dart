@@ -18,6 +18,7 @@
 
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:folio/models/kreta_auth_app.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -56,7 +57,11 @@ class KretenLoginWidget extends StatefulWidget {
     required this.onLogin,
     this.onDemoMode,
     this.onUrlChanged,
+    this.authApp = KretaAuthApp.student,
   });
+
+  /// Student or parent (guardian) login.
+  final KretaAuthApp authApp;
 
   // final String selectedSchool;
   final void Function(
@@ -89,12 +94,9 @@ class _KretenLoginWidgetState extends State<KretenLoginWidget>
   bool _hasLoadedOnce = false;
   bool _loginDone = false;
 
-  static const _loginUrl =
-      'https://idp.e-kreta.hu/connect/authorize?prompt=login&nonce=wylCrqT4oN6PPgQn2yQB0euKei9nJeZ6_ffJ-VpSKZU&response_type=code&code_challenge_method=S256&scope=openid%20email%20offline_access%20kreta-ellenorzo-webapi.public%20kreta-eugyintezes-webapi.public%20kreta-fileservice-webapi.public%20kreta-mobile-global-webapi.public%20kreta-dkt-webapi.public%20kreta-ier-webapi.public&code_challenge=HByZRRnPGb-Ko_wTI7ibIba1HQ6lor0ws4bcgReuYSQ&redirect_uri=https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect&client_id=kreta-ellenorzo-student-mobile-ios&state=folio_student_mobile';
+  String get _loginUrl => widget.authApp.authorizeUrl;
 
-  static final Uri _redirectUri = Uri.parse(
-    'https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect',
-  );
+  Uri get _redirectUri => Uri.parse(widget.authApp.redirectUri);
 
   bool _isRedirectUri(Uri uri) {
     return uri.scheme == _redirectUri.scheme &&
@@ -400,7 +402,11 @@ class KretaBgLoginWidget extends StatefulWidget {
     this.onError,
     this.onTwoFactorRequired,
     this.onCaptchaRequired,
+    this.authApp = KretaAuthApp.student,
   });
+
+  /// Student or parent (guardian) login.
+  final KretaAuthApp authApp;
 
   final String instituteCode;
   final String username;
@@ -435,12 +441,9 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
   String? _savedIdpRememberBrowser;
 
   // Same authorize URL as KretenLoginWidget — goes directly to IDP login page
-  static const _loginUrl =
-      'https://idp.e-kreta.hu/connect/authorize?prompt=login&nonce=wylCrqT4oN6PPgQn2yQB0euKei9nJeZ6_ffJ-VpSKZU&response_type=code&code_challenge_method=S256&scope=openid%20email%20offline_access%20kreta-ellenorzo-webapi.public%20kreta-eugyintezes-webapi.public%20kreta-fileservice-webapi.public%20kreta-mobile-global-webapi.public%20kreta-dkt-webapi.public%20kreta-ier-webapi.public&code_challenge=HByZRRnPGb-Ko_wTI7ibIba1HQ6lor0ws4bcgReuYSQ&redirect_uri=https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect&client_id=kreta-ellenorzo-student-mobile-ios&state=folio_student_mobile';
+  String get _loginUrl => widget.authApp.authorizeUrl;
 
-  static final Uri _redirectUri = Uri.parse(
-    'https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect',
-  );
+  Uri get _redirectUri => Uri.parse(widget.authApp.redirectUri);
 
   bool _isRedirectUri(Uri uri) =>
       uri.scheme == _redirectUri.scheme &&

@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
+import 'package:folio/models/kreta_auth_app.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/models/user.dart';
 import 'package:folio_kreta_api/client/api.dart';
@@ -20,6 +21,12 @@ class KretaClient {
   String? refreshToken;
   String? idToken;
   String? userAgent;
+
+  /// Parents' requests present themselves as the official guardian app.
+  String? get _roleUserAgent => userAgent == null
+      ? null
+      : KretaAuthApp.forRole(_user.user?.role ?? Role.student)
+          .userAgent(userAgent!);
   String? idpApplicationCookie;
   late http.Client client;
 
@@ -85,8 +92,8 @@ class KretaClient {
           if (!headerMap.containsKey("authorization") && accessToken != null) {
             headerMap["authorization"] = "Bearer $accessToken";
           }
-          if (!headerMap.containsKey("user-agent") && userAgent != null) {
-            headerMap["user-agent"] = "$userAgent";
+          if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
+            headerMap["user-agent"] = _roleUserAgent!;
           }
           if (!headerMap.containsKey("cookie") &&
               idpApplicationCookie != null &&
@@ -164,8 +171,8 @@ class KretaClient {
           if (!headerMap.containsKey("authorization") && accessToken != null) {
             headerMap["authorization"] = "Bearer $accessToken";
           }
-          if (!headerMap.containsKey("user-agent") && userAgent != null) {
-            headerMap["user-agent"] = "$userAgent";
+          if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
+            headerMap["user-agent"] = _roleUserAgent!;
           }
           if (!headerMap.containsKey("cookie") &&
               idpApplicationCookie != null &&
@@ -232,8 +239,8 @@ class KretaClient {
           if (!headerMap.containsKey("authorization") && accessToken != null) {
             headerMap["authorization"] = "Bearer $accessToken";
           }
-          if (!headerMap.containsKey("user-agent") && userAgent != null) {
-            headerMap["user-agent"] = "$userAgent";
+          if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
+            headerMap["user-agent"] = _roleUserAgent!;
           }
           if (!headerMap.containsKey("apiKey") &&
               !url.contains("idp.e-kreta.hu")) {
@@ -286,8 +293,8 @@ class KretaClient {
           if (!headerMap.containsKey("authorization") && accessToken != null) {
             headerMap["authorization"] = "Bearer $accessToken";
           }
-          if (!headerMap.containsKey("user-agent") && userAgent != null) {
-            headerMap["user-agent"] = "$userAgent";
+          if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
+            headerMap["user-agent"] = _roleUserAgent!;
           }
           headerMap["content-type"] =
               "application/x-www-form-urlencoded; charset=UTF-8";
@@ -354,8 +361,8 @@ class KretaClient {
           if (!headerMap.containsKey("authorization") && accessToken != null) {
             headerMap["authorization"] = "Bearer $accessToken";
           }
-          if (!headerMap.containsKey("user-agent") && userAgent != null) {
-            headerMap["user-agent"] = "$userAgent";
+          if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
+            headerMap["user-agent"] = _roleUserAgent!;
           }
           if (!headerMap.containsKey("content-type")) {
             headerMap["content-type"] = "multipart/form-data";
@@ -409,7 +416,7 @@ class KretaClient {
     Map<String, String> headers = {
       "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
       "accept": "*/*",
-      "user-agent": userAgent ?? "",
+      "user-agent": _roleUserAgent ?? "",
     };
 
     if (_settings.presentationMode) {

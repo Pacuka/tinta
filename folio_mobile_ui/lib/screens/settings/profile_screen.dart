@@ -982,7 +982,9 @@ Container(
                   name: Text(displayName,
                       style:
                           const TextStyle(fontWeight: FontWeight.w600)),
-                  username: Text(username),
+                  username: Text(user.role == Role.parent
+                      ? "$username · ${'parent_account'.i18n}"
+                      : username),
                   profileImage: ProfileImage(
                     name: firstName,
                     role: user.role,
@@ -1115,7 +1117,10 @@ Container(
           style: const TextStyle(fontWeight: FontWeight.w500),
         ),
         username: Text(
-          settings.presentationMode ? "01234567890" : account.username,
+          (settings.presentationMode ? "01234567890" : account.username) +
+              (account.role == Role.parent
+                  ? " · ${'parent_account'.i18n}"
+                  : ""),
         ),
         profileImage: ProfileImage(
           name: firstName,

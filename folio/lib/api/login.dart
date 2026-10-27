@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'package:folio/models/kreta_auth_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:folio/utils/jwt.dart';
 import 'package:folio_kreta_api/providers/absence_provider.dart';
@@ -39,7 +40,10 @@ Future newLoginAPI({
   String? idpRememberBrowser,
   void Function(User)? onLogin,
   void Function()? onSuccess,
+  KretaAuthApp authApp = KretaAuthApp.student,
 }) async {
+  final userAgent = authApp.userAgent(
+      Provider.of<SettingsProvider>(context, listen: false).config.userAgent);
   // actual login (token grant) logic
   Provider.of<KretaClient>(context, listen: false).userAgent =
       Provider.of<SettingsProvider>(context, listen: false).config.userAgent;
@@ -47,16 +51,15 @@ Future newLoginAPI({
   Map<String, String> headers = {
     "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
     "accept": "*/*",
-    "user-agent": Provider.of<SettingsProvider>(context, listen: false).config.userAgent,
+    "user-agent": userAgent,
   };
 
   Map? res = await Provider.of<KretaClient>(context, listen: false)
       .postAPI(KretaAPI.login, headers: headers, body: {
     "code": code,
     "code_verifier": "DSpuqj_HhDX4wzQIbtn8lr8NLE5wEi1iVLMtMK0jY6c",
-    "redirect_uri":
-        "https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect",
-    "client_id": KretaAPI.clientId,
+    "redirect_uri": authApp.redirectUri,
+    "client_id": authApp.clientId,
     "grant_type": "authorization_code",
   });
 
