@@ -217,7 +217,13 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
               Expanded(
                 child: OutlinedButton.icon(
                   key: const Key("consulting-calendar"),
-                  onPressed: () => shareIcs(hour, mine),
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    if (!await shareIcs(hour, mine)) {
+                      messenger.showSnackBar(SnackBar(
+                          content: Text("calendar_failed".i18n)));
+                    }
+                  },
                   icon: const Icon(Icons.event_rounded),
                   label: Text("calendar".i18n),
                 ),

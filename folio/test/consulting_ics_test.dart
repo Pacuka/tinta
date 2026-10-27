@@ -58,4 +58,14 @@ void main() {
     expect(items.length, 1);
     expect(items.first.date, future.add(const Duration(minutes: 10)));
   });
+
+  test('a failing share reports false instead of throwing', () async {
+    final hour = _hour(start: DateTime(2026, 11, 5, 16));
+    final ok = await shareIcs(hour, hour.slots.first,
+        writeAndShare: (_) async => throw Exception("no share target"));
+    expect(ok, isFalse);
+    expect(
+        await shareIcs(hour, hour.slots.first, writeAndShare: (_) async {}),
+        isTrue);
+  });
 }

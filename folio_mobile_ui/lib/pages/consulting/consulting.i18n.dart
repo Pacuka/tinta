@@ -26,6 +26,7 @@ extension ConsultingLocalization on String {
           "book": "Book",
           "cancel_booking": "Cancel booking",
           "calendar": "Add to calendar",
+          "calendar_failed": "Couldn't open the calendar.",
           "confirm_book": "Book this time?",
           "confirm_cancel": "Cancel your booking?",
           "late_cancel":
@@ -64,6 +65,7 @@ extension ConsultingLocalization on String {
           "book": "Foglalás",
           "cancel_booking": "Lemondás",
           "calendar": "Naptárba",
+          "calendar_failed": "Nem sikerült megnyitni a naptárat.",
           "confirm_book": "Biztosan jelentkezel erre az időpontra?",
           "confirm_cancel": "Biztosan lemondod a foglalást?",
           "late_cancel":
@@ -102,6 +104,7 @@ extension ConsultingLocalization on String {
           "book": "Buchen",
           "cancel_booking": "Stornieren",
           "calendar": "In den Kalender",
+          "calendar_failed": "Kalender konnte nicht geöffnet werden.",
           "confirm_book": "Diesen Termin buchen?",
           "confirm_cancel": "Buchung wirklich stornieren?",
           "late_cancel":

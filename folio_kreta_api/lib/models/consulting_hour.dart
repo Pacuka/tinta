@@ -99,6 +99,8 @@ class ConsultingHour {
         slots: (json["Idopontok"] is List ? json["Idopontok"] as List : const [])
             .whereType<Map>()
             .map(ConsultingSlot.fromJson)
+            // a slot without an id can't be booked
+            .where((s) => s.id.isNotEmpty)
             .toList(),
       );
 

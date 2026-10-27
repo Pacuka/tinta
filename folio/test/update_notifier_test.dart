@@ -155,5 +155,14 @@ void main() {
           isEmpty);
       expect(s.ids["consulting"], contains("FO1"));
     });
+
+    test('hours already seen in the app are not announced', () {
+      final s = NotifyState.empty(file)..ids["consulting"] = {};
+      recordSeenInApp(s, consulting: ["FO1"]);
+      expect(
+          consultingNotes([hour()], s, DateTime(2026, 11, 1, 10),
+              enabled: true),
+          isEmpty);
+    });
   });
 }

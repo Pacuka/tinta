@@ -157,4 +157,13 @@ void main() {
     expect(fo1.slots.length, 6);
     expect(_byId(back, "FO2").deadline, isNull);
   });
+
+  test('slots without an id are dropped', () {
+    final List json = jsonDecode(jsonEncode(_sample()));
+    (json[0]["Fogadoorak"][0]["Idopontok"] as List).add(
+        {"KezdoIdopont": "2026-11-05T15:55:00Z", "VegIdopont": "2026-11-05T16:00:00Z"});
+    final fo1 = _byId(ConsultingHour.listFromJson(json), "FO1");
+    expect(fo1.slots.length, 6);
+    expect(fo1.slots.every((s) => s.id.isNotEmpty), isTrue);
+  });
 }

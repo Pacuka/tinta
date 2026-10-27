@@ -173,6 +173,9 @@ Future<void> _syncAll(BuildContext context) async {
         homework: Provider.of<HomeworkProvider>(context, listen: false)
             .homework
             .map((h) => h.id),
+        consulting: Provider.of<ConsultingProvider>(context, listen: false)
+            .hours
+            .map((h) => h.id),
         lessons: week ?? const [],
       );
     } catch (_) {}

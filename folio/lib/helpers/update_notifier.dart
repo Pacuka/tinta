@@ -325,21 +325,44 @@ class UpdateNotifier {
     Iterable<String> messages = const [],
     Iterable<String> homework = const [],
     Iterable<Lesson> lessons = const [],
+    Iterable<String> consulting = const [],
   }) async {
     final state = await NotifyState.load(userId);
     if (state.firstRun) return; // first background run records everything
-    grades.forEach((id) => state.add("grades", id));
-    exams.forEach((id) => state.add("exams", id));
-    absences.forEach((id) => state.add("absences", id));
-    messages.forEach((id) => state.add("messages", id));
-    homework.forEach((id) => state.add("homework", id));
-    for (final l in lessons) {
-      state.lessonChange(l);
-    }
+    recordSeenInApp(state,
+        grades: grades,
+        exams: exams,
+        absences: absences,
+        messages: messages,
+        homework: homework,
+        lessons: lessons,
+        consulting: consulting);
     await state.save();
   }
 
   static String _day(DateTime d) => DateFormat("MMM d.", "hu").format(d);
+}
+
+/// Marks what the app already showed, so it isn't notified later.
+void recordSeenInApp(
+  NotifyState state, {
+  Iterable<String> grades = const [],
+  Iterable<String> exams = const [],
+  Iterable<String> absences = const [],
+  Iterable<String> messages = const [],
+  Iterable<String> homework = const [],
+  Iterable<Lesson> lessons = const [],
+  Iterable<String> consulting = const [],
+}) {
+  grades.forEach((id) => state.add("grades", id));
+  exams.forEach((id) => state.add("exams", id));
+  absences.forEach((id) => state.add("absences", id));
+  messages.forEach((id) => state.add("messages", id));
+  homework.forEach((id) => state.add("homework", id));
+  consulting.forEach((id) => state.add("consulting", id));
+  for (final l in lessons) {
+    state.lessonChange(l);
+  }
 }
 
 /// Notifications for consultation hours: a new hour once, and a reminder on

@@ -34,13 +34,23 @@ String buildIcs(ConsultingHour hour, ConsultingSlot slot) => [
       "",
     ].join("\r\n");
 
-/// Hands the event to the phone's calendar app via the share sheet.
-Future<void> shareIcs(ConsultingHour hour, ConsultingSlot slot) async {
+Future<void> _writeAndShare(String ics) async {
   final dir = await getTemporaryDirectory();
   final file = File("${dir.path}/fogadoora.ics");
-  await file.writeAsString(buildIcs(hour, slot));
+  await file.writeAsString(ics);
   await SharePlus.instance.share(ShareParams(
     files: [XFile(file.path, mimeType: "text/calendar")],
-    subject: "Fogadóóra – ${hour.teacherName}",
   ));
+}
+
+/// Hands the event to the phone's calendar app via the share sheet.
+/// false = it couldn't be opened.
+Future<bool> shareIcs(ConsultingHour hour, ConsultingSlot slot,
+    {Future<void> Function(String ics) writeAndShare = _writeAndShare}) async {
+  try {
+    await writeAndShare(buildIcs(hour, slot));
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
