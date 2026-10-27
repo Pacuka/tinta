@@ -247,6 +247,7 @@ Future<void> migrateDB(
   }
 
   List<Map<String, dynamic>> migrated = [];
+  bool changed = false;
 
   // go through each row and add missing keys or delete non existing keys
   await Future.forEach<Map<String, Object?>>(originalRows, (original) async {
@@ -274,11 +275,16 @@ Future<void> migrateDB(
       }
 
       migrated.add(copy);
+      changed = true;
+    } else {
+      // Rows that are already up to date must be written back too, or the
+      // table recreate below would delete them (other accounts' data).
+      migrated.add(Map<String, Object?>.from(original));
     }
   });
 
   // replace the old table with the migrated one
-  if (migrated.isNotEmpty) {
+  if (changed) {
     // Delete table
     await db.execute("drop table ${struct.table}");
 
