@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:folio_kreta_api/models/consulting_hour.dart';
 import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
+import 'package:folio_mobile_ui/pages/consulting/ics.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -189,6 +190,15 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
           const SizedBox(height: 16),
           if (mine != null) ...[
             Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  key: const Key("consulting-calendar"),
+                  onPressed: () => shareIcs(hour, mine),
+                  icon: const Icon(Icons.event_rounded),
+                  label: const Text("Naptárba"),
+                ),
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: FilledButton.tonalIcon(
                   key: const Key("consulting-cancel"),

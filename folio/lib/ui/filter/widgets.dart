@@ -9,6 +9,8 @@ import 'package:folio/ui/filter/widgets/messages.dart' as message_filter;
 import 'package:folio/ui/filter/widgets/absences.dart' as absence_filter;
 import 'package:folio/ui/filter/widgets/homework.dart' as homework_filter;
 import 'package:folio/ui/filter/widgets/exams.dart' as exam_filter;
+import 'package:folio/ui/filter/widgets/consulting.dart' as consulting_filter;
+import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio/ui/filter/widgets/notes.dart' as note_filter;
 import 'package:folio/ui/filter/widgets/events.dart' as event_filter;
 import 'package:folio/ui/filter/widgets/lessons.dart' as lesson_filter;
@@ -54,6 +56,7 @@ enum FilterType {
   updates,
   certifications,
   missedExams,
+  consulting,
 }
 
 Future<List<DateWidget>> getFilterWidgets(FilterType activeData,
@@ -66,6 +69,7 @@ Future<List<DateWidget>> getFilterWidgets(FilterType activeData,
   final examProvider = Provider.of<ExamProvider>(context);
   final noteProvider = Provider.of<NoteProvider>(context);
   final eventProvider = Provider.of<EventProvider>(context);
+  final consultingProvider = Provider.of<ConsultingProvider>(context);
   final updateProvider = Provider.of<UpdateProvider>(context);
   final settingsProvider = Provider.of<SettingsProvider>(context);
 
@@ -84,6 +88,7 @@ Future<List<DateWidget>> getFilterWidgets(FilterType activeData,
         getFilterWidgets(FilterType.exams, context: context),
         getFilterWidgets(FilterType.certifications, context: context),
         getFilterWidgets(FilterType.missedExams, context: context),
+        getFilterWidgets(FilterType.consulting, context: context),
       ]);
       items = all.expand((x) => x).toList();
 
@@ -137,6 +142,10 @@ Future<List<DateWidget>> getFilterWidgets(FilterType activeData,
     // Exams
     case FilterType.exams:
       items = exam_filter.getWidgets(examProvider.exams);
+      break;
+
+    case FilterType.consulting:
+      items = consulting_filter.getWidgets(consultingProvider.hours);
       break;
 
     // Notes
