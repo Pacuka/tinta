@@ -25,6 +25,9 @@ import 'package:folio/models/settings.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'absences_page.i18n.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
+import 'package:folio/models/user.dart' show Role;
+import 'justification/justifications_page.dart';
 
 enum AbsenceFilter { absences, delays, misses }
 
@@ -278,6 +281,51 @@ Container(
                             ),
                           ),
                         ),
+                        if (user.user?.role == Role.parent)
+                          GestureDetector(
+                            onTap: () {
+                              performHapticFeedback(
+                                  Provider.of<SettingsProvider>(context,
+                                          listen: false)
+                                      .vibrate);
+                              Navigator.of(context).push(CupertinoPageRoute(
+                                  builder: (_) => const JustificationsPage()));
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14.0, vertical: 10.0),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer
+                                    .withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(14.0),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.check_rounded,
+                                    size: 16.0,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
+                                  const SizedBox(width: 6.0),
+                                  Text(
+                                    "justify".i18n,
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         IconButton(
                           onPressed: () {
                             showDialog(

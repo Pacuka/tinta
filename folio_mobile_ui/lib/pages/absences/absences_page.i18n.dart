@@ -25,6 +25,7 @@ extension ScreensLocalization on String {
           "now": "Now",
           "justification_breakdown_title": "Justification types",
           "justification_unknown": "Unknown",
+          "justify": "Justify",
         },
         "hu-HU": {
           "Absences": "Hiányzások",
@@ -48,6 +49,7 @@ extension ScreensLocalization on String {
           "now": "Most",
           "justification_breakdown_title": "Igazolás típusok",
           "justification_unknown": "Ismeretlen",
+          "justify": "Igazolás",
         },
         "de-DE": {
           "Absences": "Fehlen",
