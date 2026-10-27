@@ -81,11 +81,17 @@ class MessageProvider with ChangeNotifier {
     await Future.wait(List.generate(messagesJson.length, (index) {
       return () async {
         Map message = messagesJson.cast<Map>()[index];
-        Map? messageJson =
-            await Provider.of<KretaClient>(_context, listen: false)
-                .getAPI(KretaAPI.message(message["azonosito"].toString()));
-        if (messageJson != null) {
-          messages.add(Message.fromJson(messageJson, forceType: type));
+        try {
+          Map? messageJson =
+              await Provider.of<KretaClient>(_context, listen: false)
+                  .getAPI(KretaAPI.message(message["azonosito"].toString()));
+          if (messageJson != null) {
+            messages.add(Message.fromJson(messageJson, forceType: type));
+          }
+        } catch (e) {
+          // One broken message must not drop the whole folder.
+          // ignore: avoid_print
+          print("WARNING: skipped $messageType message: ${e.runtimeType}");
         }
       }();
     }));
