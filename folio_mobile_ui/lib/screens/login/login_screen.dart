@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import 'package:folio/helpers/fake_kreta.dart';
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:folio_mobile_ui/common/widgets/app_logo.dart';
@@ -267,6 +268,19 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 14.0),
+                      // Test builds: switch to the fake KRÉTA server
+                      if (FakeKreta.available)
+                        SwitchListTile(
+                          dense: true,
+                          title: const Text('Kamu KRÉTA (fejlesztői)'),
+                          subtitle: const Text(
+                              'adb reverse tcp:8765 tcp:8765'),
+                          value: FakeKreta.enabled,
+                          onChanged: (v) async {
+                            await FakeKreta.setEnabled(v);
+                            if (mounted) setState(() {});
+                          },
+                        ),
                       GestureDetector(
                         onTap: () => PrivacyView.show(context),
                         child: Text(

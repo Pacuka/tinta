@@ -2,9 +2,9 @@ import 'package:intl/intl.dart';
 
 class KretaAPI {
   // IDP API
-  static const login = BaseKreta.kretaIdp + KretaApiEndpoints.token;
-  static const logout = BaseKreta.kretaIdp + KretaApiEndpoints.revoke;
-  static const nonce = BaseKreta.kretaIdp + KretaApiEndpoints.nonce;
+  static String get login => BaseKreta.kretaIdp + KretaApiEndpoints.token;
+  static String get logout => BaseKreta.kretaIdp + KretaApiEndpoints.revoke;
+  static String get nonce => BaseKreta.kretaIdp + KretaApiEndpoints.nonce;
   static const clientId = "kreta-ellenorzo-student-mobile-ios";
 
   // ELLENORZO API
@@ -77,40 +77,50 @@ class KretaAPI {
   // refer to https://discord.com/channels/1111649116020285532/1111798771513303102/1148368925969612920
 
   // ADMIN API
-  static const sendMessage =
+  static String get sendMessage =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.sendMessage;
   static String messages(String endpoint) =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.messages(endpoint);
   static String message(String id) =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.message(id);
-  static const recipientCategories =
+  static String get recipientCategories =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.recipientCategories;
-  static const availableCategories =
+  static String get availableCategories =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.availableCategories;
-  static const recipientTeachers =
+  static String get recipientTeachers =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.recipientTeachers;
-  static const recipientDirectorate =
+  static String get recipientDirectorate =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.recipientDirectorate;
-  static const uploadAttachment =
+  static String get uploadAttachment =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.uploadAttachment;
   static String downloadAttachment(String id) =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.downloadAttachment(id);
-  static const trashMessage =
+  static String get trashMessage =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.trashMessage;
-  static const deleteMessage =
+  static String get deleteMessage =>
       BaseKreta.kretaAdmin + KretaAdminEndpoints.deleteMessage;
 
   // NOTIFICATION API
-  static const notificationRegistration =
+  static String get notificationRegistration =>
       BaseKreta.kretaNotification + '/Registration';
 }
 
 class BaseKreta {
-  static String kreta(String iss) => "https://$iss.e-kreta.hu";
-  static const kretaIdp = "https://idp.e-kreta.hu";
-  static const kretaAdmin = "https://eugyintezes.e-kreta.hu";
-  static const kretaFiles = "https://files.e-kreta.hu";
-  static const kretaNotification = "https://kretaglobalmobileapi2.ekreta.hu/api/v3";
+  /// Debug builds only: when set (e.g. "http://127.0.0.1:8765"), every KRÉTA
+  /// host points at the local fake KRÉTA server so nothing reaches the school.
+  static String? fakeHost;
+
+  static String kreta(String iss) => fakeHost ?? "https://$iss.e-kreta.hu";
+  static String get kretaIdp => fakeHost ?? "https://idp.e-kreta.hu";
+  static String get kretaAdmin => fakeHost ?? "https://eugyintezes.e-kreta.hu";
+  static String get kretaFiles => fakeHost ?? "https://files.e-kreta.hu";
+  static String get kretaNotification =>
+      fakeHost ?? "https://kretaglobalmobileapi2.ekreta.hu/api/v3";
+
+  /// Token/login requests (they must not carry the bearer token).
+  static bool isIdpUrl(String url) =>
+      url.contains("idp.e-kreta.hu") ||
+      (fakeHost != null && url.startsWith("$fakeHost/connect/"));
 }
 
 class KretaApiEndpoints {

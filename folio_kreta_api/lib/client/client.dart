@@ -101,7 +101,7 @@ class KretaClient {
             headerMap["cookie"] = "idp.application=$idpApplicationCookie";
           }
           if (!headerMap.containsKey("apiKey") &&
-              !url.contains("idp.e-kreta.hu")) {
+              !BaseKreta.isIdpUrl(url)) {
             headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
           }
         }
@@ -183,7 +183,7 @@ class KretaClient {
             headerMap["content-type"] = "application/json";
           }
           if (!headerMap.containsKey("apiKey") &&
-              !url.contains("idp.e-kreta.hu")) {
+              !BaseKreta.isIdpUrl(url)) {
             headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
           }
           if (url.contains('kommunikacio/uzenetek')) {
@@ -243,7 +243,7 @@ class KretaClient {
             headerMap["user-agent"] = _roleUserAgent!;
           }
           if (!headerMap.containsKey("apiKey") &&
-              !url.contains("idp.e-kreta.hu")) {
+              !BaseKreta.isIdpUrl(url)) {
             headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
           }
         }
@@ -299,7 +299,7 @@ class KretaClient {
           headerMap["content-type"] =
               "application/x-www-form-urlencoded; charset=UTF-8";
           if (!headerMap.containsKey("apiKey") &&
-              !url.contains("idp.e-kreta.hu")) {
+              !BaseKreta.isIdpUrl(url)) {
             headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
           }
         }
@@ -368,7 +368,7 @@ class KretaClient {
             headerMap["content-type"] = "multipart/form-data";
           }
           if (!headerMap.containsKey("apiKey") &&
-              !url.contains("idp.e-kreta.hu")) {
+              !BaseKreta.isIdpUrl(url)) {
             headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
           }
           if (url.contains('kommunikacio/uzenetek')) {

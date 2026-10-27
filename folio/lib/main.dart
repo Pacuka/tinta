@@ -16,6 +16,7 @@
     along with this program, if not, see <https://www.gnu.org/licenses/>.
 */
 
+import 'package:folio/helpers/fake_kreta.dart';
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
@@ -55,6 +56,7 @@ void main() async {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     setupLocator();
     await Config.initDeviceUserAgent();
+    await FakeKreta.load();
 
     // Tinta: Firebase (the official KRÉTA app's push project) removed for
     // good; notifications are local (UpdateNotifier).
