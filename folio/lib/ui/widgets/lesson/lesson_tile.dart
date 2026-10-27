@@ -11,6 +11,7 @@ import 'package:folio_mobile_ui/common/panel/panel.dart';
 import 'package:folio_mobile_ui/common/widgets/exam/exam_viewable.dart';
 import 'package:folio_mobile_ui/common/widgets/homework/homework_viewable.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/helpers/timetable_insights.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'lesson_tile.i18n.dart';
@@ -360,6 +361,39 @@ class LessonTile extends StatelessWidget {
                               ),
                             ),
                           ),
+                        // Current lesson: time left + progress bar
+                        if (isCurrent && currentLessonIndicator)
+                          Builder(builder: (context) {
+                            final p = lessonProgress(lesson, now);
+                            if (p == null) return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${minutesLeft(lesson, now)} perc van hátra",
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w600,
+                                      color: onCardColor.withValues(alpha: 0.75),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6.0),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(3.0),
+                                    child: LinearProgressIndicator(
+                                      value: p,
+                                      minHeight: 3.0,
+                                      color: accentColor,
+                                      backgroundColor:
+                                          onCardColor.withValues(alpha: 0.15),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                         // Description (if any)
                         if (!lesson.isEmpty && cleanDesc.isNotEmpty)
                           Padding(

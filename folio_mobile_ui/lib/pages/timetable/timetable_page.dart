@@ -27,6 +27,9 @@ import 'package:flutter/services.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:folio/helpers/timetable_insights.dart';
+import 'package:folio_mobile_ui/pages/timetable/break_card.dart';
+import 'dart:async';
 import 'timetable_page.i18n.dart';
 
 class TimetablePage extends StatefulWidget {
@@ -170,10 +173,18 @@ class TimetablePageState extends State<TimetablePage>
 
     // Register listening for app state changes to refresh the timetable
     WidgetsBinding.instance.addObserver(this);
+
+    // Keep "X perc van hátra" and the lesson progress bar current
+    _minuteTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) setState(() {});
+    });
   }
+
+  Timer? _minuteTimer;
 
   @override
   void dispose() {
+    _minuteTimer?.cancel();
     _tabController.dispose();
     _controller.dispose();
     user.removeListener(_userListener);
@@ -211,7 +222,6 @@ class TimetablePageState extends State<TimetablePage>
     // Pre-compute per-day values once per build, not inside itemBuilder
     final now = DateTime.now();
     final locale = I18n.of(context).locale.languageCode;
-    final df = DateFormat("H:mm", locale);
     final dayLabels = _controller.days != null
         ? List<String>.generate(
             _controller.days!.length,
@@ -442,23 +452,12 @@ Container(
                         tabs: List.generate(_tabController.length, (index) {
                           final isToday = _sameDate(
                               _controller.days![index].first.date, now);
-                          final isSelected = _tabController.index == index;
-                          final dotColor = isSelected
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .secondary
-                                  .withValues(alpha: 0.6)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer
-                                  .withValues(alpha: 0.45);
                           final label = dayLabels[index];
                           return Tab(
                             height: 50.0,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                if (isToday) Dot(size: 4.0, color: dotColor),
                                 Text(
                                   label.substring(0, 1),
                                   style: const TextStyle(
@@ -467,7 +466,7 @@ Container(
                                     height: 1.1,
                                   ),
                                 ),
-                                SizedBox(height: isToday ? 0.0 : 2.0),
+                                const SizedBox(height: 2.0),
                                 Text(
                                   _controller.days![index].first.date.day
                                       .toString(),
@@ -476,6 +475,17 @@ Container(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14.0,
                                   ),
+                                ),
+                                const SizedBox(height: 3.0),
+                                SizedBox(
+                                  width: 18.0,
+                                  height: 3.0,
+                                  child: isToday
+                                      ? TodayUnderline(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary)
+                                      : null,
                                 ),
                               ],
                             ),
@@ -539,6 +549,16 @@ Container(
 
                                           int len =
                                               _controller.days![tab].length;
+                                          if (isNonSchoolDay(
+                                              _controller.days![tab])) {
+                                            return index == 0
+                                                ? BreakCard(
+                                                    span: breakSpanFor(
+                                                        _controller.days!,
+                                                        tab,
+                                                        DateTime.now()))
+                                                : const SizedBox.shrink();
+                                          }
                                           final Lesson lesson =
                                               _controller.days![tab][index];
                                           final Lesson? before =
@@ -552,103 +572,43 @@ Container(
                                             child: Column(
                                               children: [
                                               if (before != null &&
-                                                  (before.end.hour != 0 &&
-                                                      lesson.start.hour != 0) &&
-                                                  settingsProvider.showBreaks)
+                                                  settingsProvider.showBreaks &&
+                                                  gapMinutes(before, lesson) !=
+                                                      null)
                                                 Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: index == 0
-                                                          ? 0.0
-                                                          : 8.0,
-                                                      bottom: 6.0,
-                                                      left: 50.0),
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .secondary
-                                                            .withValues(
-                                                                alpha: 0.25),
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16.0),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          8.0,
-                                                                      vertical:
-                                                                          2.5),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            50.0),
-                                                                color: AppColors.of(
-                                                                        context)
-                                                                    .text
-                                                                    .withValues(
-                                                                        alpha:
-                                                                            0.90),
-                                                              ),
-                                                              child: Text(
-                                                                'break'.i18n,
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .scaffoldBackgroundColor,
-                                                                  fontSize:
-                                                                      12.5,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  height: 1.1,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 10.0),
-                                                            Text(
-                                                              '${df.format(before.end)} - ${df.format(lesson.start)}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 12.5,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                            ),
-                                                          ],
+                                                  padding: const EdgeInsets.only(
+                                                      left: 50.0,
+                                                      top: 2.0,
+                                                      bottom: 6.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.center,
+                                                    children: [
+                                                      Text(
+                                                        '${gapMinutes(before, lesson)} ${'break_minutes'.i18n}',
+                                                        style: TextStyle(
+                                                          fontSize: 11.0,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors.of(
+                                                                  context)
+                                                              .text
+                                                              .withValues(
+                                                                  alpha: 0.5),
                                                         ),
-                                                        if (now.isBefore(lesson.start) &&
-                                                            now.isAfter(before.end))
-                                                          Dot(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .secondary
-                                                                .withValues(
-                                                                    alpha: .5),
-                                                            size: 10.0,
-                                                          )
+                                                      ),
+                                                      if (now.isBefore(lesson.start) &&
+                                                          now.isAfter(before.end)) ...[
+                                                        const SizedBox(width: 6.0),
+                                                        Dot(
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .secondary
+                                                              .withValues(alpha: .5),
+                                                          size: 8.0,
+                                                        ),
                                                       ],
-                                                    ),
+                                                    ],
                                                   ),
                                                 ),
                                               LessonViewable(
