@@ -94,7 +94,7 @@ void main() {
     }
 
     test('new consultation hour once', () {
-      final s = NotifyState.empty(file);
+      final s = NotifyState.empty(file)..ids["consulting"] = {};
       final now = DateTime(2026, 11, 1, 10);
       final first = consultingNotes([hour()], s, now, enabled: true);
       expect(first.length, 1);
@@ -119,7 +119,7 @@ void main() {
     });
 
     test('no reminder after the slot started, nothing when disabled', () {
-      final s = NotifyState.empty(file);
+      final s = NotifyState.empty(file)..ids["consulting"] = {};
       final h = hour(mine: true);
       expect(
           consultingNotes([h], s, DateTime(2026, 11, 5, 16, 15), enabled: true)
@@ -131,11 +131,29 @@ void main() {
     });
 
     test('past hours are recorded silently', () {
-      final s = NotifyState.empty(file);
+      final s = NotifyState.empty(file)..ids["consulting"] = {};
       expect(
           consultingNotes([hour(start: DateTime(2026, 10, 1, 16))], s,
               DateTime(2026, 11, 1), enabled: true),
           isEmpty);
+    });
+
+    test('I4: first run after the update records silently', () {
+      final s = NotifyState.empty(file); // no "consulting" key yet
+      expect(
+          consultingNotes([hour()], s, DateTime(2026, 11, 1, 10),
+              enabled: true),
+          isEmpty);
+      expect(s.ids["consulting"], contains("FO1"));
+    });
+
+    test('I4: far-away hours entering the 90-day window stay silent', () {
+      final s = NotifyState.empty(file)..ids["consulting"] = {};
+      expect(
+          consultingNotes([hour(start: DateTime(2027, 1, 20, 16))], s,
+              DateTime(2026, 11, 1, 10), enabled: true),
+          isEmpty);
+      expect(s.ids["consulting"], contains("FO1"));
     });
   });
 }

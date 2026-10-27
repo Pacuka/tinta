@@ -115,15 +115,18 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
       "${hour.teacherName}\n${consultingDay(s.start)}, ${_hm(s.start)}–${_hm(s.end)}"
       "${hour.room.isNotEmpty ? " · ${hour.room}" : ""}";
 
+  /// Always closes afterwards: the hour shown here may be stale now (the
+  /// provider re-fetched), so a retry must start from the fresh list.
   Future<void> _run(Future<String?> Function() action) async {
     setState(() => _busy = true);
-    String? error;
     try {
-      error = await action();
+      await action();
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() => _busy = false);
+        Navigator.of(context).maybePop();
+      }
     }
-    if (error == null && mounted) Navigator.of(context).maybePop();
   }
 
   Future<void> _book() async {
@@ -161,7 +164,7 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
     final hint = deadlineHint(hour, now);
     final muted = TextStyle(color: scheme.onSurface.withValues(alpha: 0.7));
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 20.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,

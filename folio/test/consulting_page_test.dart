@@ -101,4 +101,35 @@ void main() {
     expect(find.byKey(const Key("consulting-confirm")), findsNothing);
     expect(calls, 1);
   });
+
+  testWidgets('I2: sheet closes after an uncertain result (no stale resend)',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: TextButton(
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              builder: (_) => ConsultingSheet(
+                hour: _hour(start: DateTime.now().add(const Duration(days: 3))),
+                onBook: (slot) async =>
+                    "Nem biztos, hogy megérkezett. Nézd meg a listát, mielőtt újraküldöd!",
+                onCancel: (slot) async => null,
+              ),
+            ),
+            child: const Text("open"),
+          ),
+        ),
+      ),
+    ));
+    await tester.tap(find.text("open"));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key("consulting-slot-FO1-1")));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key("consulting-book")));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key("consulting-confirm")));
+    await tester.pumpAndSettle();
+    expect(find.byType(ConsultingSheet), findsNothing);
+  });
 }

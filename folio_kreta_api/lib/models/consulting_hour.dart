@@ -94,7 +94,8 @@ class ConsultingHour {
         end: _date(json["VegIdopont"]) ?? DateTime(0),
         deadline: _date(json["JelentkezesHatarido"]),
         signupEnabled: json["IsJelentkezesFeatureEnabled"] == true,
-        room: (json["Terem"] is Map ? json["Terem"]["Nev"] : null) ?? "",
+        room: (json["Terem"] is Map ? json["Terem"]["Nev"]?.toString() : null) ??
+            "",
         slots: (json["Idopontok"] is List ? json["Idopontok"] as List : const [])
             .whereType<Map>()
             .map(ConsultingSlot.fromJson)

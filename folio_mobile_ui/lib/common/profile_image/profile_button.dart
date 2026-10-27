@@ -1,3 +1,4 @@
+import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/models/user.dart';
@@ -40,6 +41,7 @@ class ProfileButton extends StatelessWidget {
           Provider.of<NoteProvider>(context, listen: false).restore(),
           Provider.of<EventProvider>(context, listen: false).restore(),
           Provider.of<AbsenceProvider>(context, listen: false).restore(),
+          Provider.of<ConsultingProvider>(context, listen: false).restore(),
           Provider.of<KretaClient>(context, listen: false).refreshLogin(),
         ]);
 

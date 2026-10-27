@@ -179,9 +179,14 @@ class UpdateNotifier {
     final (cFrom, cTo) = consultingRange(now);
     final consultingJson =
         await kreta.getAPI(KretaAPI.consultingHours(iss, cFrom, cTo));
-    if (consultingJson is List) {
-      for (final (title, body) in consultingNotes(
-          ConsultingHour.listFromJson(consultingJson), state, now,
+    List<ConsultingHour>? consulting;
+    try {
+      if (consultingJson is List) {
+        consulting = ConsultingHour.listFromJson(consultingJson);
+      }
+    } catch (_) {} // odd data must not stop the other notifications
+    if (consulting != null) {
+      for (final (title, body) in consultingNotes(consulting, state, now,
           enabled: settings.notificationsLessonsEnabled)) {
         notes.add(_Note(title, body));
       }
@@ -344,8 +349,17 @@ List<(String, String)> consultingNotes(
     {required bool enabled}) {
   final hm = DateFormat("HH:mm");
   final notes = <(String, String)>[];
+  // First run after this feature arrived: just learn what already exists.
+  final known = state.ids.containsKey("consulting");
+  state.ids.putIfAbsent("consulting", () => {});
+  // Hours far ahead are only recorded (they keep entering the 90-day window).
+  final soon = now.add(const Duration(days: 14));
   for (final h in hours) {
-    if (state.add("consulting", h.id) && enabled && h.end.isAfter(now)) {
+    if (state.add("consulting", h.id) &&
+        known &&
+        enabled &&
+        h.end.isAfter(now) &&
+        h.start.isBefore(soon)) {
       notes.add((
         "Új fogadóóra: ${h.teacherName}",
         "${UpdateNotifier._day(h.start)} · ${hm.format(h.start)}–${hm.format(h.end)}",
