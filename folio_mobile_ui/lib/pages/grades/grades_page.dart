@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio/helpers/average_helper.dart';
+import 'package:folio/helpers/grade_insights.dart';
+import 'package:folio/helpers/motion_once.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/ui/widgets/grade/grade_tile.dart';
 import 'package:folio/utils/format.dart';
@@ -20,6 +22,7 @@ import 'package:folio_mobile_ui/common/widgets/grade/grade_subject_tile.dart';
 import 'package:folio_mobile_ui/common/widgets/grade/grade_viewable.dart';
 import 'package:folio_mobile_ui/pages/grades/calculator/grade_calculator.dart';
 import 'package:folio_mobile_ui/pages/grades/calculator/grade_calculator_provider.dart';
+import 'package:folio_mobile_ui/pages/grades/average_sparkline.dart';
 import 'package:folio_mobile_ui/pages/grades/graph.dart';
 import 'package:folio_mobile_ui/pages/grades/subject_grades_container.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_route_handler.dart';
@@ -391,26 +394,6 @@ Container(
                             color: colorScheme.onPrimaryContainer,
                           ),
                         ),
-                        if (currentAvg > 0) ...[
-                          const SizedBox(width: 10.0),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: colorScheme.onPrimaryContainer
-                                  .withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              currentAvg.toStringAsFixed(2),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ),
-                        ],
                         const Spacer(),
                         if (_sheetController == null &&
                             _tabController.index == 1 &&
@@ -583,6 +566,7 @@ class _SubjectsTab extends StatelessWidget {
         children: [
           if (currentAvg > 0)
             _HeroCard(
+              trend: averageTrend(filteredGrades),
               currentAvg: currentAvg,
               prevAvg: prevAvg,
               totalClassAvg: totalClassAvg,
@@ -662,6 +646,7 @@ class _SubjectsTab extends StatelessWidget {
 
 class _HeroCard extends StatelessWidget {
   const _HeroCard({
+    required this.trend,
     required this.currentAvg,
     required this.prevAvg,
     required this.totalClassAvg,
@@ -671,6 +656,7 @@ class _HeroCard extends StatelessWidget {
     required this.onShowStats,
   });
 
+  final List<double> trend;
   final double currentAvg, prevAvg, totalClassAvg, subjectAvg;
   final String currentPeriodKey;
   final VoidCallback onPeriodTap;
@@ -700,7 +686,7 @@ class _HeroCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'page_title_grades'.i18n,
+                      'your_average'.i18n,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -708,8 +694,8 @@ class _HeroCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 1),
-                    Text(
-                      currentAvg.toStringAsFixed(2),
+                    _CountUpAverage(
+                      value: currentAvg,
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w800,
@@ -722,13 +708,20 @@ class _HeroCard extends StatelessWidget {
                 const Spacer(),
                 // Right side: TrendDisplay + badges
                 if (prevAvg > 0 && currentAvg != prevAvg) ...[
-                  TrendDisplay(previous: prevAvg, current: currentAvg),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TrendDisplay(previous: prevAvg, current: currentAvg),
+                      _BadgeLabel('trend_30d'.i18n, onColor),
+                    ],
+                  ),
                   const SizedBox(width: 4),
                 ],
                 if (subjectAvg > 0) ...[
                   _Badge(
                       icon: Icons.menu_book_rounded,
                       value: subjectAvg,
+                      label: 'subject_avg_short'.i18n,
                       onColor: onColor),
                   const SizedBox(width: 8),
                 ],
@@ -736,9 +729,15 @@ class _HeroCard extends StatelessWidget {
                   _Badge(
                       icon: Icons.group_rounded,
                       value: totalClassAvg,
+                      label: 'class_avg_short'.i18n,
                       onColor: onColor),
               ],
             ),
+            if (trend.length >= 2) ...[
+              const SizedBox(height: 10),
+              AverageSparkline(
+                  points: trend, color: onColor.withValues(alpha: 0.8)),
+            ],
             const SizedBox(height: 14),
             // ── Bottom row: period chip + stats ──
             Row(
@@ -809,9 +808,13 @@ class _HeroCard extends StatelessWidget {
 
 class _Badge extends StatelessWidget {
   const _Badge(
-      {required this.icon, required this.value, required this.onColor});
+      {required this.icon,
+      required this.value,
+      required this.label,
+      required this.onColor});
   final IconData icon;
   final double value;
+  final String label;
   final Color onColor;
 
   @override
@@ -828,7 +831,7 @@ class _Badge extends StatelessWidget {
           Icon(icon, size: 12, color: onColor.withValues(alpha: 0.55)),
           const SizedBox(height: 3),
           Text(
-            value.toStringAsFixed(2),
+            formatAverage(value),
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -836,10 +839,77 @@ class _Badge extends StatelessWidget {
               color: onColor,
             ),
           ),
+          _BadgeLabel(label, onColor),
         ],
       ),
     );
   }
+}
+
+/// Tiny caption under a header number ("30 napja", "tárgyak átl.").
+class _BadgeLabel extends StatelessWidget {
+  const _BadgeLabel(this.text, this.onColor);
+  final String text;
+  final Color onColor;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 3),
+        child: Text(
+          text,
+          maxLines: 1,
+          style: TextStyle(
+            fontSize: 9,
+            height: 1.0,
+            color: onColor.withValues(alpha: 0.7),
+          ),
+        ),
+      );
+}
+
+/// The big average; counts up from 0 the first time per app launch.
+class _CountUpAverage extends StatefulWidget {
+  const _CountUpAverage({required this.value, required this.style});
+  final double value;
+  final TextStyle style;
+
+  @override
+  State<_CountUpAverage> createState() => _CountUpAverageState();
+}
+
+class _CountUpAverageState extends State<_CountUpAverage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 900));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_c.status == AnimationStatus.dismissed) {
+      if (MediaQuery.of(context).disableAnimations ||
+          !MotionOnce.shouldPlay('grades')) {
+        _c.value = 1.0;
+      } else {
+        _c.forward();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _c,
+        builder: (context, _) {
+          final t = Curves.easeOutCubic.transform(_c.value);
+          final v = widget.value * t;
+          return Text(t == 0 ? '0,00' : formatAverage(v), style: widget.style);
+        },
+      );
 }
 
 // ─── Tab 1: Jegyek (subject detail) ──────────────────────────────────────────

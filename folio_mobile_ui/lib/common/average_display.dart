@@ -1,6 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:folio/helpers/grade_insights.dart';
+import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/colors.dart';
-import 'package:folio/ui/widgets/grade/grade_tile.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 
@@ -22,7 +24,8 @@ class AverageDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color = average == 0.0
         ? AppColors.of(context).text.withValues(alpha: .8)
-        : gradeColor(context: context, value: average);
+        : averageColor(
+            average, Provider.of<SettingsProvider>(context).gradeColors);
 
     String averageText = average.toStringAsFixed(2);
     if (I18n.of(context).locale.languageCode != "en") {

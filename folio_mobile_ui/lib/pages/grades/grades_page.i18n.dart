@@ -5,6 +5,10 @@ extension Localization on String {
       {
         "en-US": {
           "page_title_grades": "Grades",
+          "your_average": "Your average",
+          "trend_30d": "30 days ago",
+          "subject_avg_short": "subjects avg",
+          "class_avg_short": "class avg",
           "subjects_tab": "Subjects",
           "grades_tab": "Grades",
           "Grades": "Grades",
@@ -23,6 +27,10 @@ extension Localization on String {
         },
         "hu-HU": {
           "page_title_grades": "Jegyek",
+          "your_average": "Átlagod",
+          "trend_30d": "30 napja",
+          "subject_avg_short": "tárgyak átl.",
+          "class_avg_short": "osztályátl.",
           "subjects_tab": "Tantárgyak",
           "grades_tab": "Jegyek",
           "Grades": "Jegyek",
@@ -41,6 +49,10 @@ extension Localization on String {
         },
         "de-DE": {
           "page_title_grades": "Noten",
+          "your_average": "Dein Schnitt",
+          "trend_30d": "vor 30 Tagen",
+          "subject_avg_short": "Fächer",
+          "class_avg_short": "Klasse",
           "subjects_tab": "Fächer",
           "grades_tab": "Noten",
           "Grades": "Noten",
