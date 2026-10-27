@@ -50,7 +50,9 @@ extension UpdateHelper on Release {
   }
 
   Future<Uint8List> download({UpdateCallback? updateCallback}) async {
-    var response = await FilcAPI.downloadRelease(downloads.first);
+    final apk = pickApk(downloads);
+    if (apk == null) throw "No Android APK in this release";
+    var response = await FilcAPI.downloadRelease(apk);
 
     List<List<int>> chunks = [];
     int downloaded = 0;

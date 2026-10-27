@@ -15,6 +15,16 @@ class ReleaseDownload {
   }
 }
 
+/// The Android installer among a release's files (the .ipa is for iPhone),
+/// preferring the arm64 build that fits practically every current phone.
+ReleaseDownload? pickApk(List<ReleaseDownload> downloads) {
+  final apks =
+      downloads.where((d) => d.url.toLowerCase().endsWith(".apk")).toList();
+  if (apks.isEmpty) return null;
+  return apks.firstWhere((d) => d.url.toLowerCase().contains("arm64"),
+      orElse: () => apks.first);
+}
+
 class Release {
   String tag;
   Version version;
@@ -54,7 +64,8 @@ class Version {
   const Version(this.major, this.minor, this.patch, {this.prerelease = "", this.prever = 0});
 
   factory Version.fromString(String o) {
-    String string = o;
+    // GitHub release tags look like "v1.2.0".
+    String string = o.trim().replaceFirst(RegExp(r'^[vV]'), '');
     int x = 0, y = 0, z = 0; // major, minor, patch (1.1.1)
     String pre = ""; // prerelease string (-beta)
     int prev = 0; // prerelease version (.1)
