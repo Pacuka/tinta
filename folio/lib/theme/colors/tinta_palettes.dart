@@ -47,6 +47,13 @@ const Map<AccentColor, TintaPalette> _light = {
     examMark: _amber,
     container: Color(0xFFC9E9EC),
   ),
+  AccentColor.uveg: TintaPalette(
+    accent: Color(0xFF2440C8),
+    onAccent: Color(0xFFFFFFFF),
+    background: Color(0xFFEEF1F8),
+    highlight: Color(0xFFFFFFFF),
+    container: Color(0xFFDCE2FF),
+  ),
 };
 
 const Map<AccentColor, TintaPalette> _dark = {
@@ -71,6 +78,13 @@ const Map<AccentColor, TintaPalette> _dark = {
     highlight: Color(0xFF152124),
     examMark: _amber,
     container: Color(0xFF163E43),
+  ),
+  AccentColor.uveg: TintaPalette(
+    accent: Color(0xFF9DB0FF),
+    onAccent: Color(0xFF0D1A66),
+    background: Color(0xFF0D0F15),
+    highlight: Color(0xFF1A1D26),
+    container: Color(0xFF25306A),
   ),
 };
 

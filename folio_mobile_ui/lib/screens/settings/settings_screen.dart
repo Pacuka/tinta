@@ -2806,6 +2806,7 @@ class _ThemeColorPicker extends StatelessWidget {
     AccentColor.kobalt: 'Kobalt',
     AccentColor.feketeSarga: 'Fekete-sárga',
     AccentColor.petrol: 'Petrol',
+    AccentColor.uveg: 'Üveg',
   };
 
   // Colors in hue order (spectrum: red → pink)

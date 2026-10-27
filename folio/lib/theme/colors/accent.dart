@@ -18,6 +18,7 @@ enum AccentColor {
   kobalt,
   feketeSarga,
   petrol,
+  uveg,
 }
 
 Map<AccentColor, Color> accentColorMap = {
@@ -25,6 +26,7 @@ Map<AccentColor, Color> accentColorMap = {
   AccentColor.kobalt: const Color(0xFF2440C8),
   AccentColor.feketeSarga: const Color(0xFFFFE14D),
   AccentColor.petrol: const Color(0xFF0F5C66),
+  AccentColor.uveg: const Color(0xFF2440C8),
   AccentColor.filc: const Color(0xFFA7DC22),
   AccentColor.blue: Colors.blue.shade300,
   AccentColor.green: Colors.green.shade400,

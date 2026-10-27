@@ -43,6 +43,14 @@ void main() {
         const Color(0xFFFFE14D));
   });
 
+  test('uveg appended at the end with its palette', () {
+    expect(AccentColor.uveg.index, 16);
+    expect(tintaPalette(AccentColor.uveg, Brightness.dark)!.background,
+        const Color(0xFF0D0F15));
+    expect(tintaPalette(AccentColor.uveg, Brightness.light)!.background,
+        const Color(0xFFEEF1F8));
+  });
+
   test('non-tinta accents return null', () {
     expect(tintaPalette(AccentColor.adaptive, Brightness.light), isNull);
     expect(tintaPalette(AccentColor.filc, Brightness.dark), isNull);
@@ -52,7 +60,8 @@ void main() {
     for (final c in [
       AccentColor.kobalt,
       AccentColor.feketeSarga,
-      AccentColor.petrol
+      AccentColor.petrol,
+      AccentColor.uveg
     ]) {
       for (final b in Brightness.values) {
         final p = tintaPalette(c, b)!;
