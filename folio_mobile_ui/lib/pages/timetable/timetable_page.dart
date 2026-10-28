@@ -117,6 +117,10 @@ class TimetablePageState extends State<TimetablePage>
     super.initState();
 
     // Initalize controllers
+    // getCustom() runs from the controller listener below, so these must be set first.
+    user = Provider.of<UserProvider>(context, listen: false);
+    db = Provider.of<DatabaseProvider>(context, listen: false);
+
     _controller = TimetableController();
     _tabController = TabController(length: 0, vsync: this, initialIndex: 0);
 
@@ -161,7 +165,6 @@ class TimetablePageState extends State<TimetablePage>
     // push timetable to calendar (calendar sync removed)
 
     // Listen for user changes
-    user = Provider.of<UserProvider>(context, listen: false);
     user.addListener(_userListener);
 
     // A sync elsewhere (pull-to-refresh, resume) updates the provider; show it.
@@ -169,7 +172,6 @@ class TimetablePageState extends State<TimetablePage>
     timetableProvider.addListener(_timetableListener);
 
     // listen for lesson customization
-    db = Provider.of<DatabaseProvider>(context, listen: false);
     getCustom();
 
     // Register listening for app state changes to refresh the timetable
