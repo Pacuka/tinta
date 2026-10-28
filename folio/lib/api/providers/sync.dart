@@ -4,6 +4,7 @@ import 'package:folio/utils/jwt.dart';
 import 'package:folio/models/user.dart';
 import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_kreta_api/providers/school_calendar_provider.dart';
+import 'package:folio_kreta_api/providers/program_event_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
@@ -128,6 +129,8 @@ Future<void> _syncAll(BuildContext context) async {
     syncStatus(Provider.of<ConsultingProvider>(context, listen: false).fetch()),
     syncStatus(
         Provider.of<SchoolCalendarProvider>(context, listen: false).fetch()),
+    syncStatus(
+        Provider.of<ProgramEventProvider>(context, listen: false).fetch()),
 
     // Sync student
     syncStatus(() async {
