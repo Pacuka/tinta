@@ -93,6 +93,15 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         resConfigs "en"
+        manifestPlaceholders += [appLabel: "Tinta"]
+
+        // Test-only install next to the real app: flutter build ... -Pkamu=true
+        // (separate package, so the fake KRÉTA never touches real accounts)
+        if (project.findProperty("kamu") == "true") {
+            applicationIdSuffix ".kamu"
+            versionNameSuffix "-kamu"
+            manifestPlaceholders += [appLabel: "Tinta Kamu"]
+        }
     }
 
     compileOptions {
