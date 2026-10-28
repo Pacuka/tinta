@@ -250,6 +250,26 @@ List<SchoolCalendarItem> buildSchoolCalendar(List<SchoolCalendarDay> days) {
     items.add(SchoolCalendarItem(
         type: d.type, title: title, first: d.date, last: d.date, note: note));
   }
+
+  // A break that ends on a Friday really lasts until Sunday, unless the
+  // Saturday is a working day.
+  for (var i = 0; i < items.length; i++) {
+    final it = items[i];
+    if (!it.type.contains("szunet") || it.last.weekday != DateTime.friday) {
+      continue;
+    }
+    final sat = it.last.add(const Duration(days: 1));
+    final next = i + 1 < items.length ? items[i + 1] : null;
+    if (next != null && !next.first.isAfter(sat.add(const Duration(days: 1)))) {
+      continue;
+    }
+    items[i] = SchoolCalendarItem(
+        type: it.type,
+        title: it.title,
+        first: it.first,
+        last: it.last.add(const Duration(days: 2)),
+        note: it.note);
+  }
   return items;
 }
 

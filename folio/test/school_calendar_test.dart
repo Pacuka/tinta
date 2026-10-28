@@ -105,4 +105,25 @@ void main() {
     expect(back.followsDay, "Hetfo");
     expect(back.typeDesc, "Tanítási nap");
   });
+
+  test('a break ending on Friday includes the weekend after it', () {
+    final items = buildSchoolCalendar(_days([
+      _entry(DateTime(2026, 10, 29), "oszi_szunet", desc: "Őszi szünet"),
+      _entry(DateTime(2026, 10, 30), "oszi_szunet", desc: "Őszi szünet"),
+      _entry(DateTime(2026, 11, 13), "tanitas_nelkuli_munkanap"),
+    ]));
+    expect(items.first.last, DateTime(2026, 11, 1));
+    expect(items.first.length, 4);
+    // a single day off is not stretched into a "3-day" item
+    expect(items.last.isRange, isFalse);
+  });
+
+  test('a working Saturday right after a break is not swallowed', () {
+    final items = buildSchoolCalendar(_days([
+      _entry(DateTime(2026, 10, 30), "oszi_szunet", desc: "Őszi szünet"),
+      _entry(DateTime(2026, 10, 31), "tanitasi_nap", follows: "Pentek"),
+    ]));
+    expect(items.first.last, DateTime(2026, 10, 30));
+    expect(items.last.note, "pénteki órarend szerint");
+  });
 }
