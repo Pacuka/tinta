@@ -14,6 +14,11 @@ import 'package:folio_mobile_ui/pages/programs/programs_page.dart';
 import 'package:folio_mobile_ui/pages/programs/programs.i18n.dart'
     show programsTitle;
 import 'package:folio_kreta_api/providers/program_event_provider.dart';
+import 'package:folio_kreta_api/providers/questionnaire_provider.dart';
+import 'package:folio_mobile_ui/pages/school_info/class_master_sheet.dart';
+import 'package:folio_mobile_ui/pages/school_info/questionnaires_page.dart';
+import 'package:folio_mobile_ui/pages/school_info/school_info.i18n.dart'
+    show questionnairesTitle, classMasterTitle;
 import 'package:folio_mobile_ui/pages/school_calendar/school_calendar.i18n.dart'
     show schoolCalendarTitle;
 import 'package:folio_mobile_ui/pages/consulting/consulting.i18n.dart'
@@ -211,6 +216,45 @@ class MoreMenu extends StatelessWidget {
               );
             },
           ),
+
+          // Homeroom teacher + PedTér questionnaires (when KRÉTA has them)
+          Builder(builder: (context) {
+            final info = Provider.of<SchoolInfoProvider>(context);
+            final masters = info.classMasters;
+            final open = info.open(DateTime.now()).length;
+            return Column(children: [
+              if (masters.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: _WideTile(
+                    icon: Icons.person_pin_rounded,
+                    title: "$classMasterTitle: ${masters.map((m) => m.name).join(", ")}",
+                    onTap: () {
+                      performHapticFeedback(settings.vibrate);
+                      showClassMasterSheet(context, masters);
+                    },
+                  ),
+                ),
+              if (info.questionnairesAvailable)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: _WideTile(
+                    icon: Icons.rate_review_rounded,
+                    title: open > 0
+                        ? "$questionnairesTitle · $open"
+                        : questionnairesTitle,
+                    onTap: () {
+                      performHapticFeedback(settings.vibrate);
+                      Navigator.of(context).pop();
+                      Navigator.of(outsideContext, rootNavigator: true).push(
+                        CupertinoPageRoute(
+                            builder: (_) => const QuestionnairesPage()),
+                      );
+                    },
+                  ),
+                ),
+            ]);
+          }),
 
           // LÉP / NÉP programmes, only where the school uses them
           Builder(builder: (context) {
