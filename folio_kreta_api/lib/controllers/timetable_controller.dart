@@ -153,107 +153,76 @@ class TimetableController extends ChangeNotifier {
   }
 
   List<List<Lesson>> _sortDays(Week week, {required BuildContext context}) {
-    List<List<Lesson>> days = [];
-
     try {
       final timetableProvider = context.read<TimetableProvider>();
-
-      List<Lesson> lessons = timetableProvider.getWeek(week) ?? [];
-
-      if (lessons.isNotEmpty) {
-        days.add([]);
-        lessons.sort((a, b) => a.date.compareTo(b.date));
-        for (var lesson in lessons) {
-          if (days.last.isNotEmpty &&
-              _differentDate(lesson.date, days.last.last.date)) {
-            days.add([]);
-          }
-          days.last.add(lesson);
-        }
-
-        for (int i = 0; i < days.length; i++) {
-          List<Lesson> day0 = List.castFrom(days[i]);
-
-          List<int> lessonIndexes = _getIndexes(day0);
-          int minIndex = 0, maxIndex = 0;
-
-          if (lessonIndexes.isNotEmpty) {
-            minIndex = lessonIndexes.reduce(math.min);
-            maxIndex = lessonIndexes.reduce(math.max);
-          }
-
-          List<Lesson> day = [];
-
-          if (lessonIndexes.isNotEmpty) {
-            // Fill missing indexes with empty spaces
-            for (var i in List<int>.generate(
-                maxIndex - minIndex + 1, (int i) => minIndex + i)) {
-              List<Lesson> indexLessons = _getLessonsByIndex(day0, i);
-
-              // Empty lesson
-              if (indexLessons.isEmpty) {
-                // Get start date by previous lesson
-                List<Lesson> prevLesson = _getLessonsByIndex(day, i - 1);
-                try {
-                  DateTime startDate =
-                      prevLesson.last.start.add(const Duration(seconds: 1));
-                  indexLessons.add(Lesson.fromJson({
-                    'isEmpty': true,
-                    'Oraszam': i,
-                    'KezdetIdopont': startDate.toIso8601String()
-                  }));
-                  // ignore: empty_catches
-                } catch (e) {}
-              }
-
-              day.addAll(indexLessons);
-            }
-          }
-
-          // Additional lessons
-          day.addAll(day0.where((l) =>
-              int.tryParse(l.lessonIndex) == null && l.subject.id != ''));
-
-          day.sort((a, b) => a.start.compareTo(b.start));
-
-          // Special Dates
-          for (var l in day0) {
-            l.subject.id == '' ? day.insert(0, l) : null;
-          }
-
-          days[i] = day;
-        }
-      }
+      return buildTimetableDays(timetableProvider.getWeek(week) ?? []);
     } catch (e) {
       log("_sortDays error: $e");
+      return [];
     }
-
-    return days;
   }
 
-  List<Lesson> _getLessonsByIndex(List<Lesson> lessons, int index) {
-    List<Lesson> ret = [];
-
-    for (var lesson in lessons) {
-      int? lessonIndex = int.tryParse(lesson.lessonIndex);
-
-      if (lessonIndex != null && lessonIndex == index) {
-        ret.add(lesson);
-      }
-    }
-
-    return ret;
-  }
-
-  List<int> _getIndexes(List<Lesson> lessons) {
-    List<int> indexes = [];
-    for (var l in lessons) {
-      int? index = int.tryParse(l.lessonIndex);
-      if (index != null) indexes.add(index);
-    }
-    return indexes;
-  }
-
-  bool _differentDate(DateTime a, DateTime b) =>
-      !(a.year == b.year && a.month == b.month && a.day == b.day);
 }
+
+/// Splits a week's lessons into days. Numbered lessons are ordered by time,
+/// missing numbers get an empty slot, and special-day entries (no subject,
+/// e.g. "Pályaorientációs nap") go on top once and never count as a slot.
+List<List<Lesson>> buildTimetableDays(List<Lesson> lessons) {
+  if (lessons.isEmpty) return [];
+
+  final sorted = [...lessons]..sort((a, b) => a.date.compareTo(b.date));
+  final List<List<Lesson>> days = [[]];
+  for (var lesson in sorted) {
+    if (days.last.isNotEmpty && _differentDate(lesson.date, days.last.last.date)) {
+      days.add([]);
+    }
+    days.last.add(lesson);
+  }
+
+  return [for (final day0 in days) _buildDay(day0)];
+}
+
+List<Lesson> _buildDay(List<Lesson> day0) {
+  bool isSpecial(Lesson l) => l.subject.id == '';
+  int? slot(Lesson l) => isSpecial(l) ? null : int.tryParse(l.lessonIndex);
+
+  final indexes = day0.map(slot).whereType<int>().toList();
+  final List<Lesson> day = [];
+
+  if (indexes.isNotEmpty) {
+    final minIndex = indexes.reduce(math.min);
+    final maxIndex = indexes.reduce(math.max);
+
+    for (var i = minIndex; i <= maxIndex; i++) {
+      final indexLessons = day0.where((l) => slot(l) == i).toList();
+
+      // Empty lesson, starting right after the previous slot
+      if (indexLessons.isEmpty) {
+        final prev = day.where((l) => int.tryParse(l.lessonIndex) == i - 1);
+        if (prev.isNotEmpty) {
+          indexLessons.add(Lesson.fromJson({
+            'isEmpty': true,
+            'Oraszam': i,
+            'KezdetIdopont':
+                prev.last.start.add(const Duration(seconds: 1)).toIso8601String(),
+          }));
+        }
+      }
+
+      day.addAll(indexLessons);
+    }
+  }
+
+  // Additional lessons without a number
+  day.addAll(day0.where((l) => !isSpecial(l) && int.tryParse(l.lessonIndex) == null));
+
+  day.sort((a, b) => a.start.compareTo(b.start));
+
+  // Special dates on top
+  day.insertAll(0, day0.where(isSpecial));
+
+  return day;
+}
+
+bool _differentDate(DateTime a, DateTime b) =>
+    !(a.year == b.year && a.month == b.month && a.day == b.day);
