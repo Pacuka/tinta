@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:folio/models/kreta_auth_app.dart';
-import 'package:flutter/foundation.dart';
 import 'package:folio/utils/jwt.dart';
 import 'package:folio_kreta_api/providers/absence_provider.dart';
 import 'package:folio_kreta_api/providers/event_provider.dart';
@@ -65,19 +64,7 @@ Future newLoginAPI({
   });
 
   if (res != null) {
-    if (kDebugMode) {
-      print(res);
-
-      // const splitSize = 1000;
-      // RegExp exp = RegExp(r"\w{" "$splitSize" "}");
-      // // String str = "0102031522";
-      // Iterable<Match> matches = exp.allMatches(res.toString());
-      // var list = matches.map((m) => m.group(0));
-      // list.forEach((e) {
-      //   print(e);
-      // });
-    }
-
+    // Never log res: it holds the access and refresh tokens.
     if (res.containsKey("error")) {
       if (res["error"] == "invalid_grant") {
         print("ERROR: invalid_grant");
