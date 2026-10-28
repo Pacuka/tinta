@@ -135,8 +135,7 @@ class LoginScreenState extends State<LoginScreen> {
                             userProvider.addUser(demoUser);
                             userProvider.setUser(demoUser.id);
                             setSystemChrome(context);
-                            Navigator.of(context)
-                                .pushReplacementNamed('login_to_navigation');
+                            _openNavigation(context);
                           }
                         },
                         child: Container(
@@ -317,7 +316,7 @@ class LoginScreenState extends State<LoginScreen> {
             userProvider.addUser(demoUser);
             userProvider.setUser(demoUser.id);
             setSystemChrome(context);
-            Navigator.of(context).pushReplacementNamed('login_to_navigation');
+            _openNavigation(context);
           },
         ),
       ),
@@ -374,7 +373,7 @@ class LoginScreenState extends State<LoginScreen> {
             userProvider.addUser(demoUser);
             userProvider.setUser(demoUser.id);
             setSystemChrome(context);
-            Navigator.of(context).pushReplacementNamed('login_to_navigation');
+            _openNavigation(context);
           },
         ),
       ),
@@ -403,7 +402,7 @@ class LoginScreenState extends State<LoginScreen> {
       onSuccess: () {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         setSystemChrome(context);
-        Navigator.of(context).pushReplacementNamed("login_to_navigation");
+        _openNavigation(context);
       },
     ).then((res) {
       if (mounted) {
@@ -1406,3 +1405,8 @@ class _OfficialLoginPageState extends State<_OfficialLoginPage> {
     );
   }
 }
+
+/// Opens the main screen and drops every route below it, so adding an account
+/// from the profile doesn't stack a second NavigationScreen on the old one.
+void _openNavigation(BuildContext context) => Navigator.of(context)
+    .pushNamedAndRemoveUntil('login_to_navigation', (_) => false);

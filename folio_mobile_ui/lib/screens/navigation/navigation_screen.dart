@@ -5,8 +5,6 @@ import 'package:folio/api/providers/update_provider.dart';
 import 'package:folio/helpers/quick_actions.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/theme/observer.dart';
-import 'package:folio/utils/navigation_service.dart';
-import 'package:folio/utils/service_locator.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio_kreta_api/providers/grade_provider.dart';
@@ -54,7 +52,9 @@ class NavigationScreenState extends State<NavigationScreen>
     with WidgetsBindingObserver {
   late NavigationRoute selected;
   List<String> initializers = [];
-  final _navigatorState = locator<NavigationService>().navigatorKey;
+  // Own key per screen: a shared (singleton) key broke the second
+  // NavigationScreen that appears while adding an account.
+  final _navigatorState = GlobalKey<NavigatorState>();
 
   late SettingsProvider settings;
   late NewsProvider newsProvider;
