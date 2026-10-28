@@ -145,6 +145,35 @@ void main() {
     expect(items.first.note, isNull);
     expect(items.first.first, DateTime(2026, 10, 28));
     expect(items.first.last, DateTime(2026, 11, 1));
-    expect(items.last.title, "Munkaszüneti nap");
+    // the Sunday holiday right after the break is part of it
+    expect(items.length, 1);
+  });
+
+  test('Christmas days inside the winter break do not split it', () {
+    final items = buildSchoolCalendar(_days([
+      _entry(DateTime(2026, 12, 21), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 22), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 23), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 24), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 25), "munkaszuneti_nap", desc: "Munkaszüneti nap"),
+      _entry(DateTime(2026, 12, 26), "munkaszuneti_nap", desc: "Munkaszüneti nap"),
+      _entry(DateTime(2026, 12, 28), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 29), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 30), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2026, 12, 31), "teli_szunet", desc: "Téli szünet"),
+      _entry(DateTime(2027, 1, 22), "elso_felev_vege"),
+    ]));
+    expect(items.length, 2);
+    expect(items.first.title, "Téli szünet");
+    expect(items.first.first, DateTime(2026, 12, 21));
+    expect(items.first.last, DateTime(2026, 12, 31));
+  });
+
+  test('a lone holiday away from breaks stays its own row', () {
+    final items = buildSchoolCalendar(_days([
+      _entry(DateTime(2027, 3, 15), "munkaszuneti_nap", desc: "Munkaszüneti nap"),
+      _entry(DateTime(2027, 4, 1), "tavaszi_szunet", desc: "Tavaszi szünet"),
+    ]));
+    expect(items.length, 2);
   });
 }

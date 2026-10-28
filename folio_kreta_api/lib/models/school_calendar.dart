@@ -268,6 +268,44 @@ List<SchoolCalendarItem> buildSchoolCalendar(List<SchoolCalendarDay> days) {
         type: d.type, title: title, first: d.date, last: d.date, note: note));
   }
 
+  return _mergeBreaks(_extendBreaks(_mergeBreaks(items)));
+}
+
+/// A day off touching a break (e.g. Christmas inside "Téli szünet",
+/// a holiday on the Sunday after "Őszi szünet") becomes part of it.
+List<SchoolCalendarItem> _mergeBreaks(List<SchoolCalendarItem> items) {
+  final out = <SchoolCalendarItem>[];
+  for (final it in items) {
+    if (out.isNotEmpty) {
+      final prev = out.last;
+      final isBreak = prev.type.contains("szunet") || it.type.contains("szunet");
+      var touches = !it.first.isAfter(prev.last.add(const Duration(days: 1)));
+      if (!touches) {
+        touches = true;
+        for (var d = prev.last.add(const Duration(days: 1));
+            d.isBefore(it.first);
+            d = d.add(const Duration(days: 1))) {
+          if (!_weekend(d)) touches = false;
+        }
+      }
+      if (prev.isFree && it.isFree && isBreak && touches) {
+        final main = prev.type.contains("szunet") ? prev : it;
+        out[out.length - 1] = SchoolCalendarItem(
+          type: main.type,
+          title: main.title,
+          first: prev.first,
+          last: it.last.isAfter(prev.last) ? it.last : prev.last,
+        );
+        continue;
+      }
+    }
+    out.add(it);
+  }
+  return out;
+}
+
+List<SchoolCalendarItem> _extendBreaks(List<SchoolCalendarItem> input) {
+  final items = [...input];
   // A break that ends on a Friday really lasts until Sunday, unless the
   // Saturday is a working day.
   for (var i = 0; i < items.length; i++) {
