@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
 import 'package:folio_kreta_api/providers/homework_provider.dart';
+import 'package:folio_kreta_api/providers/school_calendar_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:folio_kreta_api/models/lesson.dart';
 import 'package:folio_kreta_api/models/week.dart';
@@ -149,6 +150,7 @@ class TimetableController extends ChangeNotifier {
     await Future.wait([
       context.read<TimetableProvider>().fetch(week: week),
       context.read<HomeworkProvider>().fetch(from: week.start, db: false),
+      context.read<SchoolCalendarProvider>().fetchWeek(week.start),
     ]);
   }
 

@@ -6,6 +6,7 @@ import 'package:folio/models/settings.dart';
 import 'package:folio/utils/format.dart';
 import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio_kreta_api/models/week.dart';
+import 'package:folio_kreta_api/providers/school_calendar_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio/theme/colors/colors.dart';
@@ -208,6 +209,16 @@ class TimetablePageState extends State<TimetablePage>
     }
   }
 
+  /// "9. hét", or "9. hét · A" when the school has A/B weeks. The number
+  /// comes from KRÉTA when it told us, otherwise we count ourselves.
+  String _weekTitle(BuildContext context) {
+    final info = Provider.of<SchoolCalendarProvider>(context)
+        .weekOf(_controller.currentWeek.start);
+    final number = info?.number ?? _controller.currentWeekId + 1;
+    final ab = info?.shortLabel;
+    return "$number. ${"week".i18n}${ab != null ? " · $ab" : ""}";
+  }
+
   void getCustom() async {
     customLessonDesc =
         await db.userQuery.getCustomLessonDescriptions(userId: user.id!);
@@ -359,8 +370,8 @@ Container(
                                     return FadeTransition(opacity: animation, child: child);
                                   },
                                   child: Text(
-                                    "${_controller.currentWeekId + 1}. ${"week".i18n}",
-                                    key: ValueKey<int>(_controller.currentWeekId),
+                                    _weekTitle(context),
+                                    key: ValueKey<String>(_weekTitle(context)),
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontWeight: FontWeight.w600,

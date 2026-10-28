@@ -36,6 +36,12 @@ class KretaAPI {
       "${BaseKreta.kreta(iss)}${KretaApiEndpoints.consultingHours}"
       "?datumTol=${from.toUtc().toIso8601String()}"
       "&datumIg=${to.toUtc().toIso8601String()}";
+  static String schoolCalendar(String iss) =>
+      BaseKreta.kreta(iss) + KretaApiEndpoints.schoolCalendar;
+  static String schoolWeeks(String iss, DateTime from, DateTime to) =>
+      "${BaseKreta.kreta(iss)}${KretaApiEndpoints.schoolWeeks}"
+      "?orarendElemKezdoNapDatuma=${from.toUtc().toIso8601String()}"
+      "&orarendElemVegNapDatuma=${to.toUtc().toIso8601String()}";
   static String consultingHour(String iss, String uid) =>
       "${BaseKreta.kreta(iss)}${KretaApiEndpoints.consultingHours}/$uid";
   static String consultingReservation(String iss, String slotUid) =>
@@ -161,6 +167,9 @@ class KretaApiEndpoints {
   static const consultingHours = "/ellenorzo/V3/Sajat/Fogadoorak";
   static const consultingReservation =
       "/ellenorzo/V3/Sajat/Fogadoorak/Idopontok/Jelentkezesek";
+  static const schoolCalendar =
+      "/ellenorzo/V3/Sajat/Intezmenyek/TanevRendjeElemek";
+  static const schoolWeeks = "/ellenorzo/V3/Sajat/Intezmenyek/Hetirendek/Orarendi";
   static const groups = "/ellenorzo/V3/Sajat/OsztalyCsoportok";
   static const groupAverages =
       "/ellenorzo/V3/Sajat/Ertekelesek/Atlagok/OsztalyAtlagok";
