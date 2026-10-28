@@ -35,6 +35,7 @@ enum LoginState {
 // login api
 Future newLoginAPI({
   required String code,
+  required String codeVerifier,
   required BuildContext context,
   String? idpApplication,
   String? idpRememberBrowser,
@@ -57,7 +58,7 @@ Future newLoginAPI({
   Map? res = await Provider.of<KretaClient>(context, listen: false)
       .postAPI(KretaAPI.login, headers: headers, body: {
     "code": code,
-    "code_verifier": "DSpuqj_HhDX4wzQIbtn8lr8NLE5wEi1iVLMtMK0jY6c",
+    "code_verifier": codeVerifier,
     "redirect_uri": authApp.redirectUri,
     "client_id": authApp.clientId,
     "grant_type": "authorization_code",

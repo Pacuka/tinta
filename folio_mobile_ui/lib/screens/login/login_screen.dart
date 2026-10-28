@@ -37,10 +37,14 @@ import 'package:provider/provider.dart';
 
 class _LoginSheetResult {
   final String code;
+  final String codeVerifier;
   final String? idpApplication;
   final String? idpRememberBrowser;
   _LoginSheetResult(
-      {required this.code, this.idpApplication, this.idpRememberBrowser});
+      {required this.code,
+      required this.codeVerifier,
+      this.idpApplication,
+      this.idpRememberBrowser});
 }
 
 class LoginScreen extends StatefulWidget {
@@ -388,6 +392,7 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() => _loginState = LoginState.inProgress);
     newLoginAPI(
       code: result.code,
+      codeVerifier: result.codeVerifier,
       idpApplication: result.idpApplication,
       idpRememberBrowser: result.idpRememberBrowser,
       context: context,
@@ -833,10 +838,11 @@ class _CredentialsSheetState extends State<_CredentialsSheet> {
                 username: _usernameController.text.trim(),
                 password: _passwordController.text,
                 rememberbrowserCookie: null,
-                onLogin: (code, app, rem) {
+                onLogin: (code, verifier, app, rem) {
                   if (!mounted) return;
                   widget.onLogin(_LoginSheetResult(
                     code: code,
+                    codeVerifier: verifier,
                     idpApplication: app,
                     idpRememberBrowser: rem,
                   ));
@@ -1393,10 +1399,11 @@ class _OfficialLoginPageState extends State<_OfficialLoginPage> {
             _secure = uri.scheme == 'https';
           });
         },
-        onLogin: (code, app, rem) {
+        onLogin: (code, verifier, app, rem) {
           if (!mounted) return;
           Navigator.of(context).pop(_LoginSheetResult(
             code: code,
+            codeVerifier: verifier,
             idpApplication: app,
             idpRememberBrowser: rem,
           ));

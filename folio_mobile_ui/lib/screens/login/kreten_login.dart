@@ -66,6 +66,7 @@ class KretenLoginWidget extends StatefulWidget {
   // final String selectedSchool;
   final void Function(
     String code,
+    String codeVerifier,
     String? idpApplication,
     String? idpRememberBrowser,
   ) onLogin;
@@ -94,7 +95,10 @@ class _KretenLoginWidgetState extends State<KretenLoginWidget>
   bool _hasLoadedOnce = false;
   bool _loginDone = false;
 
-  String get _loginUrl => widget.authApp.authorizeUrl;
+  /// Fresh PKCE pair + state for this login page.
+  late final KretaLoginAttempt _attempt = KretaLoginAttempt(widget.authApp);
+
+  String get _loginUrl => _attempt.authorizeUrl;
 
   Uri get _redirectUri => Uri.parse(widget.authApp.redirectUri);
 
@@ -136,12 +140,16 @@ class _KretenLoginWidgetState extends State<KretenLoginWidget>
             final Uri? uri = Uri.tryParse(n.url);
             if (uri != null && _isRedirectUri(uri)) {
               final String? code = uri.queryParameters['code'];
-              if (code != null && code.isNotEmpty && !_loginDone) {
+              if (code != null &&
+                  code.isNotEmpty &&
+                  _attempt.isOwnRedirect(uri) &&
+                  !_loginDone) {
                 _loginDone = true;
                 _timeoutTimer?.cancel();
                 final cookies = await _readIdpCookies();
                 widget.onLogin(
                   code,
+                  _attempt.codeVerifier,
                   cookies['idp.application'],
                   cookies['idp.rememberbrowser'],
                 );
@@ -414,6 +422,7 @@ class KretaBgLoginWidget extends StatefulWidget {
   final String? rememberbrowserCookie;
   final void Function(
     String code,
+    String codeVerifier,
     String? idpApplication,
     String? idpRememberBrowser,
   )
@@ -441,7 +450,10 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
   String? _savedIdpRememberBrowser;
 
   // Same authorize URL as KretenLoginWidget — goes directly to IDP login page
-  String get _loginUrl => widget.authApp.authorizeUrl;
+  /// Fresh PKCE pair + state for this login page.
+  late final KretaLoginAttempt _attempt = KretaLoginAttempt(widget.authApp);
+
+  String get _loginUrl => _attempt.authorizeUrl;
 
   Uri get _redirectUri => Uri.parse(widget.authApp.redirectUri);
 
@@ -464,12 +476,16 @@ class _KretaBgLoginWidgetState extends State<KretaBgLoginWidget> {
             final Uri? uri = Uri.tryParse(n.url);
             if (uri != null && _isRedirectUri(uri)) {
               final String? code = uri.queryParameters['code'];
-              if (code != null && code.isNotEmpty && !_loginCompleted) {
+              if (code != null &&
+                  code.isNotEmpty &&
+                  _attempt.isOwnRedirect(uri) &&
+                  !_loginCompleted) {
                 _loginCompleted = true;
                 _loginTimer?.cancel();
                 if (mounted) {
                   widget.onLogin(
                     code,
+                    _attempt.codeVerifier,
                     _savedIdpApplication,
                     _savedIdpRememberBrowser,
                   );
