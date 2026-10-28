@@ -36,6 +36,13 @@ class KretaAPI {
       "${BaseKreta.kreta(iss)}${KretaApiEndpoints.consultingHours}"
       "?datumTol=${from.toUtc().toIso8601String()}"
       "&datumIg=${to.toUtc().toIso8601String()}";
+  static String questionnaires(String iss) =>
+      BaseKreta.kreta(iss) + KretaApiEndpoints.questionnaires;
+  static String questionnaire(String iss) =>
+      BaseKreta.kreta(iss) + KretaApiEndpoints.questionnaire;
+  static String classMasters(String iss, String uids) =>
+      "${BaseKreta.kreta(iss)}${KretaApiEndpoints.classMasters}"
+      "?Uids=$uids";
   static String lepEvents(String iss) =>
       BaseKreta.kreta(iss) + KretaApiEndpoints.lepEvents;
   static String nepEvents(String iss) =>
@@ -171,6 +178,10 @@ class KretaApiEndpoints {
   static const consultingHours = "/ellenorzo/V3/Sajat/Fogadoorak";
   static const consultingReservation =
       "/ellenorzo/V3/Sajat/Fogadoorak/Idopontok/Jelentkezesek";
+  static const questionnaires = "/ellenorzo/V3/Pedter/Kerdoivek";
+  static const questionnaire = "/ellenorzo/V3/Pedter/Kerdoiv";
+  static const classMasters =
+      "/ellenorzo/V3/felhasznalok/Alkalmazottak/Tanarok/Osztalyfonokok";
   static const lepEvents = "/ellenorzo/V3/Lep/Eloadasok";
   static const nepEvents = "/ellenorzo/V3/Nep/Programok";
   static const schoolCalendar =

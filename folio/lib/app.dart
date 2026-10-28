@@ -67,6 +67,7 @@ import 'package:folio_kreta_api/providers/case_provider.dart';
 import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_kreta_api/providers/school_calendar_provider.dart';
 import 'package:folio_kreta_api/providers/program_event_provider.dart';
+import 'package:folio_kreta_api/providers/questionnaire_provider.dart';
 import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
@@ -188,6 +189,9 @@ class _AppState extends State<App> {
         ),
         ChangeNotifierProvider<ProgramEventProvider>(
           create: (context) => ProgramEventProvider(context: context)..restore(),
+        ),
+        ChangeNotifierProvider<SchoolInfoProvider>(
+          create: (context) => SchoolInfoProvider(context: context)..restore(),
         ),
         ChangeNotifierProvider<NoteProvider>(
           create: (context) => NoteProvider(context: context),
