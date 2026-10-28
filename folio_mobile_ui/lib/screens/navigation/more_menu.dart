@@ -9,6 +9,9 @@ import 'package:folio_mobile_ui/common/profile_image/profile_image.dart';
 import 'package:folio_mobile_ui/common/screens.i18n.dart';
 import 'package:folio_mobile_ui/pages/absences/absences_page.dart';
 import 'package:folio_mobile_ui/pages/consulting/consulting_page.dart';
+import 'package:folio_mobile_ui/pages/school_calendar/school_calendar_page.dart';
+import 'package:folio_mobile_ui/pages/school_calendar/school_calendar.i18n.dart'
+    show schoolCalendarTitle;
 import 'package:folio_mobile_ui/pages/consulting/consulting.i18n.dart'
     show consultingTitle;
 import 'package:folio_mobile_ui/pages/messages/messages_page.dart';
@@ -201,6 +204,21 @@ class MoreMenu extends StatelessWidget {
               Navigator.of(context).pop();
               Navigator.of(outsideContext, rootNavigator: true).push(
                 CupertinoPageRoute(builder: (_) => const ConsultingPage()),
+              );
+            },
+          ),
+
+          const SizedBox(height: 12.0),
+
+          // School year calendar (not a navbar page)
+          _WideTile(
+            icon: Icons.calendar_month_rounded,
+            title: schoolCalendarTitle,
+            onTap: () {
+              performHapticFeedback(settings.vibrate);
+              Navigator.of(context).pop();
+              Navigator.of(outsideContext, rootNavigator: true).push(
+                CupertinoPageRoute(builder: (_) => const SchoolCalendarPage()),
               );
             },
           ),
