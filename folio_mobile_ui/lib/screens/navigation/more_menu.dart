@@ -10,6 +10,10 @@ import 'package:folio_mobile_ui/common/screens.i18n.dart';
 import 'package:folio_mobile_ui/pages/absences/absences_page.dart';
 import 'package:folio_mobile_ui/pages/consulting/consulting_page.dart';
 import 'package:folio_mobile_ui/pages/school_calendar/school_calendar_page.dart';
+import 'package:folio_mobile_ui/pages/programs/programs_page.dart';
+import 'package:folio_mobile_ui/pages/programs/programs.i18n.dart'
+    show programsTitle;
+import 'package:folio_kreta_api/providers/program_event_provider.dart';
 import 'package:folio_mobile_ui/pages/school_calendar/school_calendar.i18n.dart'
     show schoolCalendarTitle;
 import 'package:folio_mobile_ui/pages/consulting/consulting.i18n.dart'
@@ -207,6 +211,27 @@ class MoreMenu extends StatelessWidget {
               );
             },
           ),
+
+          // LÉP / NÉP programmes, only where the school uses them
+          Builder(builder: (context) {
+            final programs = Provider.of<ProgramEventProvider>(context);
+            if (!programs.available) return const SizedBox.shrink();
+            final pending = programs.pendingCount(DateTime.now());
+            return Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: _WideTile(
+                icon: Icons.theater_comedy_rounded,
+                title: pending > 0 ? "$programsTitle · $pending" : programsTitle,
+                onTap: () {
+                  performHapticFeedback(settings.vibrate);
+                  Navigator.of(context).pop();
+                  Navigator.of(outsideContext, rootNavigator: true).push(
+                    CupertinoPageRoute(builder: (_) => const ProgramsPage()),
+                  );
+                },
+              ),
+            );
+          }),
 
           const SizedBox(height: 12.0),
 

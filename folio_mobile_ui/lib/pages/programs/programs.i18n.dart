@@ -1,0 +1,81 @@
+import 'package:i18n_extension/i18n_extension.dart';
+
+extension ProgramsLocalization on String {
+  static final _t = Translations.byLocale("hu-HU") +
+      {
+        "en-US": {
+          "programs": "School programmes",
+          "upcoming": "Upcoming",
+          "earlier": "Earlier",
+          "pending_n": "%s programme(s) waiting for your decision",
+          "allowed": "Allowed",
+          "refused": "Not allowed",
+          "waiting": "Waiting for decision",
+          "no_decision": "No decision",
+          "appeared": "Attended",
+          "allow": "Allow",
+          "refuse": "Don't allow",
+          "question": "Do you allow %s to attend?",
+          "change_hint": "You can change your decision until the day before.",
+          "deadline_passed": "The decision deadline has passed.",
+          "saved_allow": "Allowed.",
+          "saved_refuse": "Not allowed.",
+          "empty": "No programmes right now.",
+          "retry": "Retry",
+          "error": "Couldn't reach KRÉTA.",
+          "organizer": "Organiser",
+          "place": "Place",
+        },
+        "hu-HU": {
+          "programs": "Programok (LÉP, NÉP)",
+          "upcoming": "Közelgő",
+          "earlier": "Korábbi",
+          "pending_n": "%s program vár a döntésedre",
+          "allowed": "Engedélyezve",
+          "refused": "Nem engedélyezve",
+          "waiting": "Döntésre vár",
+          "no_decision": "Nem született döntés",
+          "appeared": "Részt vett",
+          "allow": "Engedélyezem",
+          "refuse": "Nem engedélyezem",
+          "question": "Engedélyezed, hogy %s részt vegyen?",
+          "change_hint": "A döntésed az előtte lévő napig módosíthatod.",
+          "deadline_passed": "A döntési határidő lejárt.",
+          "saved_allow": "Engedélyezve.",
+          "saved_refuse": "Nem engedélyezve.",
+          "empty": "Most nincs program.",
+          "retry": "Újra",
+          "error": "Nem értük el a KRÉTA-t.",
+          "organizer": "Szervező",
+          "place": "Helyszín",
+        },
+        "de-DE": {
+          "programs": "Schulprogramme",
+          "upcoming": "Bevorstehend",
+          "earlier": "Früher",
+          "pending_n": "%s Programm(e) warten auf deine Entscheidung",
+          "allowed": "Erlaubt",
+          "refused": "Nicht erlaubt",
+          "waiting": "Wartet auf Entscheidung",
+          "no_decision": "Keine Entscheidung",
+          "appeared": "Teilgenommen",
+          "allow": "Erlauben",
+          "refuse": "Nicht erlauben",
+          "question": "Erlaubst du, dass %s teilnimmt?",
+          "change_hint": "Du kannst die Entscheidung bis zum Vortag ändern.",
+          "deadline_passed": "Die Frist ist abgelaufen.",
+          "saved_allow": "Erlaubt.",
+          "saved_refuse": "Nicht erlaubt.",
+          "empty": "Gerade keine Programme.",
+          "retry": "Erneut",
+          "error": "KRÉTA ist nicht erreichbar.",
+          "organizer": "Veranstalter",
+          "place": "Ort",
+        },
+      };
+
+  String get i18n => localize(this, _t);
+  String fill(List<Object> params) => localizeFill(this, params);
+}
+
+String get programsTitle => "programs".i18n;
