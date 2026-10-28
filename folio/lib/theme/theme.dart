@@ -271,11 +271,20 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: primaryContainer,
+        // Picked chips (grade, time slot) must stand out, not fade out.
+        selectedColor: accent,
+        checkmarkColor:
+            accent.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+        side: BorderSide.none,
         shape: const StadiumBorder(),
         elevation: 0,
         labelStyle: TextStyle(
           color: onPrimaryContainer,
           fontWeight: FontWeight.w500,
+        ),
+        secondaryLabelStyle: TextStyle(
+          color: accent.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+          fontWeight: FontWeight.w600,
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -550,11 +559,20 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: primaryContainer,
+        // Picked chips (grade, time slot) must stand out, not fade out.
+        selectedColor: accent,
+        checkmarkColor:
+            accent.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+        side: BorderSide.none,
         shape: const StadiumBorder(),
         elevation: 0,
         labelStyle: TextStyle(
           color: onPrimaryContainer,
           fontWeight: FontWeight.w500,
+        ),
+        secondaryLabelStyle: TextStyle(
+          color: accent.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+          fontWeight: FontWeight.w600,
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
