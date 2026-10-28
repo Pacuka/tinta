@@ -126,4 +126,25 @@ void main() {
     expect(items.first.last, DateTime(2026, 10, 30));
     expect(items.last.note, "pénteki órarend szerint");
   });
+
+  test('real KRÉTA shape: names cleaned, own weekday not a note, merged', () {
+    final items = buildSchoolCalendar(_days([
+      _entry(DateTime(2026, 10, 28), "oszi_szunet",
+          desc: "Őszi szünet (Nem órarendi nap) (Szerda)", follows: "Szerda"),
+      _entry(DateTime(2026, 10, 29), "oszi_szunet",
+          desc: "Őszi szünet (Nem órarendi nap) (Csütörtök)",
+          follows: "Csutortok"),
+      _entry(DateTime(2026, 10, 30), "oszi_szunet",
+          desc: "Őszi szünet (Nem órarendi nap) (Péntek)", follows: "Pentek"),
+      _entry(DateTime(2026, 10, 31), "Pihenonap", follows: "Szombat"),
+      _entry(DateTime(2026, 11, 1), "munkaszuneti_nap",
+          desc: "Munkaszüneti nap (Nem órarendi nap) (Vasárnap)",
+          follows: "Vasarnap"),
+    ]));
+    expect(items.first.title, "Őszi szünet");
+    expect(items.first.note, isNull);
+    expect(items.first.first, DateTime(2026, 10, 28));
+    expect(items.first.last, DateTime(2026, 11, 1));
+    expect(items.last.title, "Munkaszüneti nap");
+  });
 }

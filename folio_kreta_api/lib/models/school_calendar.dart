@@ -205,8 +205,24 @@ class SchoolCalendarItem {
 bool _weekend(DateTime d) =>
     d.weekday == DateTime.saturday || d.weekday == DateTime.sunday;
 
+/// "Őszi szünet (Nem órarendi nap) (Szerda)" -> "Őszi szünet".
+String _clean(String s) => s
+    .replaceAll(RegExp(r'\([^)]*\)'), '')
+    .replaceAll(RegExp(r'\s+'), ' ')
+    .trim();
+
+const _weekdays = {
+  "Hetfo": 1,
+  "Kedd": 2,
+  "Szerda": 3,
+  "Csutortok": 4,
+  "Pentek": 5,
+  "Szombat": 6,
+  "Vasarnap": 7,
+};
+
 String _title(SchoolCalendarDay d) {
-  final desc = d.typeDesc.trim();
+  final desc = _clean(d.typeDesc);
   if (desc.isNotEmpty) return desc;
   return _typeNames[d.type] ?? d.type.replaceAll("_", " ").trim();
 }
@@ -219,7 +235,8 @@ List<SchoolCalendarItem> buildSchoolCalendar(List<SchoolCalendarDay> days) {
 
   for (final d in sorted) {
     String? note;
-    if (d.followsDay != null) {
+    // KRÉTA names every day's own weekday here; only a different one matters.
+    if (d.followsDay != null && _weekdays[d.followsDay] != d.date.weekday) {
       final name = _dayNames[d.followsDay];
       if (name != null) note = "$name órarend szerint";
     }
@@ -260,7 +277,9 @@ List<SchoolCalendarItem> buildSchoolCalendar(List<SchoolCalendarDay> days) {
     }
     final sat = it.last.add(const Duration(days: 1));
     final next = i + 1 < items.length ? items[i + 1] : null;
-    if (next != null && !next.first.isAfter(sat.add(const Duration(days: 1)))) {
+    if (next != null &&
+        !next.isFree &&
+        !next.first.isAfter(sat.add(const Duration(days: 1)))) {
       continue;
     }
     items[i] = SchoolCalendarItem(
