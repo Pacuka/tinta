@@ -437,6 +437,10 @@ class SendMessageSheetState extends State<SendMessageSheet> {
                                   CustomSnackBar(
                                       content: Text('sent'.i18n),
                                       context: context));
+                              // Show the new message in the Sent tab right away.
+                              messageProvider
+                                  .fetch(type: MessageType.sent)
+                                  .catchError((_) {});
                             }
 
                             Navigator.of(context).pop();
