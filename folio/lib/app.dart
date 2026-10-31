@@ -18,8 +18,8 @@
 
 // ignore_for_file: deprecated_member_use
 
+import 'package:tinta_push/tinta_push.dart';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:folio/api/providers/live_card_provider.dart';
@@ -125,6 +125,9 @@ class _AppState extends State<App> {
     final timetable =
         TimetableProvider(user: user, database: database, kreta: kreta);
     UpdateNotifier.attach(kreta: kreta, user: user, settings: settings);
+    // Firebase build only: a push message triggers the same check as the
+    // timed background run. No-op in the F-Droid build.
+    TintaPush.init(onPush: UpdateNotifier.onBackgroundEvent);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Tinta: no config from the Firka server; the KRÉTA user agent is
@@ -257,24 +260,44 @@ class _AppState extends State<App> {
                   : systemPalette;
               return MaterialApp(
                 builder: (context, child) {
-                  // Limit font size scaling to 1.0
-                  double textScaleFactor =
-                      min(MediaQuery.of(context).textScaleFactor, 1.0);
+                  // Follow the system font size, but cap it so layouts hold.
+                  final textScaler = MediaQuery.of(context)
+                      .textScaler
+                      .clamp(maxScaleFactor: 1.3);
+
+                  // Wide screens (unfolded Fold, tablet): keep a phone-width
+                  // column in the middle instead of stretching every page.
+                  const maxWidth = 640.0;
+                  final mq = MediaQuery.of(context);
+                  final wide = mq.size.width > maxWidth;
+
+                  Widget app = MediaQuery(
+                    data: mq.copyWith(
+                      textScaler: textScaler,
+                      size: wide ? Size(maxWidth, mq.size.height) : null,
+                    ),
+                    child: child ??
+                        const Scaffold(
+                          backgroundColor: Colors.red,
+                          body: Center(
+                              child: Text("Route error - child is null",
+                                  style: TextStyle(color: Colors.white))),
+                        ),
+                  );
+                  if (wide) {
+                    // A slightly darker frame, so the column reads as intended.
+                    app = ColoredBox(
+                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                      child: Center(
+                        child: SizedBox(width: maxWidth, child: app),
+                      ),
+                    );
+                  }
 
                   return I18n(
                     initialLocale: Locale(
                         settings.language, settings.language.toUpperCase()),
-                    child: InkSplashIntro(child: MediaQuery(
-                      data: MediaQuery.of(context)
-                          .copyWith(textScaleFactor: textScaleFactor),
-                      child: child ??
-                          const Scaffold(
-                            backgroundColor: Colors.red,
-                            body: Center(
-                                child: Text("Route error - child is null",
-                                    style: TextStyle(color: Colors.white))),
-                          ),
-                    )),
+                    child: InkSplashIntro(child: app),
                   );
                 },
                 title: "Tinta",

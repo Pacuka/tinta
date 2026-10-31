@@ -28,7 +28,7 @@ class PrivacyView extends StatelessWidget {
               ),
               SelectableLinkify(
                 text: """
-  • A Tinta (továbbiakban: "alkalmazás") egy nem hivatalos, nyílt forráskódú mobilos kliensalkalmazás, segítségével az e-Kréta rendszeréből letöltheted és felhasználóbarát módon megjelenítheted az adataidat. Tanulmányi adataid csak közvetlenül az alkalmazás és a Kréta-szerverek között közlekednek, titkosított kapcsolaton keresztül.
+  • A Tinta (továbbiakban: „alkalmazás”) egy nem hivatalos, nyílt forráskódú mobilos kliensalkalmazás, segítségével a KRÉTA rendszeréből letöltheted és felhasználóbarát módon megjelenítheted az adataidat. Tanulmányi adataid csak közvetlenül az alkalmazás és a KRÉTA szerverei között közlekednek, titkosított kapcsolaton keresztül.
 
   • A Tinta fejlesztője, valamint az alkalmazás a tanulmányi és személyes adataidat semmilyen célból és semmilyen körülmények között nem másolja, nem tárolja és harmadik félnek nem továbbítja. Ezeket az Educational Development Informatikai Zrt. kezeli, az adatkezeléssel kapcsolatos tájékoztatójukat itt találod: https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4065038
 
@@ -39,6 +39,8 @@ class PrivacyView extends StatelessWidget {
   • Más szerverhez csak akkor fordul, ha te kéred: témák megosztásához és letöltéséhez a Firka szerveréhez (api.firka.app), másik betűtípus választásakor a Google Fonts-hoz.
 
   • Az alkalmazás minden indításakor a GitHub API segítségével ellenőrzi, hogy elérhető-e új verzió (github.com/Pacuka/tinta), és kérésre innen letölti a frissítést.
+
+  • Részletes adatvédelmi tájékoztató: https://tinta.pacuka.hu/adatvedelem.html
 
   • Kérdés vagy hiba esetén nyiss egy bejegyzést (issue-t) itt: https://github.com/Pacuka/tinta/issues
 

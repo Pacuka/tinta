@@ -1,3 +1,4 @@
+import 'package:folio/database/token_vault.dart';
 import 'dart:convert';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/models/linked_account.dart';
@@ -39,7 +40,15 @@ class DatabaseQuery {
     var userProvider = UserProvider(settings: settings);
     List<Map> usersMap = await db.query("users");
     for (var user in usersMap) {
-      userProvider.addUser(User.fromMap(user));
+      final id = user["id"].toString();
+      final restored = await TokenVault.restore(
+          id, Map<String, dynamic>.from(user));
+      if (restored.needsMigration) {
+        // Older version: move the inline tokens to secure storage now.
+        final row = await TokenVault.stash(id, restored.row);
+        await db.update("users", row, where: "id = ?", whereArgs: [id]);
+      }
+      userProvider.addUser(User.fromMap(restored.row));
     }
     if (userProvider
         .getUsers()

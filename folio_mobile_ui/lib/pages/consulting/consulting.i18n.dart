@@ -41,6 +41,7 @@ extension ConsultingLocalization on String {
           "err_uncertain":
               "Not sure it arrived. Check the list before you try again!",
           "err_network": "Couldn't reach KRÉTA.",
+          "err_disabled": "Your school hasn't turned on consultation hours in KRÉTA.",
         },
         "hu-HU": {
           "consulting": "Fogadóórák",
@@ -80,6 +81,7 @@ extension ConsultingLocalization on String {
           "err_uncertain":
               "Nem biztos, hogy megérkezett. Nézd meg a listát, mielőtt újraküldöd!",
           "err_network": "Nem sikerült elérni a KRÉTA-t.",
+          "err_disabled": "Az iskolád nem kapcsolta be a fogadóórákat a KRÉTA-ban.",
         },
         "de-DE": {
           "consulting": "Sprechstunden",
@@ -120,6 +122,7 @@ extension ConsultingLocalization on String {
           "err_uncertain":
               "Nicht sicher, ob es angekommen ist. Prüfe die Liste, bevor du es erneut versuchst!",
           "err_network": "KRÉTA ist nicht erreichbar.",
+          "err_disabled": "Deine Schule hat die Sprechstunden in KRÉTA nicht freigeschaltet.",
         },
       };
 

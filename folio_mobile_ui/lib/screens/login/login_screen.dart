@@ -261,11 +261,15 @@ class LoginScreenState extends State<LoginScreen> {
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2.5, color: Colors.white),
                                 )
-                              : Text(
-                                  'login_w_kreta_acc'.i18n,
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
+                              : FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'login_w_kreta_acc'.i18n,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                         ),

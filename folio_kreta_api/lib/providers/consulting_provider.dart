@@ -15,6 +15,12 @@ const consultingTakenMessage =
     "Ezt az időpontot közben elvitték, válassz másikat!";
 const consultingAlreadyMessage = "Már van foglalásod ennél a tanárnál.";
 const consultingFailedMessage = "Nem sikerült. Próbáld újra később!";
+const consultingDisabledMessage =
+    "Az iskolád nem kapcsolta be a fogadóórákat a KRÉTA-ban.";
+
+/// KRÉTA answered "permission_denied": consulting hours are off for this
+/// account (school setting), so retrying will not help.
+class ConsultingDisabled implements Exception {}
 
 /// The list we ask KRÉTA for: yesterday .. today + 90 days (local dates).
 (DateTime, DateTime) consultingRange(DateTime now) {
@@ -63,6 +69,7 @@ abstract class ConsultingBackend {
   bool get isDemo;
 
   /// GET Fogadoorak; null = request failed.
+  /// Throws [ConsultingDisabled] when KRÉTA refuses with permission_denied.
   Future<List?> list(DateTime from, DateTime to);
 
   /// POST a reservation: (status, body); status null = no response.
@@ -92,9 +99,14 @@ class _KretaConsultingBackend implements ConsultingBackend {
   @override
   Future<List?> list(DateTime from, DateTime to) async {
     try {
-      final json =
-          await _kreta.getAPI(KretaAPI.consultingHours(_iss, from, to));
+      final body = await _kreta
+          .getAPI(KretaAPI.consultingHours(_iss, from, to), json: false);
+      if (body is! String) return null;
+      if (body.trim() == "permission_denied") throw ConsultingDisabled();
+      final json = jsonDecode(body);
       return json is List ? json : null;
+    } on ConsultingDisabled {
+      rethrow;
     } catch (_) {
       return null;
     }
@@ -207,8 +219,11 @@ class ConsultingProvider with ChangeNotifier {
     notifyListeners();
     final (from, to) = consultingRange(DateTime.now());
     List? json;
+    var disabled = false;
     try {
       json = await _backend.list(from, to);
+    } on ConsultingDisabled {
+      disabled = true;
     } finally {
       _running--;
     }
@@ -228,7 +243,7 @@ class ConsultingProvider with ChangeNotifier {
       await _backend.writeCache(
           userId, parsed.map((h) => h.toCacheJson()).toList());
     } else {
-      _error = networkErrorMessage;
+      _error = disabled ? consultingDisabledMessage : networkErrorMessage;
     }
     notifyListeners();
   }

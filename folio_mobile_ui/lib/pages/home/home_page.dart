@@ -396,7 +396,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             DateFormat('EEEE, MMM d',
                                                     I18n.locale.countryCode)
                                                 .format(DateTime.now())
-                                                .capital(),
+                                                .capital() +
+                                            (I18n.locale.languageCode == "hu"
+                                                ? "."
+                                                : ""),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                       fontSize: 14.0,

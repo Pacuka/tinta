@@ -1,0 +1,9 @@
+{
+  "_megjegyzes": "Másold tool/sajat-azonosito.json néven, töltsd ki a KRÉTA üzemeltetőjétől kapott adatokkal, és add a fordításhoz: --dart-define-from-file=tool/sajat-azonosito.json",
+  "TINTA_OWN_UA": "true",
+  "TINTA_NO_APIKEY": "true",
+  "KRETA_CLIENT_ID": "<a KRÉTA-tól kapott diák Client ID>",
+  "KRETA_REDIRECT_URI": "<a KRÉTA-nál regisztrált diák visszairányítási cím>",
+  "KRETA_GUARDIAN_CLIENT_ID": "<a KRÉTA-tól kapott szülői Client ID>",
+  "KRETA_GUARDIAN_REDIRECT_URI": "<a KRÉTA-nál regisztrált szülői visszairányítási cím>"
+}

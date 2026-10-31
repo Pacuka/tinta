@@ -6,7 +6,8 @@
 ### Nem hivatalos e-napló alkalmazás az e-KRÉTA rendszerhez – tanulóktól, tanulóknak.
 
 > A Tinta **nem hivatalos** alkalmazás, nem áll kapcsolatban az e-KRÉTA rendszer
-> fejlesztőjével és üzemeltetőjével (eKRÉTA Informatikai Zrt.). Az „e-KRÉTA” név a
+> fejlesztőjével és üzemeltetőjével (Educational Development Informatikai Zrt.,
+> korábban eKRÉTA Informatikai Zrt.). Az „e-KRÉTA” név a
 > tulajdonosáé. Használata saját felelősségre történik.
 
 ## Letöltés
@@ -59,7 +60,10 @@ A Tinta fejlesztésében mesterséges intelligencia (Claude) segít, de **emberi
 felügyelet mellett**, nem „vaktában összegenerálva”:
 
 - Arról, hogy mi kerüljön az appba, hogyan nézzen ki és mikor jelenjen meg, ember dönt.
-- Minden változtatást valódi telefonon, saját KRÉTA-fiókkal kipróbálunk, mielőtt kiadjuk.
+- A változtatásokat kiadás előtt valódi telefonon, saját diák- és szülői KRÉTA-fiókkal
+  próbálom ki. Mivel élesben nem minden tesztelhető (pl. igazolást vagy
+  fogadóóra-foglalást nem küldhetek be csak próbából), minden funkciót egy
+  tesztszerveren is végigpróbálok.
 - Automatikus tesztek futnak, és a kód biztonsági átnézésen is átment
   (pl. titkosított kapcsolat ellenőrzése, a bejelentkezési adatok védelme).
 - Az AI a kódírást gyorsítja, a felelősség és az ellenőrzés emberi.

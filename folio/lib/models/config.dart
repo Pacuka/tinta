@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class Config {
   String _userAgent;
@@ -17,15 +18,31 @@ class Config {
     );
   }
 
-  /// Version of the official e-KRÉTA Android app we present ourselves as.
-  /// Keep in sync with the Play Store version.
-  static const kretaAppVersion = "5.17.0";
+  /// Official e-KRÉTA app version used in the official-style User-Agent.
+  /// Separate from Tinta's own version (pubspec). Set at build time with
+  /// --dart-define=KRETA_CLIENT_VERSION=x.y.z; the default is not updated
+  /// automatically (see ugyved/tinta-firebase-es-verzio-allapot-*.md).
+  static const kretaAppVersion =
+      String.fromEnvironment("KRETA_CLIENT_VERSION", defaultValue: "5.18.0");
 
   static String? _deviceUserAgent;
 
   /// Same format as the official app (UserAgentStringProvider):
   /// hu.ekreta.student/<app version>/<Build.MODEL>/<Android release>/<SDK>
   static Future<void> initDeviceUserAgent() async {
+    // Default (temporary): the official app's User-Agent, for compatibility
+    // until KRÉTA answers about Tinta's own access (see ugyved/).
+    // Tinta's own identity: --dart-define=TINTA_OWN_UA=true (tested working).
+    if (const bool.fromEnvironment("TINTA_OWN_UA")) {
+      final os = Platform.isAndroid
+          ? "Android ${(await DeviceInfoPlugin().androidInfo).version.release}"
+          : Platform.operatingSystem;
+      final version = (await PackageInfo.fromPlatform()).version;
+      _deviceUserAgent = "Tinta/$version ($os; +https://tinta.pacuka.hu)";
+      // ignore: avoid_print
+      print("INFO KRÉTA user agent: $_deviceUserAgent");
+      return;
+    }
     if (Platform.isIOS) {
       // The official iOS app is native; its requests look like this.
       _deviceUserAgent = "eKretaStudent/264745 CFNetwork/1494.0.7 Darwin/23.4.0";

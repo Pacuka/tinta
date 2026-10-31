@@ -66,7 +66,10 @@ class NavbarItem extends StatelessWidget {
                 color: active ? activeColor : inactiveColor,
                 size: 24.0,
               ),
-              child: active ? item.activeIcon : item.icon,
+              child: SizedBox(
+                height: 28.0,
+                child: Center(child: active ? item.activeIcon : item.icon),
+              ),
             ),
           ),
           const SizedBox(height: 4.0),

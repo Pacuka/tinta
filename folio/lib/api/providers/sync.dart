@@ -127,7 +127,9 @@ Future<void> _syncAll(BuildContext context) async {
     syncStatus(Provider.of<NoteProvider>(context, listen: false).fetch()),
     syncStatus(Provider.of<EventProvider>(context, listen: false).fetch()),
     syncStatus(Provider.of<AbsenceProvider>(context, listen: false).fetch()),
-    syncStatus(Provider.of<ConsultingProvider>(context, listen: false).fetch()),
+    if (user.user?.role == Role.parent)
+      syncStatus(
+          Provider.of<ConsultingProvider>(context, listen: false).fetch()),
     syncStatus(
         Provider.of<SchoolCalendarProvider>(context, listen: false).fetch()),
     syncStatus(

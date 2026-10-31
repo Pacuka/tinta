@@ -139,6 +139,18 @@ void providerTests() {
     expect(p.loading, isFalse);
   });
 
+  test('permission_denied says the school turned it off, not a network error',
+      () async {
+    final b = FakeBackend();
+    final p = ConsultingProvider.withBackend(b);
+    b.queueList().completeError(ConsultingDisabled());
+    await p.fetch();
+    expect(p.error, consultingDisabledMessage);
+    b.queueList().complete(null);
+    await p.fetch();
+    expect(p.error, networkErrorMessage);
+  });
+
   test('I1: after an account switch the old list is hidden and booking refused',
       () async {
     final b = FakeBackend();

@@ -160,15 +160,37 @@ int? mandatoryDocTypeId(String kod) => const {
 class UploadedFile {
   final String name;
   final String tempId;
-  const UploadedFile({required this.name, required this.tempId});
+
+  /// `utvonal` from the upload response; messages send it back.
+  final String? path;
+  const UploadedFile({required this.name, required this.tempId, this.path});
 }
 
+/// Reads KRÉTA's TemporaryFileDto: `fajlAzonosito` (or `fajlId`),
+/// `fajlMeretByteLength`, `utvonal`.
 UploadedFile? parseTempFile(dynamic json, String name) {
   if (json is! Map) return null;
   final id = json["fajlAzonosito"] ?? json["fajlId"];
   if (id == null || id.toString().isEmpty) return null;
-  return UploadedFile(name: name, tempId: id.toString());
+  final path = json["utvonal"]?.toString();
+  return UploadedFile(
+      name: name,
+      tempId: id.toString(),
+      path: path == null || path.isEmpty ? null : path);
 }
+
+/// A message attachment as the official app builds it (AttachmentDto from
+/// toAttachmentDtos, hu.ekreta.student 5.18.0): id "0" for a new file,
+/// fileHandler "Local" for files uploaded to ideiglenesfajlok.
+Map<String, dynamic> messageAttachmentJson(UploadedFile f) => {
+      "azonosito": "0",
+      "fajlNev": f.name,
+      "fajl": {
+        "fileHandler": "Local",
+        "ideiglenesFajlAzonosito": f.tempId,
+        if (f.path != null) "utvonal": f.path,
+      },
+    };
 
 bool canSubmit({
   required bool rangeOk,

@@ -32,12 +32,16 @@ class AverageDisplay extends StatelessWidget {
       averageText = averageText.replaceAll(".", ",");
     }
 
-    Widget txtWidget = Text(
-      average == 0.0 ? "-" : averageText,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-          color: color, fontWeight: FontWeight.w600, fontSize: scale * 15.0),
-      maxLines: 1,
+    // Shrinks instead of clipping when the system font is large.
+    Widget txtWidget = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        average == 0.0 ? "-" : averageText,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: color, fontWeight: FontWeight.w600, fontSize: scale * 15.0),
+        maxLines: 1,
+      ),
     );
 
     return Container(

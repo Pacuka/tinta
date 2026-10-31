@@ -1,4 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:http/http.dart' as http;
+import 'package:folio_kreta_api/models/justification.dart';
 import 'dart:convert';
 import 'dart:math';
 
@@ -237,6 +239,7 @@ class MessageProvider with ChangeNotifier {
     required List<SendRecipient> recipients,
     String subject = "Nincs tárgy",
     required String messageText,
+    List<UploadedFile> attachments = const [],
   }) async {
     List<Object> recipientList = [];
 
@@ -261,7 +264,7 @@ class MessageProvider with ChangeNotifier {
 
     Map body = {
       "cimzettLista": recipientList,
-      "csatolmanyok": [],
+      "csatolmanyok": [for (final f in attachments) messageAttachmentJson(f)],
       "azonosito": (Random().nextInt(10000) + 10000),
       "feladoNev": user.senderName,
       "feladoTitulus": user.role == Role.parent ? "Szülő" : "Diák",
@@ -275,18 +278,27 @@ class MessageProvider with ChangeNotifier {
       "content-type": "application/json",
     };
 
-    var res = await Provider.of<KretaClient>(_context, listen: false).postAPI(
+    // Raw response: a successful send may come back with an empty body.
+    final res = await Provider.of<KretaClient>(_context, listen: false).postAPI(
       KretaAPI.sendMessage,
       autoHeader: true,
       json: true,
+      rawResponse: true,
       body: json.encode(body),
       headers: headers,
     );
-
-    if (res!['hibakod'] == 'UzenetKuldesEngedelyRule') {
-      return 'send_permission_error';
-    }
-
-    return 'successfully_sent';
+    return sendResult(res is http.Response ? res.statusCode : null,
+        res is http.Response ? res.body : null);
   }
+}
+
+
+/// Maps KRÉTA's answer to a message send onto the UI result codes.
+/// [status] null means no answer at all (network error, timeout).
+String sendResult(int? status, String? body) {
+  if (status == null) return 'send_failed';
+  if (body != null && body.contains('UzenetKuldesEngedelyRule')) {
+    return 'send_permission_error';
+  }
+  return status >= 200 && status < 300 ? 'successfully_sent' : 'send_failed';
 }

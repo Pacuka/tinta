@@ -60,12 +60,24 @@ android {
     namespace = "app.zan1456.folio"
     ndkVersion = "28.2.13676358"
 
+    // Compress the native libraries inside the APK: the download shrinks
+    // from ~36 MB to ~13 MB (Android unpacks them once at install time).
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     flavorDimensions "distribution"
     productFlavors {
         github {
             dimension "distribution"
         }
         playstore {
+            dimension "distribution"
+        }
+        // F-Droid / IzzyOnDroid: no Firebase, no self-update (see tool/README.md)
+        fdroid {
             dimension "distribution"
         }
     }

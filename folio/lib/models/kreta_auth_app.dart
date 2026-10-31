@@ -11,15 +11,24 @@ import 'package:folio_kreta_api/client/api.dart';
 class KretaAuthApp {
   const KretaAuthApp._(this.clientId, this.redirectUri);
 
+  // Client ids and redirects are build-time configurable (KRETA_CLIENT_ID,
+  // KRETA_REDIRECT_URI, KRETA_GUARDIAN_CLIENT_ID, KRETA_GUARDIAN_REDIRECT_URI)
+  // so Tinta can move to its own registration. The defaults are the official
+  // apps' values, kept for compatibility until KRÉTA answers (see ugyved/).
   static const student = KretaAuthApp._(
-    'kreta-ellenorzo-student-mobile-ios',
-    'https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect',
+    KretaAPI.clientId,
+    String.fromEnvironment("KRETA_REDIRECT_URI",
+        defaultValue:
+            'https://mobil.e-kreta.hu/ellenorzo-student/prod/oauthredirect'),
   );
 
-  /// From the official guardian app (hu.ekreta.guardian 5.17.0).
+  /// Defaults from the official guardian app (hu.ekreta.guardian 5.17.0).
   static const guardian = KretaAuthApp._(
-    'kreta-ellenorzo-guardian-mobile-android',
-    'https://mobil.e-kreta.hu/ellenorzo-guardian/prod/oauthredirect',
+    String.fromEnvironment("KRETA_GUARDIAN_CLIENT_ID",
+        defaultValue: 'kreta-ellenorzo-guardian-mobile-android'),
+    String.fromEnvironment("KRETA_GUARDIAN_REDIRECT_URI",
+        defaultValue:
+            'https://mobil.e-kreta.hu/ellenorzo-guardian/prod/oauthredirect'),
   );
 
   static KretaAuthApp forRole(Role role) =>

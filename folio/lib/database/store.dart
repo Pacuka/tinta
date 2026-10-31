@@ -1,3 +1,4 @@
+import 'package:folio/database/token_vault.dart';
 import 'dart:convert';
 import 'package:folio/models/linked_account.dart';
 import 'package:folio/helpers/notification_helper.dart';
@@ -31,13 +32,15 @@ class DatabaseStore {
   }
 
   Future<void> storeUser(User user) async {
+    // Tokens go to secure storage; the database row keeps empty strings.
+    final row = await TokenVault.stash(
+        user.id, Map<String, dynamic>.from(user.toMap()));
     List userRes =
         await db.query("users", where: "id = ?", whereArgs: [user.id]);
     if (userRes.isNotEmpty) {
-      await db
-          .update("users", user.toMap(), where: "id = ?", whereArgs: [user.id]);
+      await db.update("users", row, where: "id = ?", whereArgs: [user.id]);
     } else {
-      await db.insert("users", user.toMap());
+      await db.insert("users", row);
       await db.insert("user_data", {"id": user.id});
     }
   }
@@ -45,6 +48,7 @@ class DatabaseStore {
   Future<void> removeUser(String userId) async {
     await db.delete("users", where: "id = ?", whereArgs: [userId]);
     await db.delete("user_data", where: "id = ?", whereArgs: [userId]);
+    await TokenVault.remove(userId);
   }
 }
 

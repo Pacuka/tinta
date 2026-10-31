@@ -5,7 +5,12 @@ class KretaAPI {
   static String get login => BaseKreta.kretaIdp + KretaApiEndpoints.token;
   static String get logout => BaseKreta.kretaIdp + KretaApiEndpoints.revoke;
   static String get nonce => BaseKreta.kretaIdp + KretaApiEndpoints.nonce;
-  static const clientId = "kreta-ellenorzo-student-mobile-ios";
+  /// OAuth client id (student). Build-time configurable so Tinta can switch
+  /// to its own id once KRÉTA issues one: --dart-define=KRETA_CLIENT_ID=...
+  /// The default is the official app's id, a temporary compatibility value
+  /// (open question, see ugyved/).
+  static const clientId = String.fromEnvironment("KRETA_CLIENT_ID",
+      defaultValue: "kreta-ellenorzo-student-mobile-ios");
 
   // ELLENORZO API
   static String notes(String iss) =>

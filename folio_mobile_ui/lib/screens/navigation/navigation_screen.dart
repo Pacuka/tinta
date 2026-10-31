@@ -15,6 +15,7 @@ import 'package:folio_mobile_ui/screens/navigation/nabar.dart';
 import 'package:folio_mobile_ui/screens/navigation/navbar_item.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_route.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_route_handler.dart';
+import 'package:folio_mobile_ui/screens/navigation/notification_open.dart';
 import 'package:folio_mobile_ui/screens/navigation/status_bar.dart';
 import 'package:folio_mobile_ui/screens/news/news_view.dart';
 import 'package:folio_mobile_ui/screens/settings/live_activity_consent_dialog.dart';
@@ -157,6 +158,10 @@ class NavigationScreenState extends State<NavigationScreen>
     // Local notifications need the Android 13+ permission.
     if (settings.notificationsEnabled) UpdateNotifier.requestPermission();
 
+    // A tapped notification opens what it is about.
+    UpdateNotifier.tapped.addListener(_onNotificationTap);
+    UpdateNotifier.checkLaunchTap();
+
     // initial sync
     _lastSync = DateTime.now();
     syncAll(context);
@@ -173,8 +178,18 @@ class NavigationScreenState extends State<NavigationScreen>
 
   @override
   void dispose() {
+    UpdateNotifier.tapped.removeListener(_onNotificationTap);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _onNotificationTap() {
+    final payload = UpdateNotifier.tapped.value;
+    if (payload == null) return;
+    UpdateNotifier.tapped.value = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) openFromNotification(context, payload, setPage: setPage);
+    });
   }
 
   DateTime _lastSync = DateTime.now();

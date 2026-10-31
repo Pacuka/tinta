@@ -97,3 +97,9 @@ tool_logs/d8dx_fix/*.log
 tool_logs/pub_fix/*.log
 folio/android/app/key.jks
 folio/android/app/google-services.json
+
+# Firebase build (folio/tool/build-firebase.sh): temporary override and the
+# private Firebase project config
+folio/pubspec_overrides.yaml
+folio/tool/push.json
+folio/tool/sajat-azonosito.json

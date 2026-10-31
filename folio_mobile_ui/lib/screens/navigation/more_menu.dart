@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
 import 'package:provider/provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
+import 'package:folio/models/user.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/profile_image/profile_image.dart';
@@ -204,8 +205,10 @@ class MoreMenu extends StatelessWidget {
 
           const SizedBox(height: 12.0),
 
-          // Consultation hours (not a navbar page)
-          _WideTile(
+          // Consultation hours (not a navbar page). Parents only: KRÉTA
+          // answers permission_denied to student accounts.
+          if (user.user?.role == Role.parent)
+            _WideTile(
             icon: Icons.event_available_rounded,
             title: consultingTitle,
             onTap: () {

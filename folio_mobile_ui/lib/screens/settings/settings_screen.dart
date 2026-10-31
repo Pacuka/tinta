@@ -2557,6 +2557,8 @@ Container(
           'adatvédelem',
           'privacy',
           'github',
+          'weboldal',
+          'website',
           'licenc',
           'license',
           'névjegy',
@@ -2574,6 +2576,17 @@ Container(
                 onPressed: () => _openPrivacy(context),
                 borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
+              ),
+              PanelButton(
+                leading: Icon(Icons.language_rounded,
+                    size: 22.0,
+                    color: AppColors.of(context).text.withValues(alpha: 0.95)),
+                title: Text("website".i18n),
+                onPressed: () => launchUrl(
+                    Uri.parse("https://tinta.pacuka.hu"),
+                    mode: LaunchMode.externalApplication),
+                borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
               ),
               PanelButton(
                 leading: Icon(Icons.code_rounded,

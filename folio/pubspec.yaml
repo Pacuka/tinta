@@ -3,7 +3,7 @@ description: "Egy nem hivatalos e-KRÉTA kliens, diákoktól diákoknak."
 homepage: https://github.com/Pacuka/tinta
 publish_to: "none"
 
-version: 1.4.1+7
+version: 1.5.0+8
 
 environment:
   sdk: ^3.6.0
@@ -15,6 +15,10 @@ dependencies:
     path: "../folio_mobile_ui/"
   folio_kreta_api:
     path: "../folio_kreta_api/"
+  # Push seam: no-op here (F-Droid build); the Firebase build swaps in
+  # ../tinta_push_firebase via pubspec_overrides.yaml (tool/build-firebase.sh).
+  tinta_push:
+    path: "../tinta_push/"
   flutter_localizations:
     sdk: flutter
   i18n_extension: ^15.1.0
@@ -44,6 +48,7 @@ dependencies:
   flutter_native_splash: ^2.4.4
   device_info_plus: ^12.4.0
   flutter_local_notifications: ^22.3.3
+  flutter_secure_storage: ^10.3.4
 
 dependency_overrides:
   intl: 0.20.2

@@ -52,6 +52,7 @@ String consultingErrorText(String error) {
     consultingFailedMessage: "err_failed",
     uncertainSubmitMessage: "err_uncertain",
     networkErrorMessage: "err_network",
+    consultingDisabledMessage: "err_disabled",
   };
   return keys[error]?.i18n ?? error;
 }

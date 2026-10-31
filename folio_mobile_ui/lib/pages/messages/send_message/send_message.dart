@@ -11,6 +11,7 @@ import 'package:folio_kreta_api/providers/message_provider.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/custom_snack_bar.dart';
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
+import 'package:folio_mobile_ui/pages/absences/justification/attachments.dart';
 import 'package:folio_mobile_ui/pages/messages/send_message/send_message.i18n.dart';
 
 class SendMessageSheet extends StatefulWidget {
@@ -46,6 +47,11 @@ class SendMessageSheetState extends State<SendMessageSheet> {
   final _subjectController = TextEditingController();
   final _messageController = TextEditingController();
 
+  /// Picked files, uploaded to KRÉTA's temporary storage right away
+  /// (same flow as justification attachments).
+  final _attachments = AttachmentController();
+  bool _sending = false;
+
   List<SendRecipient> selectedRecipients = [];
   late List<SendRecipient> _available;
 
@@ -59,6 +65,7 @@ class SendMessageSheetState extends State<SendMessageSheet> {
   void dispose() {
     _subjectController.dispose();
     _messageController.dispose();
+    _attachments.dispose();
     super.dispose();
   }
 
@@ -405,14 +412,39 @@ class SendMessageSheetState extends State<SendMessageSheet> {
 
                       const SizedBox(height: 12.0),
 
-                      // Send button
+                      // Full width, so the title stays left-aligned when empty.
                       SizedBox(
                         width: double.infinity,
+                        child: AttachmentSection(
+                          title: "attachments".i18n,
+                          controller: _attachments,
+                          maxItems: 5,
+                          enabled: !_sending,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12.0),
+
+                      // Send button: waits for uploads, keeps the draft on failure
+                      ListenableBuilder(
+                        listenable: _attachments,
+                        builder: (context, _) => SizedBox(
+                        width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: () async {
+                          onPressed: _sending || _attachments.uploading
+                              ? null
+                              : () async {
                             if (_messageController.text.replaceAll(' ', '') ==
                                 '') return;
                             if (selectedRecipients.isEmpty) return;
+                            if (_attachments.hasFailed) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  CustomSnackBar(
+                                      content: Text('attach_failed'.i18n),
+                                      context: context));
+                              return;
+                            }
+                            setState(() => _sending = true);
 
                             final subjectText =
                                 _subjectController.text.replaceAll(' ', '') !=
@@ -424,7 +456,18 @@ class SendMessageSheetState extends State<SendMessageSheet> {
                               recipients: selectedRecipients,
                               subject: subjectText,
                               messageText: _messageController.text,
+                              attachments: _attachments.uploaded,
                             );
+                            if (!mounted) return;
+                            setState(() => _sending = false);
+
+                            if (res == 'send_failed') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  CustomSnackBar(
+                                      content: Text('send_failed'.i18n),
+                                      context: context));
+                              return; // keep the sheet and the draft
+                            }
 
                             if (res == 'send_permission_error') {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -445,7 +488,13 @@ class SendMessageSheetState extends State<SendMessageSheet> {
 
                             Navigator.of(context).pop();
                           },
-                          icon: const Icon(Icons.send_rounded, size: 18.0),
+                          icon: _sending
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2))
+                              : const Icon(Icons.send_rounded, size: 18.0),
                           label: Text("send".i18n),
                           style: FilledButton.styleFrom(
                             padding:
@@ -455,6 +504,7 @@ class SendMessageSheetState extends State<SendMessageSheet> {
                             ),
                           ),
                         ),
+                      ),
                       ),
 
                       SizedBox(

@@ -25,6 +25,14 @@ Lesson lesson({
     });
 
 void main() {
+  group('nextLessonCheck', nextCheckTests);
+
+  test('notification payload round trip', () {
+    expect(notificationPayload("grade", "a:b"), "grade:a:b");
+    expect(parseNotificationPayload("grade:a:b"), ("grade", "a:b"));
+    expect(parseNotificationPayload(notificationPayload("timetable")),
+        ("timetable", null));
+  });
   final file = File('${Directory.systemTemp.path}/tinta_notify_test.json');
 
   test('first run records silently', () {
@@ -164,5 +172,43 @@ void main() {
               enabled: true),
           isEmpty);
     });
+  });
+}
+
+Lesson lessonAt(DateTime start, {String status = "Naplozott", String subject = "Matematika"}) =>
+    Lesson.fromJson({
+      "Uid": "L${start.millisecondsSinceEpoch}",
+      "Datum": DateTime(start.year, start.month, start.day).toIso8601String(),
+      "KezdetIdopont": start.toIso8601String(),
+      "VegIdopont": start.add(const Duration(minutes: 45)).toIso8601String(),
+      "Oraszam": 1,
+      "Allapot": {"Uid": "1", "Nev": status, "Leiras": status},
+      "Tantargy": {"Uid": "S1", "Nev": subject},
+      "TeremNeve": "32",
+    });
+
+void nextCheckTests() {
+  final day = DateTime(2026, 11, 2);
+  DateTime at(int h, int m) => day.add(Duration(hours: h, minutes: m));
+  final lessons = [lessonAt(at(8, 0)), lessonAt(at(10, 0))];
+
+  test('next check: before the lesson, for cancellations', () {
+    expect(nextLessonCheck(lessons, at(7, 0)), at(7, 45));
+  });
+  test('next check: a quarter hour in, when attendance is taken', () {
+    expect(nextLessonCheck(lessons, at(7, 50)), at(8, 15));
+  });
+  test('next check: right after the lesson, when grades come in', () {
+    expect(nextLessonCheck(lessons, at(8, 20)), at(8, 48));
+  });
+  test('next check: none after the last lesson', () {
+    expect(nextLessonCheck(lessons, at(11, 0)), isNull);
+  });
+  test('next check: cancelled lessons and free days are skipped', () {
+    final odd = [
+      lessonAt(at(8, 0), status: "Elmaradt"),
+      lessonAt(at(9, 0), subject: ""),
+    ];
+    expect(nextLessonCheck(odd, at(7, 0)), isNull);
   });
 }

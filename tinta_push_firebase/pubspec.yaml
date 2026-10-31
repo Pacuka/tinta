@@ -1,0 +1,16 @@
+# Same package name as ../tinta_push on purpose: the Firebase build swaps it
+# in with pubspec_overrides.yaml, so the app code is identical in both builds.
+name: tinta_push
+description: Firebase Cloud Messaging implementation of the Tinta push seam (Firebase build only).
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^4.6.0
+  firebase_messaging: ^16.1.3

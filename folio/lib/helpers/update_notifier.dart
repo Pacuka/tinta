@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
+import 'package:folio/models/user.dart';
 import 'package:folio/models/config.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_kreta_api/client/api.dart';
@@ -24,7 +25,8 @@ import 'package:path_provider/path_provider.dart';
 
 /// Local notifications for new KRÉTA data, without any push server.
 ///
-/// Runs from background_fetch (every ~15 min, and shortly before lessons).
+/// Runs from background_fetch (every ~15 min, plus exact runs around each
+/// lesson, see [nextLessonCheck]).
 /// What was already seen is kept in a small state file; the first run only
 /// records the current state, so old data never triggers notifications.
 class UpdateNotifier {
@@ -34,9 +36,23 @@ class UpdateNotifier {
   static bool _pluginReady = false;
   static bool _running = false;
 
+  /// Payload of the notification the user tapped (see
+  /// [notificationPayload]); the app opens it and sets this back to null.
+  static final tapped = ValueNotifier<String?>(null);
+
+  /// Picks up the notification that launched the app from a cold start.
+  static Future<void> checkLaunchTap() async {
+    await _initPlugin();
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    if (details?.didNotificationLaunchApp ?? false) {
+      tapped.value = details!.notificationResponse?.payload;
+    }
+  }
+
   static Future<void> _initPlugin() async {
     if (_pluginReady) return;
     await _plugin.initialize(
+      onDidReceiveNotificationResponse: (r) => tapped.value = r.payload,
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('@drawable/ic_notification'),
         // Permission is asked explicitly in requestPermission().
@@ -157,6 +173,7 @@ class UpdateNotifier {
           [g.description, g.mode.description]
               .where((s) => s.trim().isNotEmpty)
               .join(" · "),
+          notificationPayload("grade", g.id),
         ));
       }
     }
@@ -171,14 +188,16 @@ class UpdateNotifier {
         notes.add(_Note(
           "Új számonkérés: ${e.subject.name}",
           "${_day(e.writeDate)} · ${e.description.isNotEmpty ? e.description : (e.mode?.description ?? '')}",
+          notificationPayload("exam", e.id),
         ));
       }
     }
 
-    // Consultation hours
+    // Consultation hours (parents only, students get permission_denied)
     final (cFrom, cTo) = consultingRange(now);
-    final consultingJson =
-        await kreta.getAPI(KretaAPI.consultingHours(iss, cFrom, cTo));
+    final consultingJson = user.role == Role.parent
+        ? await kreta.getAPI(KretaAPI.consultingHours(iss, cFrom, cTo))
+        : null;
     List<ConsultingHour>? consulting;
     try {
       if (consultingJson is List) {
@@ -188,7 +207,7 @@ class UpdateNotifier {
     if (consulting != null) {
       for (final (title, body) in consultingNotes(consulting, state, now,
           enabled: settings.notificationsLessonsEnabled)) {
-        notes.add(_Note(title, body));
+        notes.add(_Note(title, body, notificationPayload("consulting")));
       }
     }
 
@@ -201,6 +220,7 @@ class UpdateNotifier {
         notes.add(_Note(
           a.delay > 0 ? "Késés: ${a.delay} perc" : "Új hiányzás",
           "${_day(a.date)} · ${a.subject.name}",
+          notificationPayload("absence", a.id),
         ));
       }
     }
@@ -216,6 +236,7 @@ class UpdateNotifier {
         notes.add(_Note(
           "Új üzenet: ${m["uzenetFeladoNev"] ?? ""}".trim(),
           "${m["uzenetTargy"] ?? ""}",
+          notificationPayload("message", id),
         ));
       }
     }
@@ -234,6 +255,7 @@ class UpdateNotifier {
         notes.add(_Note(
           "Új házi: ${hw.subject.name}",
           "Határidő: ${_day(hw.deadline)} · ${hw.content.replaceAll(RegExp(r'<[^>]*>'), '')}",
+          notificationPayload("homework", id),
         ));
       }
     }
@@ -248,30 +270,22 @@ class UpdateNotifier {
         if (l.end.isBefore(now)) continue;
         final change = state.lessonChange(l);
         if (change == null || !settings.notificationsLessonsEnabled) continue;
-        notes.add(_Note(change, "${_day(l.date)} · ${l.lessonIndex}. óra"));
+        notes.add(_Note(change, "${_day(l.date)} · ${l.lessonIndex}. óra",
+            notificationPayload("timetable")));
       }
     }
 
     if (!state.firstRun) await _show(notes);
     await state.save();
-    await _scheduleBeforeNextLesson(lessons);
+    await _scheduleNextCheck(lessons);
   }
 
-  /// One-off run ~15 min before the next lesson today/tomorrow, so a
-  /// cancellation or room change shows up in time.
-  static Future<void> _scheduleBeforeNextLesson(List<Lesson> lessons) async {
+  /// One-off exact run at the next moment KRÉTA data is likely to change,
+  /// see [nextLessonCheck]. The ~15 min periodic fetch covers the rest.
+  static Future<void> _scheduleNextCheck(List<Lesson> lessons) async {
     final now = DateTime.now();
-    final upcoming = lessons
-        .where((l) =>
-            l.status?.name != "Elmaradt" &&
-            // KRÉTA also returns non-teaching days (e.g. autumn break) as
-            // lessons without a subject.
-            l.subject.name.isNotEmpty &&
-            l.start.subtract(const Duration(minutes: 15)).isAfter(now))
-        .toList()
-      ..sort((a, b) => a.start.compareTo(b.start));
-    if (upcoming.isEmpty) return;
-    final at = upcoming.first.start.subtract(const Duration(minutes: 15));
+    final at = nextLessonCheck(lessons, now);
+    if (at == null) return;
     try {
       await BackgroundFetch.scheduleTask(TaskConfig(
         taskId: lessonCheckTaskId,
@@ -304,6 +318,7 @@ class UpdateNotifier {
         title: n.title,
         body: n.body,
         notificationDetails: details,
+        payload: n.payload,
       );
     }
     if (notes.length > 8) {
@@ -367,6 +382,36 @@ void recordSeenInApp(
 
 /// Notifications for consultation hours: a new hour once, and a reminder on
 /// the morning (from 07:00) of an own booking. Records what it has seen.
+/// "type:id" for a notification, e.g. "grade:123"; [id] is left out for
+/// targets that are a whole page ("timetable", "consulting").
+String notificationPayload(String type, [String? id]) =>
+    id == null ? type : "$type:$id";
+
+/// Splits a payload made by [notificationPayload] into (type, id).
+(String, String?) parseNotificationPayload(String payload) {
+  final i = payload.indexOf(":");
+  return i < 0 ? (payload, null) : (payload.substring(0, i), payload.substring(i + 1));
+}
+
+/// When KRÉTA data most likely changes during a school day: shortly before
+/// a lesson (cancellation, room change), a quarter hour in (attendance) and
+/// just after it ends (grades). Returns the first such moment after [now],
+/// or null when no lesson is left in [lessons].
+DateTime? nextLessonCheck(List<Lesson> lessons, DateTime now) {
+  final soon = now.add(const Duration(minutes: 1));
+  final times = <DateTime>[
+    for (final l in lessons)
+      // KRÉTA also returns non-teaching days as lessons without a subject.
+      if (l.subject.name.isNotEmpty && l.status?.name != "Elmaradt") ...[
+        l.start.subtract(const Duration(minutes: 15)),
+        l.start.add(const Duration(minutes: 15)),
+        l.end.add(const Duration(minutes: 3)),
+      ],
+  ].where((t) => t.isAfter(soon)).toList()
+    ..sort();
+  return times.isEmpty ? null : times.first;
+}
+
 List<(String, String)> consultingNotes(
     List<ConsultingHour> hours, NotifyState state, DateTime now,
     {required bool enabled}) {
@@ -409,7 +454,10 @@ List<(String, String)> consultingNotes(
 class _Note {
   final String title;
   final String body;
-  _Note(this.title, this.body);
+
+  /// What a tap opens, see [notificationPayload].
+  final String? payload;
+  _Note(this.title, this.body, [this.payload]);
 }
 
 /// What the notifier has already seen (persisted per user).

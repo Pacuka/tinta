@@ -17,6 +17,14 @@ import 'package:http/io_client.dart' as http;
 import 'dart:async';
 
 class KretaClient {
+  /// The official app's API key, sent with every non-IDP request.
+  static const _apiKey = "21ff6c25-d1da-4a68-a811-c881a6057463";
+
+  /// Sent by default (temporary compatibility, see ugyved/). KRÉTA also
+  /// served Tinta without it in a test on 2026-10-31:
+  /// --dart-define=TINTA_NO_APIKEY=true
+  static const _sendApiKey = !bool.fromEnvironment("TINTA_NO_APIKEY");
+
   String? accessToken;
   String? refreshToken;
   String? idToken;
@@ -100,9 +108,10 @@ class KretaClient {
               idpApplicationCookie!.isNotEmpty) {
             headerMap["cookie"] = "idp.application=$idpApplicationCookie";
           }
-          if (!headerMap.containsKey("apiKey") &&
+          if (_sendApiKey &&
+              !headerMap.containsKey("apiKey") &&
               !BaseKreta.isIdpUrl(url)) {
-            headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+            headerMap["apiKey"] = _apiKey;
           }
         }
 
@@ -184,9 +193,10 @@ class KretaClient {
           if (!headerMap.containsKey("content-type")) {
             headerMap["content-type"] = "application/json";
           }
-          if (!headerMap.containsKey("apiKey") &&
+          if (_sendApiKey &&
+              !headerMap.containsKey("apiKey") &&
               !BaseKreta.isIdpUrl(url)) {
-            headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+            headerMap["apiKey"] = _apiKey;
           }
           if (url.contains('kommunikacio/uzenetek')) {
             headerMap["X-Uzenet-Lokalizacio"] = "hu-HU";
@@ -237,7 +247,7 @@ class KretaClient {
       final request = http.MultipartRequest("POST", Uri.parse(url));
       if (token != null) request.headers["authorization"] = "Bearer $token";
       if (_roleUserAgent != null) request.headers["user-agent"] = _roleUserAgent!;
-      request.headers["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+      if (_sendApiKey) request.headers["apiKey"] = _apiKey;
       request.files.add(http.MultipartFile.fromBytes("fajl", bytes,
           filename: Uri.encodeComponent(fileName)));
       // Sending the body is part of send(): give slow mobile uplinks time.
@@ -272,9 +282,10 @@ class KretaClient {
           if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
             headerMap["user-agent"] = _roleUserAgent!;
           }
-          if (!headerMap.containsKey("apiKey") &&
+          if (_sendApiKey &&
+              !headerMap.containsKey("apiKey") &&
               !BaseKreta.isIdpUrl(url)) {
-            headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+            headerMap["apiKey"] = _apiKey;
           }
         }
 
@@ -328,9 +339,10 @@ class KretaClient {
           }
           headerMap["content-type"] =
               "application/x-www-form-urlencoded; charset=UTF-8";
-          if (!headerMap.containsKey("apiKey") &&
+          if (_sendApiKey &&
+              !headerMap.containsKey("apiKey") &&
               !BaseKreta.isIdpUrl(url)) {
-            headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+            headerMap["apiKey"] = _apiKey;
           }
         }
 
@@ -397,9 +409,10 @@ class KretaClient {
           if (!headerMap.containsKey("content-type")) {
             headerMap["content-type"] = "multipart/form-data";
           }
-          if (!headerMap.containsKey("apiKey") &&
+          if (_sendApiKey &&
+              !headerMap.containsKey("apiKey") &&
               !BaseKreta.isIdpUrl(url)) {
-            headerMap["apiKey"] = "21ff6c25-d1da-4a68-a811-c881a6057463";
+            headerMap["apiKey"] = _apiKey;
           }
           if (url.contains('kommunikacio/uzenetek')) {
             headerMap["X-Uzenet-Lokalizacio"] = "hu-HU";

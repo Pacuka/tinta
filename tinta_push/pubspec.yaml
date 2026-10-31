@@ -1,0 +1,7 @@
+name: tinta_push
+description: Push messaging seam for Tinta. This default build has no push and no Firebase dependency (F-Droid build).
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"

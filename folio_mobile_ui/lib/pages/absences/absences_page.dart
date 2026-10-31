@@ -389,10 +389,15 @@ Container(
                       onTap: (_) => performHapticFeedback(
                           Provider.of<SettingsProvider>(context, listen: false).vibrate),
                       padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),
+                      // Labels shrink instead of clipping with a large font.
                       tabs: [
-                        Tab(text: "Absences".i18n),
-                        Tab(text: "Delays".i18n),
-                        Tab(text: "Misses".i18n),
+                        for (final t in ["Absences", "Delays", "Misses"])
+                          Tab(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(t.i18n, maxLines: 1),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -650,17 +655,20 @@ class _StatCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2.0),
-            Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w500,
-                height: 1.2,
-                color: value > 0
-                    ? color.withValues(alpha: 0.8)
-                    : onCardColor.withValues(alpha: 0.6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  color: value > 0
+                      ? color.withValues(alpha: 0.8)
+                      : onCardColor.withValues(alpha: 0.6),
+                ),
               ),
             ),
           ],

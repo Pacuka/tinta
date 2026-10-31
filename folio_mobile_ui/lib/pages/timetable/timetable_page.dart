@@ -302,17 +302,23 @@ Container(
                         }(),
                         // "Órarend" title
                         Expanded(
-                          child: Text(
-                            "timetable".i18n,
-                            style: TextStyle(
-                              fontSize: 28.0,
-                              fontWeight: FontWeight.w800,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "timetable".i18n,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 28.0,
+                                fontWeight: FontWeight.w800,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                              ),
                             ),
                           ),
                         ),
+                        const SizedBox(width: 8.0),
                         // Compact inline week selector
                         Container(
                           decoration: BoxDecoration(

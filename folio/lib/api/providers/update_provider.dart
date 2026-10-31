@@ -1,3 +1,4 @@
+import 'package:folio/flavor.dart';
 import 'dart:io';
 
 import 'package:folio/api/client.dart';
@@ -34,7 +35,7 @@ class UpdateProvider extends ChangeNotifier {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final current = Version.fromString(packageInfo.version);
 
-    if (!Platform.isAndroid) return;
+    if (!Platform.isAndroid || kIsFdroid) return;
 
     _releases = await FilcAPI.getReleases() ?? [];
     _releases.sort((a, b) => -a.version.compareTo(b.version));
