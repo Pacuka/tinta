@@ -1583,7 +1583,15 @@ Container(
                         items: [
                           DropdownMenuItem(
                             value: 'native',
-                            child: Text('native_android'.i18n),
+                            child: Text('live_type_auto'.i18n),
+                          ),
+                          DropdownMenuItem(
+                            value: 'wavy',
+                            child: Text('live_type_wavy'.i18n),
+                          ),
+                          DropdownMenuItem(
+                            value: 'android16',
+                            child: Text('live_type_android16'.i18n),
                           ),
                           const DropdownMenuItem(
                             value: 'hyper_os',

@@ -37,6 +37,19 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                         manager.showOrUpdateNative(title, body, subText)
                         result.success(null)
                     }
+                    "showOrUpdateLive" -> {
+                        manager.showOrUpdateLive(
+                            title = call.argument<String>("title") ?: "",
+                            compact = call.argument<String>("compact") ?: "",
+                            body = call.argument<String>("body") ?: "",
+                            next = call.argument<String>("next") ?: "",
+                            startMs = call.argument<Number>("startMs")?.toLong() ?: 0L,
+                            endMs = call.argument<Number>("endMs")?.toLong() ?: 0L,
+                            timerFormat = call.argument<String>("timerFormat") ?: "%s",
+                            mode = call.argument<String>("mode") ?: "auto",
+                        )
+                        result.success(null)
+                    }
                     "showOrUpdateHyperOs" -> {
                         val title = call.argument<String>("title") ?: ""
                         val body = call.argument<String>("body") ?: ""

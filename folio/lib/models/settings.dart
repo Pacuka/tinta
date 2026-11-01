@@ -125,7 +125,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _qSubjectsSubTiles;
   // android live activity
   bool _androidLiveActivityEnabled;
-  String _androidLiveNotificationType; // 'native' | 'hyper_os'
+  String _androidLiveNotificationType; // 'native' (= automatikus) | 'wavy' | 'android16' | 'hyper_os'
   // countdown settings
   bool _liveCountdownEnabled;
   bool _liveCountdownBeforeLesson;

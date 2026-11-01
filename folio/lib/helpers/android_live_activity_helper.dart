@@ -81,15 +81,105 @@ class AndroidLiveActivityHelper {
           'remainingSeconds': remainingSeconds,
         });
       } else {
-        await _channel.invokeMethod('showOrUpdateNative', {
-          'title': title,
-          'body': body,
-          'subText': subText,
-        });
+        final content = liveContent(state, data);
+        if (content == null) {
+          await cancel();
+          return;
+        }
+        // 'native' (régi érték) = automatikus: Android 16-on felső sávos élő
+        // frissítés, régebbin hullámos csík. 'wavy' / 'android16' = kézzel.
+        final live = {...content, 'mode': liveMode(type)};
+        // A provider 5 mp-enként hív; a visszaszámlálást a rendszer ketyegteti,
+        // a csíkot elég 30 mp-enként újrarajzolni, vagy ha változott a tartalom.
+        final now = DateTime.now();
+        final key = live.toString();
+        if (_active &&
+            key == _lastKey &&
+            _lastSent != null &&
+            now.difference(_lastSent!) < const Duration(seconds: 30)) {
+          return;
+        }
+        await _channel.invokeMethod('showOrUpdateLive', live);
+        _lastKey = key;
+        _lastSent = now;
       }
       _active = true;
     } on PlatformException catch (e) {
       debugPrint('AndroidLiveActivityHelper error: $e');
+    }
+  }
+
+  static String? _lastKey;
+
+  /// A beállítás értékéből a natív oldal módja: auto / wavy / promoted.
+  @visibleForTesting
+  static String liveMode(String type) => switch (type) {
+        'wavy' => 'wavy',
+        'android16' => 'promoted',
+        _ => 'auto',
+      };
+  static DateTime? _lastSent;
+
+  /// Az élő értesítés tartalma (mi, hol, mi jön utána, mettől meddig).
+  /// A `compact` az összecsukott nézet egyetlen sora (ott a csík miatt
+  /// csak egy szövegsor fér el).
+  /// `null`, ha nincs mit mutatni.
+  @visibleForTesting
+  static Map<String, Object>? liveContent(
+      LiveCardState state, Map<String, String> data) {
+    final startMs = int.tryParse(data['startDate'] ?? '') ?? 0;
+    final endMs = int.tryParse(data['endDate'] ?? '') ?? 0;
+    if (endMs == 0) return null;
+
+    final nextSubject = data['nextSubject'] ?? '';
+    final nextRoom = data['nextRoom'] ?? '';
+    String place(String subject, String room) =>
+        room.isEmpty ? subject : '$subject · $room';
+
+    switch (state) {
+      case LiveCardState.duringLesson:
+        final room = (data['subtitle'] ?? '').replaceFirst('Terem: ', '').trim();
+        return {
+          'title': '${data['index'] ?? ''}${data['title'] ?? ''}'.trim(),
+          'compact': place(
+              '${data['index'] ?? ''}${data['title'] ?? ''}'.trim(), room),
+          'body': room.isEmpty ? '' : 'Terem: $room',
+          'next': nextSubject.isEmpty
+              ? 'Ez a mai utolsó órád.'
+              : 'Utána: ${place(nextSubject, nextRoom)}',
+          'startMs': startMs,
+          'endMs': endMs,
+          'timerFormat': 'még %s',
+        };
+      case LiveCardState.duringBreak:
+        return {
+          'title': 'Szünet',
+          'compact': nextSubject.isEmpty
+              ? 'Szünet'
+              : 'Szünet → ${place(nextSubject, nextRoom)}',
+          'body': nextSubject.isEmpty
+              ? ''
+              : 'Következő: ${place(nextSubject, nextRoom)}',
+          'next': data['description'] ?? '',
+          'startMs': startMs,
+          'endMs': endMs,
+          'timerFormat': 'még %s',
+        };
+      case LiveCardState.morning:
+      case LiveCardState.afternoon:
+      case LiveCardState.night:
+        if (nextSubject.isEmpty) return null;
+        return {
+          'title': 'Következő óra: $nextSubject',
+          'compact': place(nextSubject, nextRoom),
+          'body': nextRoom.isEmpty ? '' : 'Terem: $nextRoom',
+          'next': '',
+          'startMs': startMs,
+          'endMs': endMs,
+          'timerFormat': '%s múlva',
+        };
+      default:
+        return null;
     }
   }
 
@@ -101,6 +191,7 @@ class AndroidLiveActivityHelper {
       debugPrint('AndroidLiveActivityHelper cancel error: $e');
     } finally {
       _active = false;
+      _lastKey = null;
     }
   }
 
