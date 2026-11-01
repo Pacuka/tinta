@@ -348,6 +348,26 @@ class LessonTile extends StatelessWidget {
                             ],
                           ],
                         ),
+                        // Regular teacher (the substitute replaces this line)
+                        if (!isSubstitute &&
+                            !lesson.isEmpty &&
+                            lesson.teacher.name.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2.0),
+                            child: Text(
+                              lesson.teacher.renamedTo ?? lesson.teacher.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w500,
+                                color: onCardColor.withValues(alpha: 0.6),
+                                decoration: isCancelled
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                          ),
                         if (isSubstitute && !isCancelled)
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
