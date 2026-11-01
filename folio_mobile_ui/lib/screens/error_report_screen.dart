@@ -7,8 +7,6 @@ import 'package:folio_mobile_ui/common/widgets/app_logo.dart';
 import 'error_report_screen.i18n.dart';
 import 'package:folio/theme/colors/colors.dart';
 
-//TODO: MAKE THIS USE APP THEME
-
 class ErrorReportScreen extends StatelessWidget {
   final FlutterErrorDetails details;
 
@@ -113,7 +111,8 @@ class ErrorReportScreen extends StatelessWidget {
                   style: ButtonStyle(
                     padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(vertical: 10.0)),
-                    backgroundColor: WidgetStateProperty.all(Colors.black),
+                    backgroundColor: WidgetStateProperty.all(
+                        Theme.of(context).colorScheme.primary),
                     shape: WidgetStateProperty.all(
                       RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0)),
@@ -121,11 +120,10 @@ class ErrorReportScreen extends StatelessWidget {
                   ),
                   child: Text(
                     "submit".i18n,
-                    style: const TextStyle(
-                        color: Color(0xFFF7F9FC),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 18.0,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Montserrat'),
+                        fontWeight: FontWeight.w700),
                   ),
                   onPressed: () => reportProblem(context),
                 ),
@@ -140,7 +138,7 @@ class ErrorReportScreen extends StatelessWidget {
                       const EdgeInsets.symmetric(vertical: 14.0),
                     ),
                     backgroundColor: WidgetStateProperty.all(
-                      const Color(0xFFF3F7FE),
+                      AppColors.of(context).highlight,
                     ),
                     shape: WidgetStateProperty.all(
                       RoundedRectangleBorder(
@@ -148,15 +146,18 @@ class ErrorReportScreen extends StatelessWidget {
                       ),
                     ),
                     side: WidgetStateProperty.all(
-                      const BorderSide(width: 1.0, color: Color(0xFFC7D3EB)),
+                      BorderSide(
+                          width: 1.0,
+                          color: AppColors.of(context)
+                              .text
+                              .withValues(alpha: .15)),
                     ),
                   ),
                   child: Text(
                     "goback".i18n,
-                    style: const TextStyle(
-                      color: Color(0xFF011234),
+                    style: TextStyle(
+                      color: AppColors.of(context).text,
                       fontSize: 18.0,
-                      fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -271,13 +272,13 @@ class ErrorDetail extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 4.0),
             margin: const EdgeInsets.only(top: 4.0),
             decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 218, 218, 218),
+                color: AppColors.of(context).highlight,
                 borderRadius: BorderRadius.circular(4.0)),
             child: Text(
               content,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'monospace',
-                color: Color.fromARGB(255, 0, 0, 0),
+                color: AppColors.of(context).text,
               ),
             ),
           ),

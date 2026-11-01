@@ -97,21 +97,20 @@ extension Localization on String {
           "login_w_kreten":
               "Melden Sie sich mit Ihrem e-KRÉTA-Konto an, um fortzufahren!",
           "privacy": "Datenschutzrichtlinie",
-          //TODO: translate to german, waiting for translator
-          "welcome_title_1": "This is your home",
+          "welcome_title_1": "Das ist dein kleines Zuhause",
           "welcome_text_1":
-              "In the day view, you'll find everything you need: your timetable, your tasks, your assignments and your unread messages, all in one place.",
+              "In der Tagesansicht findest du alles, was du brauchst: Stundenplan, Aufgaben, Prüfungen und ungelesene Nachrichten, alles an einem Ort.",
           "welcome_title_2":
-              "You can see your deteriorating tendency in ten different ways",
+              "Deinen Abwärtstrend siehst du auf zehn verschiedene Arten",
           "welcome_text_2":
-              "You will see so many statistics that 8 years of elementary maths will not be enough to comprehend it.",
+              "Du bekommst so viele Statistiken, dass acht Jahre Mathe in der Grundschule nicht reichen, um alle zu verstehen.",
           "welcome_title_3":
-              "Follow your goals and turn maths one into maths five.",
+              "Verfolge deine Ziele und mach aus der Mathe-Sechs eine Eins.",
           "welcome_text_3":
-              "Set your target and we'll tell you how many grades you should get. You even get confetti when you reach your goal.",
-          "welcome_title_4": "Take as many notes as you want.",
+              "Setz dir ein Ziel, und wir sagen dir, welche Noten du dafür brauchst. Wenn du es erreichst, gibt es sogar Konfetti.",
+          "welcome_title_4": "Mach dir so viele Notizen, wie du willst.",
           "welcome_text_4":
-              "You can also organise your notes by lesson in the built-in notebook, so you can find everything in one app.",
+              "Im eingebauten Notizbuch kannst du deine Notizen nach Fächern ordnen, so findest du alles in einer App.",
           "login_w_kreta_acc": "Mit e-KRÉTA-Konto anmelden",
           "demo_login": "Demo-Modus ausprobieren",
         },

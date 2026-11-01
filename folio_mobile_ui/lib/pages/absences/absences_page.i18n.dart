@@ -74,6 +74,7 @@ extension ScreensLocalization on String {
           "now": "Jetzt",
           "justification_breakdown_title": "Entschuldigungstypen",
           "justification_unknown": "Unbekannt",
+          "justify": "Entschuldigen",
         },
       };
 
