@@ -57,6 +57,10 @@
             </intent-filter>
         </service>
 
+        <!-- Élő óra-értesítés háttérbeli léptetése (AlarmManager) -->
+        <receiver
+            android:name="app.zan1456.folio.live_activity.LiveLessonAlarmReceiver"
+            android:exported="false" />
     </application>
 
     <meta-data android:name="flutterEmbedding" android:value="2" />

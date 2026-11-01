@@ -1525,7 +1525,10 @@ Container(
                   onPressed: () {
                     final newVal = !settings.androidLiveActivityEnabled;
                     settings.update(androidLiveActivityEnabled: newVal);
-                    if (!newVal) AndroidLiveActivityHelper.cancel();
+                    if (!newVal) {
+                      AndroidLiveActivityHelper.cancel();
+                      AndroidLiveActivityHelper.cancelSchedule();
+                    }
                     setState(() {});
                   },
                   title: Text(
@@ -1546,7 +1549,10 @@ Container(
                     onChanged: (v) {
                       _haptic();
                       settings.update(androidLiveActivityEnabled: v);
-                      if (!v) AndroidLiveActivityHelper.cancel();
+                      if (!v) {
+                        AndroidLiveActivityHelper.cancel();
+                        AndroidLiveActivityHelper.cancelSchedule();
+                      }
                       setState(() {});
                     },
                     value: settings.androidLiveActivityEnabled,

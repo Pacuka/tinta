@@ -2,7 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+
 import 'package:folio/api/providers/live_card_provider.dart';
+import 'package:folio/helpers/subject.dart';
+import 'package:folio/utils/format.dart';
+import 'package:folio_kreta_api/models/lesson.dart';
 
 class AndroidLiveActivityHelper {
   static const _channel = MethodChannel('app.zan1456.folio/android_live_activity');
@@ -181,6 +186,108 @@ class AndroidLiveActivityHelper {
       default:
         return null;
     }
+  }
+
+  static String? _lastPlan;
+
+  /// Átadja a mai órák menetrendjét a natív oldalnak, ami időzítőkkel
+  /// magától frissíti az élő értesítést akkor is, ha a Tinta nem fut.
+  /// Csak akkor küld, ha a menetrend megváltozott.
+  static Future<void> scheduleDay(
+    List<Lesson> today, {
+    required Duration delay,
+    required String type,
+  }) async {
+    if (!Platform.isAndroid) return;
+    if (type == 'hyper_os') return cancelSchedule();
+    final plan = jsonEncode(dayPlan(today, delay: delay));
+    final key = '$type|$plan';
+    if (key == _lastPlan) return;
+    try {
+      await _channel.invokeMethod('scheduleDay', {
+        'plan': plan,
+        'mode': liveMode(type),
+      });
+      _lastPlan = key;
+    } on PlatformException catch (e) {
+      debugPrint('AndroidLiveActivityHelper scheduleDay error: $e');
+    }
+  }
+
+  static Future<void> cancelSchedule() async {
+    if (!Platform.isAndroid) return;
+    _lastPlan = null;
+    try {
+      await _channel.invokeMethod('cancelSchedule');
+    } on PlatformException catch (e) {
+      debugPrint('AndroidLiveActivityHelper cancelSchedule error: $e');
+    }
+  }
+
+  static String _subjectName(Lesson l) =>
+      l.subject.renamedTo ?? ShortSubject.resolve(subject: l.subject).capital();
+
+  /// A nap szakaszai (első óra előtti óra, órák, szünetek), mindegyik
+  /// `from`/`to` epoch ms-mal és ugyanazokkal a mezőkkel, mint [liveContent].
+  /// [today] már szűrve van (nincs elmaradt / üres óra).
+  @visibleForTesting
+  static List<Map<String, Object>> dayPlan(
+    List<Lesson> today, {
+    Duration delay = Duration.zero,
+    String Function(Lesson)? name,
+  }) {
+    final subj = name ?? _subjectName;
+    final lessons = [...today]..sort((a, b) => a.start.compareTo(b.start));
+    int ms(DateTime d) => d.subtract(delay).millisecondsSinceEpoch;
+    String room(Lesson l) => l.room.replaceAll('_', ' ').trim();
+    String place(Lesson l) =>
+        room(l).isEmpty ? subj(l) : '${subj(l)} · ${room(l)}';
+
+    final out = <Map<String, Object>>[];
+    for (var i = 0; i < lessons.length; i++) {
+      final l = lessons[i];
+      final next = i + 1 < lessons.length ? lessons[i + 1] : null;
+      if (i == 0) {
+        out.add({
+          'from': ms(l.start.subtract(const Duration(hours: 1))),
+          'to': ms(l.start),
+          'title': 'Következő óra: ${subj(l)}',
+          'compact': place(l),
+          'body': room(l).isEmpty ? '' : 'Terem: ${room(l)}',
+          'next': '',
+          'startMs': 0,
+          'endMs': ms(l.start),
+          'timerFormat': '%s múlva',
+        });
+      }
+      final title = '${l.lessonIndex.isEmpty ? '' : '${l.lessonIndex}. '}'
+          '${subj(l)}';
+      out.add({
+        'from': ms(l.start),
+        'to': ms(l.end),
+        'title': title,
+        'compact': room(l).isEmpty ? title : '$title · ${room(l)}',
+        'body': room(l).isEmpty ? '' : 'Terem: ${room(l)}',
+        'next': next == null ? 'Ez a mai utolsó órád.' : 'Utána: ${place(next)}',
+        'startMs': ms(l.start),
+        'endMs': ms(l.end),
+        'timerFormat': 'még %s',
+      });
+      if (next != null && next.start.isAfter(l.end)) {
+        out.add({
+          'from': ms(l.end),
+          'to': ms(next.start),
+          'title': 'Szünet',
+          'compact': 'Szünet → ${place(next)}',
+          'body': 'Következő: ${place(next)}',
+          'next': '',
+          'startMs': ms(l.end),
+          'endMs': ms(next.start),
+          'timerFormat': 'még %s',
+        });
+      }
+    }
+    return out;
   }
 
   static Future<void> cancel() async {

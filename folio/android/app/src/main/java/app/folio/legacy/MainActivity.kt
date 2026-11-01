@@ -8,6 +8,7 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import app.zan1456.folio.live_activity.LiveLessonNotificationManager
+import app.zan1456.folio.live_activity.LiveLessonScheduler
 import app.zan1456.folio.wear.WearSyncManager
 
 class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener {
@@ -56,6 +57,18 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                         val subText = call.argument<String>("subText")
                         val remainingSeconds = call.argument<Int>("remainingSeconds") ?: 0
                         manager.showOrUpdateHyperOs(title, body, subText, remainingSeconds)
+                        result.success(null)
+                    }
+                    "scheduleDay" -> {
+                        LiveLessonScheduler.schedule(
+                            this,
+                            call.argument<String>("plan") ?: "[]",
+                            call.argument<String>("mode") ?: "auto",
+                        )
+                        result.success(null)
+                    }
+                    "cancelSchedule" -> {
+                        LiveLessonScheduler.cancel(this)
                         result.success(null)
                     }
                     "cancel" -> {

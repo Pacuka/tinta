@@ -438,6 +438,12 @@ class LiveCardProvider extends ChangeNotifier {
 
     // ── Android Live Activity ─────────────────────────────────
     if (Platform.isAndroid && _settings.androidLiveActivityEnabled) {
+      // A nap menetrendje a natív időzítőknek (app nélkül is frissül).
+      AndroidLiveActivityHelper.scheduleDay(
+        _settings.developerMode && _settings.devLiveFakeLessons ? [] : today,
+        delay: _delay,
+        type: _settings.androidLiveNotificationType,
+      );
       final shouldShow = currentState == LiveCardState.duringLesson ||
           currentState == LiveCardState.duringBreak ||
           ((currentState == LiveCardState.morning ||
@@ -456,6 +462,7 @@ class LiveCardProvider extends ChangeNotifier {
       }
     } else if (Platform.isAndroid && AndroidLiveActivityHelper.isActive) {
       AndroidLiveActivityHelper.cancel();
+      AndroidLiveActivityHelper.cancelSchedule();
     }
 
     LAData = toMap();

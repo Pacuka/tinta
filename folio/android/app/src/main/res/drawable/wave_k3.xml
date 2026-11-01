@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Élő óra-értesítés: 3 hullámhosszú, mozgó hullámos csík (generált). -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="72dp"
+            android:height="12dp"
+            android:viewportWidth="72"
+            android:viewportHeight="12">
+            <group android:name="wave">
+                <path
+                    android:pathData="M-24,6 q6,-6 12,0 t12,0 t12,0 t12,0 t12,0 t12,0 t12,0 t12,0 t12,0 t12,0"
+                    android:strokeColor="#FFFFFFFF"
+                    android:strokeWidth="4"
+                    android:strokeLineCap="round" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="wave">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="1400"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:propertyName="translateX"
+                android:repeatCount="infinite"
+                android:valueFrom="0"
+                android:valueTo="24" />
+        </aapt:attr>
+    </target>
+</animated-vector>

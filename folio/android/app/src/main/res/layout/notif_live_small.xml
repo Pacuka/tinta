@@ -29,11 +29,170 @@
             android:maxLines="1" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/live_progress"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="12dp"
-        android:layout_marginTop="6dp"
-        android:importantForAccessibility="no"
-        android:scaleType="fitXY" />
+        android:layout_marginTop="6dp">
+
+        <ImageView
+            android:id="@+id/live_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY" />
+
+        <!-- Mozgó hullám (Android 12+): a weightSum-mal állítjuk, hogy a
+             szélesség hányad része legyen; a hullámhossz szerint választunk. -->
+        <LinearLayout
+            android:id="@+id/live_wave_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone">
+        <ProgressBar
+            android:id="@+id/live_wave_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k1"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k2"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k3"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k4"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k5"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_6"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k6"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_7"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k7"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_8"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k8"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_9"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k9"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_10"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k10"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_11"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k11"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_12"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k12"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_13"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k13"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_14"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k14"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_15"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k15"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        <ProgressBar
+            android:id="@+id/live_wave_16"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/wave_k16"
+            android:indeterminateOnly="false"
+            android:visibility="gone" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

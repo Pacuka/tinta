@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -29,6 +30,13 @@ class LiveLessonNotificationManager(private val context: Context) {
     companion object {
         const val CHANNEL_ID = "live_lesson_activity"
         const val NOTIFICATION_ID = 1337
+        private const val WAVELENGTH_DP = 24f
+        private val WAVE_IDS = intArrayOf(
+            R.id.live_wave_1, R.id.live_wave_2, R.id.live_wave_3, R.id.live_wave_4,
+            R.id.live_wave_5, R.id.live_wave_6, R.id.live_wave_7, R.id.live_wave_8,
+            R.id.live_wave_9, R.id.live_wave_10, R.id.live_wave_11, R.id.live_wave_12,
+            R.id.live_wave_13, R.id.live_wave_14, R.id.live_wave_15, R.id.live_wave_16,
+        )
     }
 
     init {
@@ -109,7 +117,17 @@ class LiveLessonNotificationManager(private val context: Context) {
             )
             return
         }
-        val bar = if (progress >= 0f) wavyBar(progress) else null
+        // Android 12+: a hullám mozog (rendszer által animált vektor egy
+        // ProgressBarban), a bitmapen csak az egyenes sáv és a végpötty van.
+        val animated = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && progress > 0.02f
+        val bar = if (progress >= 0f) wavyBar(progress, drawWave = !animated) else null
+        val waveId = if (animated) {
+            val d = context.resources.displayMetrics.density
+            val k = Math.round(progress * contentWidthPx() / (WAVELENGTH_DP * d)).coerceIn(1, 16)
+            WAVE_IDS[k - 1]
+        } else {
+            0
+        }
         val chronoBase = SystemClock.elapsedRealtime() + remaining
 
         // Összecsukva csak egy szövegsor + csík fér el, ott a [compact] sor megy.
@@ -125,6 +143,20 @@ class LiveLessonNotificationManager(private val context: Context) {
                 setChronometer(R.id.live_timer, chronoBase, timerFormat, true)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     setChronometerCountDown(R.id.live_timer, true)
+                }
+                if (waveId != 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    setViewVisibility(R.id.live_wave_row, View.VISIBLE)
+                    // A ProgressBar súlya 1, így a sor [progress] részét tölti ki.
+                    setFloat(R.id.live_wave_row, "setWeightSum", 1f / progress)
+                    for (id in WAVE_IDS) {
+                        setViewVisibility(id, if (id == waveId) View.VISIBLE else View.GONE)
+                    }
+                    setColorStateList(
+                        waveId, "setIndeterminateTintList",
+                        ColorStateList.valueOf(accentColor())
+                    )
+                } else {
+                    setViewVisibility(R.id.live_wave_row, View.GONE)
                 }
                 if (bar != null) {
                     setImageViewBitmap(R.id.live_progress, bar)
@@ -240,18 +272,23 @@ class LiveLessonNotificationManager(private val context: Context) {
      * nem lehet saját View-t tenni): a megtett rész szinuszhullám, utána kis
      * rés, majd egyenes, halványabb sáv a végén pöttyel.
      */
-    private fun wavyBar(progress: Float): Bitmap {
+    /** Az értesítés tartalmi szélessége kb.: kijelző mínusz ikon és margók. */
+    private fun contentWidthPx(): Int {
+        val dm = context.resources.displayMetrics
+        return (dm.widthPixels - 120 * dm.density).toInt().coerceAtLeast((120 * dm.density).toInt())
+    }
+
+    private fun wavyBar(progress: Float, drawWave: Boolean = true): Bitmap {
         val dm = context.resources.displayMetrics
         val d = dm.density
-        // Az ImageView szélessége kb. a kijelző mínusz az értesítés margói.
-        val w = (dm.widthPixels - 64 * d).toInt().coerceAtLeast((120 * d).toInt())
+        val w = contentWidthPx()
         val h = (12 * d).toInt()
         val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
 
         val stroke = 4 * d
         val amp = 2.5f * d
-        val wave = 22 * d
+        val wave = WAVELENGTH_DP * d
         val gap = 6 * d
         val mid = h / 2f
         val left = stroke / 2
@@ -268,7 +305,7 @@ class LiveLessonNotificationManager(private val context: Context) {
         val active = Paint(track).apply { alpha = 255 }
 
         val split = left + (right - left) * progress
-        if (progress > 0f && split > left + 1) {
+        if (drawWave && progress > 0f && split > left + 1) {
             val path = Path()
             path.moveTo(left, mid)
             var x = left
