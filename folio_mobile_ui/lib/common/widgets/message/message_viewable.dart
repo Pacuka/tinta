@@ -71,6 +71,76 @@ class MessagePopup extends StatefulWidget {
 
 class _MessagePopupState extends State<MessagePopup> {
   bool _showAllRecipients = false;
+  bool _busy = false;
+
+  /// Kukába tesz / visszaállít (KRÉTA postaladaelemek/kuka). Kukázás után a
+  /// lap bezárul, a „Visszavonás” visszarakja.
+  Future<void> _trash(bool trash) async {
+    final provider =
+        Provider.of<MessageProvider>(widget.outsideContext, listen: false);
+    final messenger = ScaffoldMessenger.of(widget.outsideContext);
+    final message = widget.message;
+    setState(() => _busy = true);
+    bool ok;
+    try {
+      ok = await provider.setTrashed([message], trash: trash);
+    } catch (_) {
+      ok = false;
+    }
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(content: Text("action_failed".i18n)));
+      return;
+    }
+    Navigator.of(context).pop();
+    messenger.showSnackBar(SnackBar(
+      content: Text((trash ? "trashed" : "restored").i18n),
+      action: trash
+          ? SnackBarAction(
+              label: "undo".i18n,
+              onPressed: () => provider.setTrashed([message], trash: false),
+            )
+          : null,
+    ));
+  }
+
+  Future<void> _deleteForever() async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("delete_forever_q".i18n),
+        content: Text("delete_forever_body".i18n),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text("cancel".i18n)),
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("delete_forever".i18n)),
+        ],
+      ),
+    );
+    if (sure != true || !mounted) return;
+    final provider =
+        Provider.of<MessageProvider>(widget.outsideContext, listen: false);
+    final messenger = ScaffoldMessenger.of(widget.outsideContext);
+    setState(() => _busy = true);
+    bool ok;
+    try {
+      ok = await provider.deletePermanently([widget.message]);
+    } catch (_) {
+      ok = false;
+    }
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(content: Text("action_failed".i18n)));
+      return;
+    }
+    Navigator.of(context).pop();
+    messenger.showSnackBar(SnackBar(content: Text("deleted".i18n)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -383,6 +453,43 @@ class _MessagePopupState extends State<MessagePopup> {
                         ),
                       ],
 
+                      // Kuka: kukába / visszaállítás / végleges törlés
+                      if (message.type == MessageType.inbox ||
+                          message.type == MessageType.sent ||
+                          message.type == MessageType.trash) ...[
+                        const SizedBox(height: 12.0),
+                        Row(
+                          children: message.type == MessageType.trash
+                              ? [
+                                  Expanded(
+                                    child: _ActionButton(
+                                      icon: Icons.restore_from_trash_rounded,
+                                      label: "restore".i18n,
+                                      onTap: _busy ? null : () => _trash(false),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  Expanded(
+                                    child: _ActionButton(
+                                      icon: Icons.delete_forever_rounded,
+                                      label: "delete_forever".i18n,
+                                      danger: true,
+                                      onTap: _busy ? null : _deleteForever,
+                                    ),
+                                  ),
+                                ]
+                              : [
+                                  Expanded(
+                                    child: _ActionButton(
+                                      icon: Icons.delete_outline_rounded,
+                                      label: "to_trash".i18n,
+                                      onTap: _busy ? null : () => _trash(true),
+                                    ),
+                                  ),
+                                ],
+                        ),
+                      ],
+
                       SizedBox(
                           height: MediaQuery.of(context).padding.bottom + 8.0),
                     ],
@@ -391,6 +498,51 @@ class _MessagePopupState extends State<MessagePopup> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.danger = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = danger
+        ? Theme.of(context).colorScheme.error
+        : AppColors.of(context).text.withValues(alpha: .85);
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: BorderRadius.circular(12.0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12.0),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20.0, color: color),
+              const SizedBox(width: 8.0),
+              Flexible(
+                child: Text(label,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: color, fontWeight: FontWeight.w600)),
+              ),
+            ],
+          ),
         ),
       ),
     );

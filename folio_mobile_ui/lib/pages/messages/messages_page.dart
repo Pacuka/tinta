@@ -299,7 +299,10 @@ Container(
         },
         child: ListView.builder(
           padding: EdgeInsets.zero,
-          physics: const BouncingScrollPhysics(),
+          // Always scrollable, so pull-to-refresh also works on a short or
+          // empty list (e.g. an empty Trash tab).
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           itemBuilder: (context, index) => filterWidgets.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.symmetric(

@@ -139,6 +139,68 @@ class MessageProvider with ChangeNotifier {
     );
   }
 
+  /// Kukába teszi ([trash] = true) vagy visszaállítja a kukából az üzeneteket
+  /// (POST postaladaelemek/kuka, mint a hivatalos app), aztán frissít.
+  /// `true`, ha a KRÉTA elfogadta.
+  Future<bool> setTrashed(List<Message> messages, {bool trash = true}) async {
+    if (messages.isEmpty) return false;
+    final user = Provider.of<UserProvider>(_context, listen: false).user;
+    if (user == null) return false;
+    final from = messages.first.type ?? MessageType.inbox;
+    if (DemoData.isDemo(user.id)) {
+      _messages.removeWhere((m) => messages.any((x) => x.id == m.id));
+      notifyListeners();
+      return true;
+    }
+    final res = await Provider.of<KretaClient>(_context, listen: false).postAPI(
+      KretaAPI.messages("kuka"),
+      json: false,
+      rawResponse: true,
+      body: jsonEncode({
+        "isKuka": trash,
+        "postaladaElemAzonositoLista": [for (final m in messages) m.id],
+      }),
+      headers: {
+        "content-type": "application/json",
+        "X-Uzenet-Lokalizacio": "hu-HU",
+      },
+    );
+    final ok = res is http.Response && res.statusCode >= 200 && res.statusCode < 300;
+    // Visszaállításnál a KRÉTA az eredeti mappába teszi (beérkezett/elküldött).
+    if (ok) {
+      await _refetch(trash
+          ? [from, MessageType.trash]
+          : [MessageType.trash, MessageType.inbox, MessageType.sent]);
+    }
+    return ok;
+  }
+
+  /// Végleg törli a kukában lévő üzeneteket (DELETE postaladaelemek/torles).
+  Future<bool> deletePermanently(List<Message> messages) async {
+    if (messages.isEmpty) return false;
+    final user = Provider.of<UserProvider>(_context, listen: false).user;
+    if (user == null) return false;
+    if (DemoData.isDemo(user.id)) {
+      _messages.removeWhere((m) => messages.any((x) => x.id == m.id));
+      notifyListeners();
+      return true;
+    }
+    final ids = [for (final m in messages) "postaladaElemAzonositok=${m.id}"];
+    final status = await Provider.of<KretaClient>(_context, listen: false)
+        .deleteAPI("${KretaAPI.messages("torles")}?isKuka=true&${ids.join("&")}");
+    final ok = status is int && status >= 200 && status < 300;
+    if (ok) await _refetch([MessageType.trash]);
+    return ok;
+  }
+
+  Future<void> _refetch(List<MessageType> types) async {
+    for (final t in types.toSet()) {
+      try {
+        await fetch(type: t);
+      } catch (_) {}
+    }
+  }
+
   // Stores Messages in the database
   Future<void> store(List<Message> messages, MessageType type) async {
     _storeGen++;
