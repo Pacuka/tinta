@@ -5,12 +5,12 @@ Nem bonyolult, de **elsőre kb. 20–30 perc**. Utána már csak pár koppintás
 
 ## Mi kell hozzá?
 
-- ✅ az iPhone-od + a **töltőkábele**
-- ✅ egy **számítógép** (Windows vagy Mac) – csak az első telepítéshez és a frissítéshez
-- ✅ az **Apple ID-d** (ugyanaz, amivel az App Store-ba belépsz) + a jelszava
-- ✅ a gép és a telefon legyen **ugyanazon a wifin**
+- az iPhone-od + a **töltőkábele**
+- egy **számítógép** (Windows vagy Mac) – csak az első telepítéshez és a frissítéshez
+- az **Apple ID-d** (ugyanaz, amivel az App Store-ba belépsz) + a jelszava
+- a gép és a telefon legyen **ugyanazon a wifin**
 
-> ⚠️ **Fontos tudni:** ingyenes Apple ID-vel az Apple **7 napig** engedi futni az
+> **Fontos tudni:** ingyenes Apple ID-vel az Apple **7 napig** engedi futni az
 > így telepített appokat. Utána a Tinta nem indul el, amíg nem „frissíted”
 > (lásd a 4. lépést – fél perc). **Az adataid ilyenkor sem vesznek el.**
 
@@ -66,7 +66,7 @@ Az AltStore egy kis app, ami „aláírja” a Tintát az Apple ID-ddel, hogy az
    A telefon újraindul, utána még egyszer rákérdez → **Bekapcsolás**.
    (Ha nem látod ezt a menüt, húzd ki és dugd vissza a kábelt, és nézd meg újra.)
 
-Most már van egy **AltStore** ikon a kezdőképernyőn. 🎉
+Most már van egy **AltStore** ikon a kezdőképernyőn.
 
 ## 3. A Tinta feltelepítése
 
@@ -126,11 +126,6 @@ kell, és mindegyiknél él a **7 napos** frissítés meg a **max. 3 app** szab�
 | **Ingyenes, közös tanúsítványok + konfigurációs profil** (pl. WSF, ESign „anti-revoke”, Scarlet, GBox) | amíg az Apple rá nem jön – hetek, hónapok | ingyen | **Nem ajánlott.** A profil letiltja, hogy a telefon elérje az Apple ellenőrző szervereit, és vele együtt az **iOS-frissítéseket is** (biztonsági javításokat sem kapsz). Egyes változatok minden címkérést a **saját DNS-szerverükön** visznek át. A tanúsítványok idegenek, sokan használják őket közösen. Ha mégis letiltják, a javítás sokszor a telefon visszaállítása vagy törlése. A Tintában KRÉTA-belépés van, ide ez nem való. |
 | **Saját Apple fejlesztői fiók** | 1 év | 99 $/év | Átlagfelhasználónak nem éri meg. (Ha a Tintának egyszer lesz ilyen, a barátok kaphatnak 1 évig működő verziót – ha így lesz, ide beírom.) |
 
-> ℹ️ **Más módszerek is vannak.** Gép nélküli, hosszabb ideig működő megoldásokat
-> gyűjt össze például a WSF: https://wsfteam.xyz/ – ezeket nem a Tinta fejlesztője
-> készíti és nem is ellenőrzi. **Ha ilyet használsz, az teljes egészében a saját
-> felelősséged** (a fenti kockázatokkal együtt).
-
 **Tipp, hogy a 7 nap ne legyen macera:** az AltStore és a Sideloadly is tud **magától**
 frissíteni, ha a gépen fut a program, és a telefon ugyanazon a wifin van (pl. otthon
 este). Ha ezt beállítod, gyakorlatilag nem kell vele foglalkoznod.
@@ -151,6 +146,6 @@ odakerül, ide beírom. Addig a fenti módszerek közül válassz.
 
 Írj nekem, vagy nyiss hibajegyet: https://github.com/Pacuka/tinta/issues
 
-> 🔒 A „gép nélkül, örökre, ingyen” megoldásokról (ESign, WSF, Scarlet, GBox…) lásd
+> A „gép nélkül, örökre, ingyen” megoldásokról (ESign, WSF, Scarlet, GBox…) lásd
 > fent: bármikor leállhatnak, és a profiljuk letiltja az iOS-frissítéseket. Ha
 > teheted, maradj az AltStore-nál vagy a Sideloadly-nél.

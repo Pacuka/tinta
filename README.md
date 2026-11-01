@@ -36,8 +36,11 @@ Androidon az app magától szól, ha új verzió érhető el.
 - Belépés a KRÉTA hivatalos oldalán (a jelszót nem a Tinta kéri be), captchával is
 - Az appban megnyitott üzenet a KRÉTÁ-ban is olvasottá válik
 - Saját dizájn: tintacsík minden oldalon, amit egy kis toll rajzol meg; témák
-  (Kobalt, Fekete-sárga, Petrol, Material You)
+  (Kobalt, Fekete-sárga, Petrol, Üveg, Material You)
 - Névnapi és szülinapi köszöntés, vicces napi köszöntések
+- Szülői fiók: igazolás beküldése (akár orvosi papír fotójával), fogadóóra-foglalás,
+  üzenet a tanároknak, több gyerek egy appban
+- Tanév rendje (szünetek, tanítás nélküli napok), LÉP/NÉP-programok, kérdőívek
 - Wear OS óra-app: mai órák, értesítések a csuklón
 
 ## Adatvédelem
@@ -56,17 +59,14 @@ Más szerverhez csak ezekben az esetekben fordul az app:
 
 ## Hogyan készül?
 
-A Tinta fejlesztésében mesterséges intelligencia (Claude) segít, de **emberi
-felügyelet mellett**, nem „vaktában összegenerálva”:
+A Tinta kódjának nagy részét a Claude nevű AI írja. Én mondom meg, mit csináljon,
+átnézem, és kiadás előtt kipróbálom. A Dartot még tanulom: a kódot nagyjából értem,
+de nem minden részét látom át egyedül.
 
-- Arról, hogy mi kerüljön az appba, hogyan nézzen ki és mikor jelenjen meg, ember dönt.
-- A változtatásokat kiadás előtt valódi telefonon, saját diák- és szülői KRÉTA-fiókkal
-  próbálom ki. Mivel élesben nem minden tesztelhető (pl. igazolást vagy
-  fogadóóra-foglalást nem küldhetek be csak próbából), minden funkciót egy
-  tesztszerveren is végigpróbálok.
-- Automatikus tesztek futnak, és a kód biztonsági átnézésen is átment
-  (pl. titkosított kapcsolat ellenőrzése, a bejelentkezési adatok védelme).
-- Az AI a kódírást gyorsítja, a felelősség és az ellenőrzés emberi.
+- Arról, hogy mi kerüljön az appba, hogyan nézzen ki és mikor jelenjen meg, én döntök.
+- Kiadás előtt valódi telefonon, saját diák- és szülői fiókkal próbálom ki. Amit
+  élesben nem lehet (pl. igazolás, fogadóóra-foglalás), azt egy tesztszerveren.
+- Automatikus tesztek is futnak.
 
 ## Honnan származik?
 

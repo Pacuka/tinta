@@ -5,6 +5,6 @@
 - az app forrásai (képek, ikonok, egyebek)
 - téma rendszer kódja
 - lokális db (sqlite) kezelő kódja
-- analítika és egyéb finomságok kódjai
+- egyéb segédkódok
 - értesítés rendszer kódja
 - kisebb része a kréta bejelentkezésnek

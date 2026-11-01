@@ -1,6 +1,6 @@
 # Hozzájárulás a Tintához
 
-Köszönjük, ha segítesz! Hibát a [hibajegyek](https://github.com/Pacuka/tinta/issues)
+Köszönöm, ha segítesz! Hibát a [hibajegyek](https://github.com/Pacuka/tinta/issues)
 között jelezhetsz; ha kódot küldenél, nyiss egy Pull Requestet a `main` ágra, és
 írd le benne, mit változtattál (képernyőképpel, ha a felületet érinti).
 
