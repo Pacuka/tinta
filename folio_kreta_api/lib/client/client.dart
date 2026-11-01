@@ -46,7 +46,6 @@ class KretaClient {
   late final DatabaseProvider _database;
   late final StatusProvider _status;
 
-  // bool _loginRefreshing = false;
 
   KretaClient({
     this.accessToken,
@@ -449,10 +448,29 @@ class KretaClient {
     }
   }
 
-  Future<String?> refreshLogin() async {
-    // if (_loginRefreshing) return null;
-    // _loginRefreshing = true;
+  // In-flight token refresh, per user. Account switching and screens can call
+  // refreshLogin() several times at once; KRÉTA rotates the refresh token, so
+  // parallel calls with the same token could be rejected (invalid_grant).
+  Future<String?>? _refreshing;
+  String? _refreshingUserId;
 
+  Future<String?> refreshLogin() {
+    final userId = _user.user?.id;
+    if (userId == null) return Future.value(null);
+    final running = _refreshing;
+    if (running != null && _refreshingUserId == userId) return running;
+    final future = _refreshLogin().whenComplete(() {
+      if (_refreshingUserId == userId) {
+        _refreshing = null;
+        _refreshingUserId = null;
+      }
+    });
+    _refreshing = future;
+    _refreshingUserId = userId;
+    return future;
+  }
+
+  Future<String?> _refreshLogin() async {
     User? loginUser = _user.user;
     if (loginUser == null) return null;
 
@@ -514,16 +532,13 @@ class KretaClient {
         if (res.containsKey("id_token")) {
           idToken = res["id_token"];
         }
-        // _loginRefreshing = false;
         print('successful refresh');
 
         return 'success';
       } else {
-        // _loginRefreshing = false;
         return null;
       }
     } else {
-      // _loginRefreshing = false;
       return null;
     }
 
