@@ -6,14 +6,34 @@ import 'package:folio/api/client.dart';
 import 'package:folio/helpers/storage_helper.dart';
 import 'package:folio/models/release.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 enum UpdateState { none, preparing, downloading, installing }
 
 typedef UpdateCallback = Function(double progress, UpdateState state);
 
-// ignore: todo
-// TODO: cleanup old apk files
+/// Removes downloaded update APKs older than a day (the install happens right
+/// after the download, so by then they are only taking up space). Covers the
+/// update dialog's temp files and the old Downloads-folder ones.
+Future<void> cleanupOldUpdateApks({DateTime? now}) async {
+  final cutoff = (now ?? DateTime.now()).subtract(const Duration(days: 1));
+  final dirs = <Directory>[
+    await getTemporaryDirectory(),
+    if (Platform.isAndroid) Directory(await StorageHelper.downloadsPath()),
+  ];
+  final ours = RegExp(r'^(folio_update_.*|folio-v.*)\.apk$');
+  for (final dir in dirs) {
+    try {
+      await for (final f in dir.list(followLinks: false)) {
+        if (f is! File || !ours.hasMatch(f.uri.pathSegments.last)) continue;
+        if ((await f.lastModified()).isBefore(cutoff)) await f.delete();
+      }
+    } catch (_) {
+      // No permission or the folder is gone: nothing to clean.
+    }
+  }
+}
 
 extension UpdateHelper on Release {
   Future<void> install({UpdateCallback? updateCallback}) async {

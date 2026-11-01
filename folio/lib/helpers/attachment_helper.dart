@@ -56,6 +56,15 @@ Future<bool> _openFile(String path) async {
   return result.type == ResultType.done;
 }
 
+/// Downloads a KRÉTA file into the private cache (if not there yet) and
+/// opens it with the system viewer. `false` if the download or opening failed.
+Future<bool> downloadAndOpen(
+  String key,
+  String name, {
+  required Future<dynamic> Function() fetch,
+}) async =>
+    _openFile(await _cachedFile(key, name, fetch: fetch));
+
 extension AttachmentHelper on Attachment {
   Future<String> download(BuildContext context, {bool overwrite = false}) {
     final kreta = Provider.of<KretaClient>(context, listen: false);

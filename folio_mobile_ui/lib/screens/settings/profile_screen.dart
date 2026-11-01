@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
+import 'package:folio/helpers/attachment_helper.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/models/user.dart';
 import 'package:folio/theme/colors/colors.dart';
@@ -951,15 +952,21 @@ Container(
   Future<void> _downloadCertification(DigitalCertification cert) async {
     final iss = user.instituteCode;
     if (iss == null) return;
-    final bytes = await kretaClient.getAPI(
-      KretaAPI.digitalCertificationFile(iss, cert.id),
-      rawResponse: true,
+    final name = "${cert.name ?? cert.typeName ?? "bizonyitvany"}"
+        "${cert.schoolYear != null ? " ${cert.schoolYear}" : ""}.pdf";
+    final ok = await downloadAndOpen(
+      "cert-${user.id}-${cert.id}",
+      name,
+      fetch: () => kretaClient.getAPI(
+        KretaAPI.digitalCertificationFile(iss, cert.id),
+        rawResponse: true,
+      ),
     );
-    if (bytes == null) return;
-    // TODO: open/save PDF via share_plus or open_file
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("cert_issued".i18n)),
-    );
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("cert_open_failed".i18n)),
+      );
+    }
   }
 
   // ── Tab 2: Fiókok ────────────────────────────────────────────────────────

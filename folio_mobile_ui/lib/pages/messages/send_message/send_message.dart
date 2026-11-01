@@ -452,12 +452,20 @@ class SendMessageSheetState extends State<SendMessageSheet> {
                                     ? _subjectController.text
                                     : 'Nincs tárgy';
 
-                            final res = await messageProvider.sendMessage(
-                              recipients: selectedRecipients,
-                              subject: subjectText,
-                              messageText: _messageController.text,
-                              attachments: _attachments.uploaded,
-                            );
+                            // No network / timeout can throw instead of
+                            // returning; treat it as a failed send so the
+                            // draft stays and the user gets told.
+                            String? res;
+                            try {
+                              res = await messageProvider.sendMessage(
+                                recipients: selectedRecipients,
+                                subject: subjectText,
+                                messageText: _messageController.text,
+                                attachments: _attachments.uploaded,
+                              );
+                            } catch (_) {
+                              res = 'send_failed';
+                            }
                             if (!mounted) return;
                             setState(() => _sending = false);
 

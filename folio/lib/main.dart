@@ -1,3 +1,4 @@
+import 'dart:async';
 /*
     Folio, the unofficial client for e-Kréta
     Copyright (C) 2025  Folio team
@@ -28,6 +29,7 @@ import 'package:folio/models/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:folio/models/config.dart';
 import 'package:folio/helpers/update_notifier.dart';
+import 'package:folio/helpers/update_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/app.dart';
 import 'package:flutter/services.dart';
@@ -88,6 +90,9 @@ void main() async {
         .putIfAbsent(notesSvg.cacheKey(null), () => notesSvg.loadBytes(null));
     svg.cache.putIfAbsent(
         absencesSvg.cacheKey(null), () => absencesSvg.loadBytes(null));
+
+    // Old update APKs: fire and forget, never blocks startup.
+    unawaited(cleanupOldUpdateApks());
 
     runApp(App(
       database: startup.database,
