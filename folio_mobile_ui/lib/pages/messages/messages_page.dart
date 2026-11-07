@@ -8,6 +8,7 @@ import 'package:folio_kreta_api/providers/message_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio_kreta_api/models/message.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
+import 'package:folio_mobile_ui/common/custom_snack_bar.dart';
 import 'package:folio_mobile_ui/common/empty.dart';
 import 'package:folio/ui/filter/sort.dart';
 import 'package:folio_mobile_ui/common/widgets/message/message_viewable.dart';
@@ -31,6 +32,7 @@ class MessagesPageState extends State<MessagesPage>
 
   late UserProvider user;
   late MessageProvider messageProvider;
+  bool _openingCompose = false;
   late UpdateProvider updateProvider;
   late String firstName;
   late TabController tabController;
@@ -317,20 +319,44 @@ Container(
   }
 
   Future<void> showSendMessageSheet(BuildContext context) async {
-    await messageProvider.fetchAllRecipients();
+    if (_openingCompose) return;
+    _openingCompose = true;
+    final rs = await loadComposeRecipients(
+      messageProvider.fetchAllRecipients,
+      () => messageProvider.recipients,
+    );
+    _openingCompose = false;
+    if (!context.mounted) return;
 
-    List<SendRecipient> rs = [];
-
-    List<int> add = [];
-    for (var r in messageProvider.recipients) {
-      if (!add.contains(r.id)) {
-        rs.add(r);
-        add.add(r.id ?? 0);
-      }
+    if (rs == null) {
+      ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
+          content: Text("recipients_failed".i18n), context: context));
+      return;
     }
-
     SendMessageSheet.show(context, rs);
   }
+}
+
+/// Recipients for the compose sheet, without duplicates. If [fetch] fails
+/// (no network) the saved list is used, so a draft can still be written;
+/// null means there is nothing to show at all.
+Future<List<SendRecipient>?> loadComposeRecipients(
+  Future<void> Function() fetch,
+  List<SendRecipient> Function() saved,
+) async {
+  bool failed = false;
+  try {
+    await fetch();
+  } catch (_) {
+    failed = true;
+  }
+
+  final rs = <SendRecipient>[];
+  final seen = <int>{};
+  for (final r in saved()) {
+    if (seen.add(r.id ?? 0)) rs.add(r);
+  }
+  return failed && rs.isEmpty ? null : rs;
 }
 
 class _MessageFilterBar extends StatelessWidget {

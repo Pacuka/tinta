@@ -100,6 +100,11 @@ class HomeworkProvider with ChangeNotifier {
       return;
     }
 
+    // The database, not _homework: restore() may still be running at startup,
+    // and the background check saves homework edits there.
+    final saved = await _database.userQuery.getHomework(userId: user.id);
+    if (_homework.isEmpty) _homework = saved;
+    final known = {for (final h in saved) h.id: h.json};
     List<Homework> homework = [];
     await Future.forEach(homeworkJson.cast<Map>(), (Map hw) async {
       Map? e = await Provider.of<KretaClient>(_context, listen: false)
@@ -109,6 +114,7 @@ class HomeworkProvider with ChangeNotifier {
       //     : {};
 
       if (e != null) {
+        Homework.carryModified(known[e["Uid"]], e);
         Homework hmwrk = Homework.fromJson(e);
         // hw.subject.renamedTo =
         //     renamedSubjects.isNotEmpty ? renamedSubjects[hw.subject.id] : null;

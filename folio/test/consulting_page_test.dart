@@ -97,7 +97,9 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         body: ConsultingSheet(
-          hour: _hour(start: DateTime.now().add(const Duration(days: 3))),
+          hour: _hour(
+              start: DateTime.now().add(const Duration(days: 3)),
+              deadline: DateTime.now().add(const Duration(days: 2))),
           onBook: (slot) async {
             calls++;
             await Future.delayed(const Duration(milliseconds: 300));
@@ -132,7 +134,9 @@ void main() {
             onPressed: () => showModalBottomSheet(
               context: context,
               builder: (_) => ConsultingSheet(
-                hour: _hour(start: DateTime.now().add(const Duration(days: 3))),
+                hour: _hour(
+              start: DateTime.now().add(const Duration(days: 3)),
+              deadline: DateTime.now().add(const Duration(days: 2))),
                 onBook: (slot) async =>
                     "Nem biztos, hogy megérkezett. Nézd meg a listát, mielőtt újraküldöd!",
                 onCancel: (slot) async => null,

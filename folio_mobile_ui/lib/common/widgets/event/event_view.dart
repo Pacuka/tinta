@@ -8,6 +8,7 @@ import 'package:folio/theme/colors/colors.dart';
 import 'package:folio/theme/colors/utils.dart';
 import 'package:folio/utils/format.dart';
 import 'package:folio_kreta_api/models/event.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/sheet_scroll_view.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
 
@@ -36,8 +37,7 @@ class EventView extends StatelessWidget {
             top: Radius.circular(12.0),
           ),
         ),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+        child: SheetScrollView(
           child: Stack(
             children: [
               // Background SVG + gradient (Positioned – doesn't affect Stack height)
@@ -53,11 +53,9 @@ class EventView extends StatelessWidget {
                         "assets/svg/cover_arts/line.svg",
                         // ignore: deprecated_member_use
                         color: ColorsUtils()
-                            .fade(
-                                context,
+                            .fade(context,
                                 Theme.of(context).colorScheme.secondary,
-                                darkenAmount: 0.1,
-                                lightenAmount: 0.1)
+                                darkenAmount: 0.1, lightenAmount: 0.1)
                             .withValues(alpha: 0.33),
                         width: MediaQuery.of(context).size.width,
                       ),
@@ -103,11 +101,9 @@ class EventView extends StatelessWidget {
                       height: 4,
                       decoration: BoxDecoration(
                         color: ColorsUtils()
-                            .fade(
-                                context,
+                            .fade(context,
                                 Theme.of(context).colorScheme.secondary,
-                                darkenAmount: 0.1,
-                                lightenAmount: 0.1)
+                                darkenAmount: 0.1, lightenAmount: 0.1)
                             .withValues(alpha: 0.33),
                         borderRadius: BorderRadius.circular(2.0),
                       ),
@@ -211,8 +207,7 @@ class EventView extends StatelessWidget {
                       padding: const EdgeInsets.all(14.0),
                       child: SelectableLinkify(
                         text: event.content.escapeHtml(),
-                        options: const LinkifyOptions(
-                            removeWww: true),
+                        options: const LinkifyOptions(removeWww: true),
                         onOpen: (link) {
                           launchUrl(
                             Uri.parse(link.url),
@@ -220,17 +215,16 @@ class EventView extends StatelessWidget {
                               showTitle: true,
                               colorSchemes: CustomTabsColorSchemes(
                                 defaultPrams: CustomTabsColorSchemeParams(
-                                  toolbarColor: Theme.of(context)
-                                      .scaffoldBackgroundColor,
+                                  toolbarColor:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                 ),
                               ),
                             ),
                           );
                         },
                         style: TextStyle(
-                          color: AppColors.of(context)
-                              .text
-                              .withValues(alpha: 0.9),
+                          color:
+                              AppColors.of(context).text.withValues(alpha: 0.9),
                           fontSize: 14.0,
                           fontWeight: FontWeight.w500,
                         ),

@@ -108,7 +108,9 @@ class HomeworkTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 )
-              : TypeTag("homework_tag".i18n),
+              : TypeTag(
+                  (homework.modified ? "homework_modified_tag" : "homework_tag")
+                      .i18n),
           minLeadingWidth: 0,
         ),
       ),

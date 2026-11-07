@@ -44,6 +44,7 @@ class KretaClient {
   late final SettingsProvider _settings;
   late final UserProvider _user;
   late final DatabaseProvider _database;
+  DatabaseProvider get database => _database;
   late final StatusProvider _status;
 
 

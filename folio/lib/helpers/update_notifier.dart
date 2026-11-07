@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:folio/api/providers/database_provider.dart';
@@ -143,8 +144,8 @@ class UpdateNotifier {
     }
   }
 
-  static Future<void> _check(
-      KretaClient kreta, UserProvider userProvider, SettingsProvider settings) async {
+  static Future<void> _check(KretaClient kreta, UserProvider userProvider,
+      SettingsProvider settings) async {
     final user = userProvider.user;
     if (user == null || user.accessToken.trim().isEmpty) return;
     if (!settings.notificationsEnabled) return;
@@ -165,9 +166,8 @@ class UpdateNotifier {
       for (final g in gradesJson.cast<Map>().map(Grade.fromJson)) {
         if (!state.add("grades", g.id)) continue;
         if (!settings.notificationsGradesEnabled) continue;
-        final value = g.value.value > 0
-            ? "${g.value.value}"
-            : g.value.valueName;
+        final value =
+            g.value.value > 0 ? "${g.value.value}" : g.value.valueName;
         notes.add(_Note(
           "Új jegy: $value – ${g.subject.name}",
           [g.description, g.mode.description]
@@ -241,19 +241,37 @@ class UpdateNotifier {
       }
     }
 
-    // Homework (detail only for new ones)
-    final hwJson = await kreta.getAPI(KretaAPI.homework(iss,
-        start: today.subtract(const Duration(days: 7))));
+    // Homework (detail only when the list doesn't carry what we need)
+    final hwJson = await kreta.getAPI(
+        KretaAPI.homework(iss, start: today.subtract(const Duration(days: 7))));
     if (hwJson is List) {
       for (final h in hwJson.cast<Map>()) {
         final id = "${h["Uid"]}";
-        if (!state.add("homework", id)) continue;
-        if (!settings.notificationsLessonsEnabled || state.firstRun) continue;
-        final detail = await kreta.getAPI(KretaAPI.homework(iss, id: id));
-        if (detail is! Map) continue;
-        final hw = Homework.fromJson(detail);
+        final isNew = state.add("homework", id);
+        final notify = settings.notificationsLessonsEnabled && !state.firstRun;
+        final listed = "${h["Szoveg"] ?? ""}".trim().isNotEmpty;
+        final due = DateTime.tryParse("${h["HataridoDatuma"]}")?.toLocal();
+        final open = due != null && !due.isBefore(today);
+        final detail = (isNew && notify) || (!listed && open)
+            ? await kreta.getAPI(KretaAPI.homework(iss, id: id))
+            : null;
+        final source = detail is Map ? detail : (listed ? h : null);
+        if (source == null) continue;
+        // KRÉTA has no modification date, so compare with the last sighting.
+        final edited = state.homeworkChanged(id,
+            sha1.convert(utf8.encode(Homework.signature(source))).toString());
+        if (!edited && !(isNew && notify)) continue;
+        // The list may differ from the detail, the database has details.
+        final full = detail is Map
+            ? detail
+            : await kreta.getAPI(KretaAPI.homework(iss, id: id));
+        if (edited && full is Map) {
+          await _saveHomeworkEdit(kreta, user.id, full);
+        }
+        if (!notify) continue;
+        final hw = Homework.fromJson(full is Map ? full : source);
         notes.add(_Note(
-          "Új házi: ${hw.subject.name}",
+          "${isNew ? "Új" : "Módosult a"} házi: ${hw.subject.name}",
           "Határidő: ${_day(hw.deadline)} · ${hw.content.replaceAll(RegExp(r'<[^>]*>'), '')}",
           notificationPayload("homework", id),
         ));
@@ -331,6 +349,18 @@ class UpdateNotifier {
     }
   }
 
+  /// Stamps the change right away, the app may open hours later.
+  static Future<void> _saveHomeworkEdit(
+      KretaClient kreta, String userId, Map detail) async {
+    final database = kreta.database;
+    final saved = await database.userQuery.getHomework(userId: userId);
+    final i = saved.indexWhere((h) => h.id == detail["Uid"]);
+    if (i < 0) return;
+    Homework.carryModified(saved[i].json, detail);
+    saved[i] = Homework.fromJson(detail);
+    await database.userStore.storeHomework(saved, userId: userId);
+  }
+
   /// Things seen in the app don't need a notification later.
   static Future<void> markSeenInApp({
     required String userId,
@@ -390,7 +420,9 @@ String notificationPayload(String type, [String? id]) =>
 /// Splits a payload made by [notificationPayload] into (type, id).
 (String, String?) parseNotificationPayload(String payload) {
   final i = payload.indexOf(":");
-  return i < 0 ? (payload, null) : (payload.substring(0, i), payload.substring(i + 1));
+  return i < 0
+      ? (payload, null)
+      : (payload.substring(0, i), payload.substring(i + 1));
 }
 
 /// When KRÉTA data most likely changes during a school day: shortly before
@@ -465,15 +497,19 @@ class NotifyState {
   final File file;
   final Map<String, Set<String>> ids;
   final Map<String, String> lessons; // lesson id -> signature
+  final Map<String, String> homework; // homework id -> content signature
   final Set<String> days; // days whose timetable we already know
   final bool firstRun;
 
-  NotifyState(this.file, this.ids, this.lessons, this.days, this.firstRun);
+  NotifyState(this.file, this.ids, this.lessons, this.days, this.firstRun,
+      {Map<String, String>? homework})
+      : homework = homework ?? {};
 
   @visibleForTesting
   NotifyState.empty(this.file, {this.firstRun = false})
       : ids = {},
         lessons = {},
+        homework = {},
         days = {};
 
   static Future<NotifyState> load(String userId) async {
@@ -484,11 +520,12 @@ class NotifyState {
       final j = jsonDecode(await file.readAsString()) as Map;
       return NotifyState(
         file,
-        (j["ids"] as Map).map((k, v) =>
-            MapEntry(k as String, Set<String>.from(v as List))),
+        (j["ids"] as Map)
+            .map((k, v) => MapEntry(k as String, Set<String>.from(v as List))),
         Map<String, String>.from(j["lessons"] as Map),
         Set<String>.from(j["days"] as List),
         false,
+        homework: Map<String, String>.from((j["homework"] ?? {}) as Map),
       );
     } catch (_) {
       return NotifyState(file, {}, {}, {}, true);
@@ -499,10 +536,19 @@ class NotifyState {
   bool add(String kind, String id) =>
       id.isNotEmpty && ids.putIfAbsent(kind, () => {}).add(id);
 
+  /// Records [signature] and returns true if it differs from the previous one.
+  /// The first sighting is never a change.
+  bool homeworkChanged(String id, String signature) {
+    final old = homework[id];
+    homework[id] = signature;
+    return old != null && old != signature;
+  }
+
   /// Returns a notification title if the lesson changed in a way that
   /// matters (cancelled, substitute, room), and records its new state.
   String? lessonChange(Lesson l) {
-    final sig = "${l.status?.name}|${l.substituteTeacher?.name ?? ''}|${l.room}";
+    final sig =
+        "${l.status?.name}|${l.substituteTeacher?.name ?? ''}|${l.room}";
     final day = DateFormat("yyyy-MM-dd").format(l.date);
     final old = lessons[l.id];
     final dayKnown = days.contains(day);
@@ -531,9 +577,11 @@ class NotifyState {
         .format(DateTime.now().subtract(const Duration(days: 14)));
     days.removeWhere((d) => d.compareTo(cutoff) < 0);
     if (lessons.length > 400) lessons.clear();
+    if (homework.length > 400) homework.clear();
     await file.writeAsString(jsonEncode({
       "ids": ids.map((k, v) => MapEntry(k, v.toList())),
       "lessons": lessons,
+      "homework": homework,
       "days": days.toList(),
     }));
   }

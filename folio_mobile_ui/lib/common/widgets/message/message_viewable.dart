@@ -12,6 +12,7 @@ import 'package:folio/theme/colors/utils.dart';
 import 'package:folio/utils/format.dart';
 import 'package:folio_kreta_api/models/message.dart';
 import 'package:folio_kreta_api/providers/message_provider.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/sheet_scroll_view.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
 import 'package:folio/ui/widgets/message/message_tile.dart';
@@ -30,8 +31,7 @@ class MessageViewable extends StatelessWidget {
       onTap: () {
         if (pressed) return;
         pressed = true;
-        Provider.of<MessageProvider>(context, listen: false)
-            .markSeen(message);
+        Provider.of<MessageProvider>(context, listen: false).markSeen(message);
         MessagePopup.show(context: context, message: message);
         Future.delayed(const Duration(seconds: 2), () {
           pressed = false;
@@ -152,8 +152,7 @@ class _MessagePopupState extends State<MessagePopup> {
         message.recipients.any((r) => r.name == user.student?.name);
     final otherRecipients =
         message.recipients.where((r) => r.name != user.student?.name).toList();
-    final allNames =
-        message.recipients.map((r) => r.name).toSet().toList();
+    final allNames = message.recipients.map((r) => r.name).toSet().toList();
 
     String recipientLabel = "";
     if (_showAllRecipients) {
@@ -168,8 +167,8 @@ class _MessagePopupState extends State<MessagePopup> {
       if (allNames.length > 3) recipientLabel += " +${allNames.length - 3}";
     }
 
-    final canExpand = message.recipients.length > 1 ||
-        (!iAmRecipient && allNames.length > 3);
+    final canExpand =
+        message.recipients.length > 1 || (!iAmRecipient && allNames.length > 3);
 
     final authorName = settings.presentationMode ? "Tanár" : message.author;
     final hasAttachments = message.attachments.isNotEmpty;
@@ -228,8 +227,7 @@ class _MessagePopupState extends State<MessagePopup> {
             ),
 
             Positioned.fill(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+              child: SheetScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: Column(
@@ -344,9 +342,8 @@ class _MessagePopupState extends State<MessagePopup> {
                               const SizedBox(height: 4.0),
                               GestureDetector(
                                 onTap: canExpand
-                                    ? () => setState(() =>
-                                        _showAllRecipients =
-                                            !_showAllRecipients)
+                                    ? () => setState(() => _showAllRecipients =
+                                        !_showAllRecipients)
                                     : null,
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,8 +398,7 @@ class _MessagePopupState extends State<MessagePopup> {
                         padding: const EdgeInsets.all(14.0),
                         child: SelectableLinkify(
                           text: message.content.escapeHtml(),
-                          options: const LinkifyOptions(
-                              removeWww: true),
+                          options: const LinkifyOptions(removeWww: true),
                           onOpen: (link) {
                             launchUrl(
                               Uri.parse(link.url),
@@ -538,8 +534,8 @@ class _ActionButton extends StatelessWidget {
               Flexible(
                 child: Text(label,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        color: color, fontWeight: FontWeight.w600)),
+                    style:
+                        TextStyle(color: color, fontWeight: FontWeight.w600)),
               ),
             ],
           ),

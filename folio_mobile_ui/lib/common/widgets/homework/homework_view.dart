@@ -2,9 +2,11 @@ import 'package:folio/helpers/subject.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_kreta_api/models/homework.dart';
 import 'package:folio/utils/format.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/sheet_scroll_view.dart';
 import 'package:folio_mobile_ui/common/detail.dart';
 import 'package:folio_mobile_ui/common/sliding_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/widgets/homework/homework_attachment_tile.dart';
+import 'package:folio_mobile_ui/common/widgets/homework/homework_history.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:intl/intl.dart';
@@ -36,84 +38,111 @@ class HomeworkView extends StatelessWidget {
       ));
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header
-          ListTile(
-            leading: Icon(
-              SubjectIcon.resolveVariant(
-                  subject: homework.subject, context: context),
-              size: 36.0,
-            ),
-            title: Text(
-              homework.subject.renamedTo ?? homework.subject.name.capital(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontStyle: homework.subject.isRenamed &&
-                          settingsProvider.renamedSubjectsItalics
-                      ? FontStyle.italic
-                      : null),
-            ),
-            subtitle: Text(
-              (homework.teacher.isRenamed
-                      ? homework.teacher.renamedTo
-                      : homework.teacher.name) ??
-                  '',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            trailing: Text(
-              homework.date.format(context),
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
+      child: SheetScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              ListTile(
+                leading: Icon(
+                  SubjectIcon.resolveVariant(
+                      subject: homework.subject, context: context),
+                  size: 36.0,
+                ),
+                title: Text(
+                  homework.subject.renamedTo ?? homework.subject.name.capital(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontStyle: homework.subject.isRenamed &&
+                              settingsProvider.renamedSubjectsItalics
+                          ? FontStyle.italic
+                          : null),
+                ),
+                subtitle: Text(
+                  (homework.teacher.isRenamed
+                          ? homework.teacher.renamedTo
+                          : homework.teacher.name) ??
+                      '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                trailing: Text(
+                  homework.date.format(context),
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ),
 
-          // Details
-          // Exact time the teacher entered it (KRÉTA "RogzitesIdopontja").
-          if (homework.date.year != 0)
-            Detail(
-                title: "entered".i18n,
-                description: DateFormat.yMMMd(
-                        I18n.of(context).locale.toString())
-                    .add_Hm()
-                    .format(homework.date)),
-          if (homework.deadline.year != 0)
-            Detail(
-                title: "deadline".i18n,
-                description: homework.deadline.format(context)),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
-            child: SelectableLinkify(
-              text: homework.content.escapeHtml(),
-              options: const LinkifyOptions(removeWww: true),
-              onOpen: (link) {
-                launchUrl(
-                  Uri.parse(link.url),
-                  customTabsOptions: CustomTabsOptions(
-                    showTitle: true,
-                    colorSchemes: CustomTabsColorSchemes(
-                      defaultPrams: CustomTabsColorSchemeParams(
-                        toolbarColor: Theme.of(context).scaffoldBackgroundColor,
-                      ),
+              // Details
+              // Exact time the teacher entered it (KRÉTA "RogzitesIdopontja").
+              if (homework.date.year != 0)
+                Detail(
+                    title: "entered".i18n,
+                    description:
+                        DateFormat.yMMMd(I18n.of(context).locale.toString())
+                            .add_Hm()
+                            .format(homework.date)),
+              if (homework.deadline.year != 0)
+                Detail(
+                    title: "deadline".i18n,
+                    description: homework.deadline.format(context)),
+              if (homework.modified)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18.0, vertical: 2.0),
+                  child: Text(
+                    "${"modified".i18n}: ${DateFormat.MMMd(I18n.of(context).locale.toString()).add_Hm().format(homework.modifiedAt!)}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
-                );
-              },
-              style: const TextStyle(fontWeight: FontWeight.w400),
-            ),
-          ),
+                ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
+                child: SelectableLinkify(
+                  text: homework.content.escapeHtml(),
+                  options: const LinkifyOptions(removeWww: true),
+                  onOpen: (link) {
+                    launchUrl(
+                      Uri.parse(link.url),
+                      customTabsOptions: CustomTabsOptions(
+                        showTitle: true,
+                        colorSchemes: CustomTabsColorSchemes(
+                          defaultPrams: CustomTabsColorSchemeParams(
+                            toolbarColor:
+                                Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  style: const TextStyle(fontWeight: FontWeight.w400),
+                ),
+              ),
 
-          // Attachments
-          ...attachmentTiles,
-        ],
+              if (homework.previous.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 6.0),
+                  child: HomeworkHistory(homework),
+                ),
+
+              // Attachments
+              ...attachmentTiles,
+            ],
+          ),
+        ),
       ),
     );
   }

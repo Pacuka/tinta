@@ -17,6 +17,15 @@ class Homework {
   List<HomeworkAttachment> attachments;
   String id;
 
+  /// When Tinta noticed the last change. KRÉTA itself sends no modification
+  /// date, see [Homework.signature].
+  DateTime? modifiedAt;
+
+  /// Earlier versions Tinta saw, oldest first.
+  List<HomeworkVersion> previous;
+
+  bool get modified => modifiedAt != null;
+
   Homework({
     required this.date,
     required this.lessonDate,
@@ -29,8 +38,49 @@ class Homework {
     required this.group,
     required this.attachments,
     required this.id,
+    this.modifiedAt,
+    this.previous = const [],
     this.json,
   });
+
+  /// What a student would notice changing: text, deadline, attachments.
+  static String signature(Map json) => [
+        "${json["Szoveg"] ?? ""}".trim(),
+        "${json["HataridoDatuma"] ?? ""}",
+        ...((json["Csatolmanyok"] ?? []) as List)
+            .cast<Map>()
+            .map((a) => "${a["Uid"]}")
+            .toList()
+          ..sort(),
+      ].join("\u0000");
+
+  // Stored inside [json], so they survive the database like the rest.
+  static const modifiedKey = "TintaModositva";
+  static const previousKey = "TintaKorabbi";
+  static const maxPrevious = 10;
+
+  /// Compares [fresh] with the [old] copy: a change saves the old version and
+  /// stamps [now]; otherwise what the old copy knew is carried over.
+  static void carryModified(Map? old, Map fresh, {DateTime? now}) {
+    if (old == null) return;
+    var modified = old[modifiedKey];
+    final previous = ((old[previousKey] ?? []) as List).cast<Map>().toList();
+    if (signature(old) != signature(fresh)) {
+      modified = (now ?? DateTime.now()).toIso8601String();
+      previous.add({
+        "Szoveg": old["Szoveg"],
+        "HataridoDatuma": old["HataridoDatuma"],
+        "Csatolmanyok": old["Csatolmanyok"],
+        "Mikor": modified,
+      });
+    }
+    if (modified != null) fresh[modifiedKey] = modified;
+    if (previous.isNotEmpty) {
+      fresh[previousKey] = previous.length > maxPrevious
+          ? previous.sublist(previous.length - maxPrevious)
+          : previous;
+    }
+  }
 
   factory Homework.fromJson(Map json) {
     return Homework(
@@ -56,9 +106,42 @@ class Homework {
           .cast<Map>()
           .map((Map json) => HomeworkAttachment.fromJson(json))
           .toList(),
+      modifiedAt: DateTime.tryParse("${json[modifiedKey]}"),
+      previous: ((json[previousKey] ?? []) as List)
+          .cast<Map>()
+          .map(HomeworkVersion.fromJson)
+          .toList(),
       json: json,
     );
   }
+}
+
+class HomeworkVersion {
+  String content;
+  DateTime? deadline;
+  List<String> attachments;
+
+  /// When Tinta noticed that this version was replaced.
+  DateTime replacedAt;
+
+  HomeworkVersion({
+    required this.content,
+    required this.replacedAt,
+    this.deadline,
+    this.attachments = const [],
+  });
+
+  factory HomeworkVersion.fromJson(Map json) => HomeworkVersion(
+        content: "${json["Szoveg"] ?? ""}".trim(),
+        replacedAt: DateTime.parse(json["Mikor"]).toLocal(),
+        deadline: json["HataridoDatuma"] != null
+            ? DateTime.parse(json["HataridoDatuma"]).toLocal()
+            : null,
+        attachments: ((json["Csatolmanyok"] ?? []) as List)
+            .cast<Map>()
+            .map((a) => "${a["Nev"] ?? ""}")
+            .toList(),
+      );
 }
 
 class HomeworkAttachment {

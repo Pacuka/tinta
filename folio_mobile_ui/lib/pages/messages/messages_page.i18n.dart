@@ -11,6 +11,7 @@ extension Localization on String {
           "Draft": "Draft",
           "empty": "You have no messages.",
           "Send": "Send",
+          "recipients_failed": "Couldn't load the recipients. Check your connection and try again.",
         },
         "hu-HU": {
           "Messages": "Üzenetek",
@@ -20,6 +21,7 @@ extension Localization on String {
           "Draft": "Piszkozat",
           "empty": "Nincsenek üzeneteid.",
           "Send": "Küldés",
+          "recipients_failed": "Nem sikerült betölteni a címzetteket. Ellenőrizd a netet, és próbáld újra.",
         },
         "de-DE": {
           "Messages": "Nachrichten",
@@ -29,6 +31,7 @@ extension Localization on String {
           "Draft": "Entwurf",
           "empty": "Sie haben keine Nachrichten.",
           "Send": "Senden",
+          "recipients_failed": "Die Empfänger konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
         },
       };
 
