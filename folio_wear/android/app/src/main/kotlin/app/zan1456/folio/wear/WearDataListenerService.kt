@@ -92,6 +92,17 @@ class WearDataListenerService : WearableListenerService() {
                     notifications?.let { MainActivity.methodChannel?.invokeMethod("onNotificationsReceived", it) }
                 }
             }
+            "/folio/pair-confirm" -> {
+                // The activity's listener is gone while it is paused.
+                val code = payload.toString(Charsets.UTF_8)
+                val prefs = getSharedPreferences("folio_wear", Context.MODE_PRIVATE)
+                if (code == prefs.getString("pairing_code", null)) {
+                    prefs.edit().putBoolean("is_paired", true).apply()
+                }
+                Handler(Looper.getMainLooper()).post {
+                    MainActivity.methodChannel?.invokeMethod("onPairConfirmed", code)
+                }
+            }
             else -> Log.w(TAG, "unknown message path: $path")
         }
     }

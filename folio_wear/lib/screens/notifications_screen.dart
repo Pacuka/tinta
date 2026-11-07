@@ -3,12 +3,13 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/wear_notification.dart';
 import '../providers/wear_data_provider.dart';
+import '../theme/wear_theme.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
-const _kCardBg = Color(0xFF1C1C1E);
+const _kCardBg = WearColors.surface;
 // Round screen: keep content away from the curved edge.
 const _kHPad = 22.0;
-const _kRadius = 16.0;
+const _kRadius = 20.0;
 const _kItemSpacing = 4.0;
 
 class NotificationsScreen extends StatelessWidget {
@@ -37,7 +38,6 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48.0),
@@ -48,11 +48,11 @@ class _EmptyState extends StatelessWidget {
               width: 56.0,
               height: 56.0,
               decoration: BoxDecoration(
-                color: const Color(0xFF1C1C1E),
+                color: WearColors.surface,
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: Icon(Icons.notifications_none_rounded,
-                  size: 28.0, color: cs.primary.withValues(alpha: 0.7)),
+                  size: 28.0, color: WearColors.ink.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 12.0),
             const Text(
@@ -70,13 +70,13 @@ class _EmptyState extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 22.0, vertical: 9.0),
                 decoration: BoxDecoration(
-                  color: cs.primary.withValues(alpha: 0.18),
+                  color: WearColors.ink.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(24.0),
                 ),
                 child: Text(
                   'Frissítés',
                   style: TextStyle(
-                      color: cs.primary,
+                      color: WearColors.ink,
                       fontSize: 13.0,
                       fontWeight: FontWeight.w600),
                 ),
@@ -178,13 +178,17 @@ class _NotifTile extends StatelessWidget {
     final icon  = _typeIcon[item.type]  ?? Icons.notifications_rounded;
     final gradeNum = _gradeNum;
     final isGrade  = item.type == 'grade';
-    final timeStr  = DateFormat('MM.dd HH:mm').format(item.timestamp);
+    final now      = DateTime.now();
+    final isToday  = item.timestamp.year == now.year &&
+        item.timestamp.month == now.month &&
+        item.timestamp.day == now.day;
+    final timeStr  = DateFormat(isToday ? 'HH:mm' : 'MM.dd.').format(item.timestamp);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: _kHPad),
       child: Container(
         decoration: BoxDecoration(
-          color: isGrade ? color.withValues(alpha: 0.1) : _kCardBg,
+          color: _kCardBg,
           borderRadius: BorderRadius.circular(_kRadius),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
@@ -196,8 +200,10 @@ class _NotifTile extends StatelessWidget {
               width: 34.0,
               height: 34.0,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(11.0),
+                color: gradeNum != null
+                    ? WearColors.cobalt
+                    : color.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
               ),
               child: gradeNum != null
                   ? Center(
@@ -206,7 +212,7 @@ class _NotifTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w900,
-                          color: color,
+                          color: Colors.white,
                           height: 1.0,
                         ),
                       ),

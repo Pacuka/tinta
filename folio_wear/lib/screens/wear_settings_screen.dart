@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/wear_data_provider.dart';
+import '../theme/wear_theme.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
-const _kCardBg = Color(0xFF1C1C1E);
+const _kCardBg = WearColors.surface;
 // Round screen: keep content away from the curved edge.
 const _kHPad = 22.0;
-const _kRadius = 14.0;
+const _kRadius = 20.0;
 const _kItemH = 52.0;
 
 class WearSettingsScreen extends StatelessWidget {
@@ -52,16 +53,6 @@ class WearSettingsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionLabel(label: 'Szinkronizálás'),
-                      _SwitchItem(
-                        icon: Icons.cloud_off_rounded,
-                        iconColor: const Color(0xFF90CAF9),
-                        label: 'Offline mód',
-                        subtitle: 'Csak manuálisan szinkronizál',
-                        value: data.offlineMode,
-                        onChanged: data.setOfflineMode,
-                      ),
-                      const SizedBox(height: 4.0),
                       _TapItem(
                         icon: Icons.sync_rounded,
                         iconColor: const Color(0xFF80CBC4),
@@ -69,11 +60,10 @@ class WearSettingsScreen extends StatelessWidget {
                         subtitle: data.lastSync != null
                             ? _relTime(data.lastSync!)
                             : 'Még nem szinkronizált',
-                        enabled: data.connected && !data.offlineMode,
+                        enabled: data.connected,
                         onTap: data.requestSync,
                       ),
-                      const SizedBox(height: 12.0),
-                      _SectionLabel(label: 'Párosítás'),
+                      const SizedBox(height: 4.0),
                       _InfoItem(
                         icon: data.isPaired
                             ? Icons.smartphone_rounded
@@ -83,7 +73,9 @@ class WearSettingsScreen extends StatelessWidget {
                             : const Color(0xFFEF9A9A),
                         label: data.isPaired ? 'Párosítva' : 'Nincs párosítva',
                         subtitle: data.isPaired
-                            ? 'Telefon csatlakoztatva'
+                            ? (data.connected
+                                ? 'Telefon csatlakoztatva'
+                                : 'A telefon nem elérhető')
                             : 'Kód: ${data.pairingCode}',
                       ),
                       if (data.isPaired) ...[
@@ -125,7 +117,7 @@ class WearSettingsScreen extends StatelessWidget {
       builder: (ctx) {
         final cs = Theme.of(ctx).colorScheme;
         return AlertDialog(
-          backgroundColor: const Color(0xFF1C1C1E),
+          backgroundColor: _kCardBg,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text(
@@ -159,33 +151,6 @@ class WearSettingsScreen extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0, top: 6.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 9.5,
-          fontWeight: FontWeight.w600,
-          color: Color(0x55FFFFFF),
-          letterSpacing: 0.7,
-        ),
-      ),
-      ),
     );
   }
 }
@@ -255,13 +220,17 @@ class _ItemBase extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                      height: 1.0,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                        height: 1.0,
+                      ),
                     ),
                   ),
                   if (subtitle.isNotEmpty) ...[
@@ -270,8 +239,8 @@ class _ItemBase extends StatelessWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: 9.5,
-                        color: Colors.white.withValues(
-                            alpha: enabled ? 0.35 : 0.22),
+                        color: WearColors.muted
+                            .withValues(alpha: enabled ? 1.0 : 0.5),
                         height: 1.0,
                       ),
                       maxLines: 2,
@@ -291,47 +260,6 @@ class _ItemBase extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-
-class _SwitchItem extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  const _SwitchItem({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return _ItemBase(
-      icon: icon,
-      iconColor: iconColor,
-      label: label,
-      subtitle: subtitle,
-      trailing: Transform.scale(
-        scale: 0.72,
-        alignment: Alignment.centerRight,
-        child: Switch(
-          value: value,
-          onChanged: onChanged,
-          activeTrackColor: cs.primary.withValues(alpha: 0.5),
-          activeThumbColor: cs.primary,
-          inactiveTrackColor: Colors.white12,
-          inactiveThumbColor: Colors.white38,
-        ),
-      ),
-    );
-  }
-}
 
 class _TapItem extends StatelessWidget {
   final IconData icon;

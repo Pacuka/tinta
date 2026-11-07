@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/wear_data_provider.dart';
+import '../theme/wear_theme.dart';
 
 class PairingScreen extends StatelessWidget {
   const PairingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Consumer<WearDataProvider>(
       builder: (context, data, _) {
         final code = data.pairingCode;
@@ -19,22 +19,22 @@ class PairingScreen extends StatelessWidget {
           backgroundColor: Colors.black,
           body: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28.0),
+              padding: const EdgeInsets.fromLTRB(28.0, 0.0, 28.0, 14.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Watch icon
                   Container(
-                    width: 46.0,
-                    height: 46.0,
+                    width: 36.0,
+                    height: 36.0,
                     decoration: BoxDecoration(
-                      color: cs.primary.withValues(alpha: 0.14),
+                      color: WearColors.ink.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     child:
-                        Icon(Icons.watch_rounded, size: 24.0, color: cs.primary),
+                        Icon(Icons.watch_rounded, size: 20.0, color: WearColors.ink),
                   ),
-                  const SizedBox(height: 12.0),
+                  const SizedBox(height: 6.0),
 
                   const Text(
                     'Párosítás',
@@ -54,14 +54,14 @@ class PairingScreen extends StatelessWidget {
                       height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 14.0),
+                  const SizedBox(height: 10.0),
 
                   // Code badge — HyperOS card style
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20.0, vertical: 11.0),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1C1C1E),
+                      color: WearColors.surface,
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     child: Text(
@@ -69,12 +69,12 @@ class PairingScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22.0,
                         fontWeight: FontWeight.w800,
-                        color: cs.primary,
+                        color: WearColors.ink,
                         letterSpacing: 6.0,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14.0),
+                  const SizedBox(height: 10.0),
 
                   // Connection indicator
                   Row(

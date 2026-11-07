@@ -69,23 +69,25 @@ class _WearCurvedScrollbarState extends State<WearCurvedScrollbar>
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasContent) return widget.child;
+    // The Stack stays even without content: swapping it in during the first
+    // swipe would rebuild the child and cancel that swipe.
     return Stack(
       children: [
         widget.child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: FadeTransition(
-              opacity: _fade,
-              child: CustomPaint(
-                painter: _HyperOSArcPainter(
-                  fraction: _fraction,
-                  thumbFrac: _thumbFrac,
+        if (_hasContent)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: FadeTransition(
+                opacity: _fade,
+                child: CustomPaint(
+                  painter: _HyperOSArcPainter(
+                    fraction: _fraction,
+                    thumbFrac: _thumbFrac,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

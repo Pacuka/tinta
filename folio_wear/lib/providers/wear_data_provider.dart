@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import '../models/wear_lesson.dart';
 import '../models/wear_notification.dart';
 
-class WearDataProvider with ChangeNotifier {
+class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
   static const _channel = MethodChannel('app.zan1456.folio.wear/data');
 
   static void Function(double delta)? onRotaryInput;
@@ -14,21 +15,40 @@ class WearDataProvider with ChangeNotifier {
   List<WearNotification> _notifications = [];
   DateTime? _lastSync;
   bool _connected = false;
-  bool _offlineMode = false;
   bool _isPaired = false;
   String _pairingCode = '';
+  bool _loaded = false;
+  bool _foreground = true;
+  Timer? _pairingRetry;
+
+  /// The phone only hears a pairing request while Tinta is open on it, so an
+  /// unpaired watch keeps asking until the code is confirmed.
+  static const pairingRetryInterval = Duration(seconds: 5);
 
   List<WearLesson> get lessons => _lessons;
   List<WearNotification> get notifications => _notifications;
   DateTime? get lastSync => _lastSync;
   bool get connected => _connected;
-  bool get offlineMode => _offlineMode;
   bool get isPaired => _isPaired;
   String get pairingCode => _pairingCode;
 
+  /// False until the saved state is read, so a paired watch doesn't flash
+  /// the pairing screen on start.
+  bool get loaded => _loaded;
+
   WearDataProvider() {
     _channel.setMethodCallHandler(_handleNativeCall);
+    WidgetsBinding.instance.addObserver(this);
     _loadCached();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = state == AppLifecycleState.resumed;
+    if (foreground == _foreground) return;
+    _foreground = foreground;
+    _updatePairingRetry();
+    if (foreground) requestSync();
   }
 
   Future<void> _handleNativeCall(MethodCall call) async {
@@ -41,9 +61,7 @@ class WearDataProvider with ChangeNotifier {
         break;
       case 'onConnectionChanged':
         _connected = call.arguments as bool;
-        if (_connected && !_isPaired && _pairingCode.isNotEmpty) {
-          _sendPairingRequest();
-        }
+        _updatePairingRetry();
         notifyListeners();
         break;
       case 'onRotaryInput':
@@ -53,6 +71,7 @@ class WearDataProvider with ChangeNotifier {
         final code = call.arguments as String;
         if (code == _pairingCode) {
           _isPaired = true;
+          _updatePairingRetry();
           try { await _channel.invokeMethod('setIsPaired', true); } catch (_) {}
           notifyListeners();
         }
@@ -101,9 +120,6 @@ class WearDataProvider with ChangeNotifier {
         if (result['connected'] != null) {
           _connected = result['connected'] as bool;
         }
-        if (result['offlineMode'] != null) {
-          _offlineMode = result['offlineMode'] as bool;
-        }
         if (result['isPaired'] != null) {
           _isPaired = result['isPaired'] as bool;
         }
@@ -119,11 +135,11 @@ class WearDataProvider with ChangeNotifier {
       try { await _channel.invokeMethod('setPairingCode', _pairingCode); } catch (_) {}
     }
 
+    _loaded = true;
+    _updatePairingRetry();
     notifyListeners();
 
-    if (!_offlineMode) {
-      requestSync();
-    }
+    requestSync();
 
     // Pull retry: if lessons are still empty after 4s, pull from native cache
     Future.delayed(const Duration(seconds: 4), () async {
@@ -142,14 +158,32 @@ class WearDataProvider with ChangeNotifier {
     try { await _channel.invokeMethod('sendPairingRequest', _pairingCode); } catch (_) {}
   }
 
-  Future<void> requestSync() async {
-    try { await _channel.invokeMethod('requestSync'); } catch (_) {}
+  void _updatePairingRetry() {
+    final shouldAsk = _loaded &&
+        _foreground &&
+        _connected &&
+        !_isPaired &&
+        _pairingCode.isNotEmpty;
+    if (!shouldAsk) {
+      _pairingRetry?.cancel();
+      _pairingRetry = null;
+      return;
+    }
+    if (_pairingRetry != null) return;
+    _sendPairingRequest();
+    _pairingRetry =
+        Timer.periodic(pairingRetryInterval, (_) => _sendPairingRequest());
   }
 
-  Future<void> setOfflineMode(bool offline) async {
-    _offlineMode = offline;
-    try { await _channel.invokeMethod('setOfflineMode', offline); } catch (_) {}
-    notifyListeners();
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _pairingRetry?.cancel();
+    super.dispose();
+  }
+
+  Future<void> requestSync() async {
+    try { await _channel.invokeMethod('requestSync'); } catch (_) {}
   }
 
   Future<void> unpair() async {
@@ -159,6 +193,7 @@ class WearDataProvider with ChangeNotifier {
       await _channel.invokeMethod('setIsPaired', false);
       await _channel.invokeMethod('setPairingCode', _pairingCode);
     } catch (_) {}
+    _updatePairingRetry();
     notifyListeners();
   }
 

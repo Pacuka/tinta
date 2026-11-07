@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/wear_data_provider.dart';
+import '../theme/wear_theme.dart';
 
 class ConnectingScreen extends StatelessWidget {
   const ConnectingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
@@ -21,7 +21,7 @@ class ConnectingScreen extends StatelessWidget {
                 height: 32.0,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: cs.primary,
+                  color: WearColors.ink,
                   backgroundColor: Colors.white.withValues(alpha: 0.08),
                 ),
               ),
@@ -53,13 +53,13 @@ class ConnectingScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 22.0, vertical: 9.0),
                   decoration: BoxDecoration(
-                    color: cs.primary.withValues(alpha: 0.15),
+                    color: WearColors.ink.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(24.0),
                   ),
                   child: Text(
                     'Újrapróbálás',
                     style: TextStyle(
-                      color: cs.primary,
+                      color: WearColors.ink,
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                     ),
