@@ -16,9 +16,9 @@
   (`arm64` a legtöbb mai telefonra, `armeabi` a régebbiekre).
 - **iPhone:** a `Tinta.ipa` ugyanott; telepítés AltStore-ral, lásd az
   [iPhone-os útmutatót](ipa-sideloading.md).
-- **Wear OS óra** (pl. Galaxy Watch): a Tinta óra-app a telefonos Tintától kapja az
-  adatokat – a párosítás a telefonos app *Beállítások → Egyéb → WearOS* menüjében,
-  az órán megjelenő kóddal történik.
+- **Wear OS óra** (pl. Galaxy Watch4 vagy újabb): a `tinta-wear` fájl ugyanott; a telepítéshez
+  számítógép kell, lásd a [Wear OS-útmutatót](wear-os.md). Az óra a telefonos Tintától kapja az
+  adatokat, Androidos telefon kell hozzá.
 
 Androidon az app magától szól, ha új verzió érhető el.
 
@@ -44,7 +44,7 @@ Androidon az app magától szól, ha új verzió érhető el.
 - Szülői fiók: igazolás beküldése (akár orvosi papír fotójával), fogadóóra-foglalás,
   üzenet a tanároknak, több gyerek egy appban
 - Tanév rendje (szünetek, tanítás nélküli napok), LÉP/NÉP-programok, kérdőívek
-- Wear OS óra-app: mai órák, értesítések a csuklón
+- Wear OS óra-app: a mostani óra és a hátralévő idő, órarend, teendők, tanulmányi átlag, értesítések, számlap-kiegészítő és gyorsnézeti lap
 
 ## Adatvédelem
 
