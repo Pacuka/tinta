@@ -1,6 +1,7 @@
 package app.zan1456.folio.wear
 
 import android.os.Handler
+import app.zan1456.folio.wear.glance.GlanceData
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
@@ -88,6 +89,7 @@ class MainActivity : FlutterActivity(),
                 "setIsPaired" -> {
                     val paired = call.arguments as Boolean
                     prefs.edit().putBoolean("is_paired", paired).apply()
+                    GlanceData.requestRefresh(this)
                     Log.d(TAG, "setIsPaired: $paired")
                     result.success(null)
                 }
@@ -274,6 +276,7 @@ class MainActivity : FlutterActivity(),
     private fun saveAndForward(key: String, json: String, method: String) {
         getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(key, json).apply()
         methodChannel?.invokeMethod(method, json)
+        if (key == "timetable") GlanceData.requestRefresh(this)
     }
 
     private fun sendSyncRequestToPhone() {

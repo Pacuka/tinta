@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:folio/api/client.dart';
 import 'package:folio/helpers/storage_helper.dart';
 import 'package:folio/models/release.dart';
@@ -70,7 +71,8 @@ extension UpdateHelper on Release {
   }
 
   Future<Uint8List> download({UpdateCallback? updateCallback}) async {
-    final apk = pickApk(downloads);
+    final device = await DeviceInfoPlugin().androidInfo;
+    final apk = pickApk(downloads, abis: device.supportedAbis);
     if (apk == null) throw "No Android APK in this release";
     var response = await FilcAPI.downloadRelease(apk);
 

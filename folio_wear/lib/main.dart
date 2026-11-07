@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'package:wear/wear.dart';
 import 'providers/wear_data_provider.dart';
 import 'screens/connecting_screen.dart';
 import 'screens/pairing_screen.dart';
@@ -35,13 +34,10 @@ class FolioWearApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
         useMaterial3: true,
       ),
-      home: const WatchShape(builder: _buildForShape),
+      home: const _WearRoot(),
     );
   }
 }
-
-Widget _buildForShape(BuildContext context, WearShape shape, Widget? child) =>
-    const _WearRoot();
 
 // ─────────────────────────────────────────────────────────────────────────────
 

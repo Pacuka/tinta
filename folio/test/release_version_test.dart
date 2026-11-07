@@ -57,4 +57,33 @@ void main() {
       expect(preview, isNull);
     });
   });
+
+  group('pickApk', () {
+    ReleaseDownload file(String name) => ReleaseDownload(
+        url: 'https://example.invalid/$name', size: 1);
+    final files = [
+      file('Tinta.ipa'),
+      file('tinta-1.6.1-armeabi-v7a.apk'),
+      file('tinta-1.6.1-arm64-v8a.apk'),
+      file('tinta-wear-1.6.1.apk'),
+    ];
+
+    test('64-bit phone gets arm64', () {
+      expect(pickApk(files, abis: ['arm64-v8a', 'armeabi-v7a'])!.url,
+          contains('arm64'));
+    });
+
+    test('32-bit phone gets armeabi', () {
+      expect(pickApk(files, abis: ['armeabi-v7a', 'armeabi'])!.url,
+          contains('armeabi-v7a'));
+    });
+
+    test('never picks the watch app', () {
+      expect(pickApk([file('tinta-wear-1.6.1.apk')]), isNull);
+    });
+
+    test('unknown device falls back to arm64', () {
+      expect(pickApk(files)!.url, contains('arm64'));
+    });
+  });
 }

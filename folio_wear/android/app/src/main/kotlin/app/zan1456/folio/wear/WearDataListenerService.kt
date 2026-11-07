@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import app.zan1456.folio.wear.glance.GlanceData
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
@@ -148,5 +149,6 @@ class WearDataListenerService : WearableListenerService() {
             .edit()
             .putString(key, json)
             .apply()
+        if (key == "timetable") GlanceData.requestRefresh(this)
     }
 }

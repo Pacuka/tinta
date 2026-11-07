@@ -15,14 +15,22 @@ class ReleaseDownload {
   }
 }
 
-/// The Android installer among a release's files (the .ipa is for iPhone),
-/// preferring the arm64 build that fits practically every current phone.
-ReleaseDownload? pickApk(List<ReleaseDownload> downloads) {
-  final apks =
-      downloads.where((d) => d.url.toLowerCase().endsWith(".apk")).toList();
+/// The phone installer among a release's files: the .ipa is for iPhone and
+/// tinta-wear is for the watch. [abis] is what the phone can run, best first.
+ReleaseDownload? pickApk(List<ReleaseDownload> downloads,
+    {List<String> abis = const ["arm64-v8a"]}) {
+  final apks = downloads.where((d) {
+    final url = d.url.toLowerCase();
+    return url.endsWith(".apk") && !url.contains("tinta-wear");
+  }).toList();
   if (apks.isEmpty) return null;
-  return apks.firstWhere((d) => d.url.toLowerCase().contains("arm64"),
-      orElse: () => apks.first);
+  for (final abi in abis) {
+    final key = abi.startsWith("arm64") ? "arm64" : "armeabi";
+    for (final apk in apks) {
+      if (apk.url.toLowerCase().contains(key)) return apk;
+    }
+  }
+  return apks.first;
 }
 
 class Release {

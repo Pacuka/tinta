@@ -29,6 +29,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
     }
 
     defaultConfig {
@@ -77,4 +78,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21"
     implementation 'com.google.android.gms:play-services-wearable:18.2.0'
     implementation 'androidx.wear:wear:1.3.0'
+    implementation 'androidx.wear.tiles:tiles:1.6.2'
+    implementation 'androidx.wear.protolayout:protolayout:1.4.2'
+    implementation 'androidx.wear.watchface:watchface-complications-data-source:1.3.0'
+    implementation 'com.google.guava:guava:33.4.8-android'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
 }
