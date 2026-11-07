@@ -82,6 +82,9 @@ class _Row extends StatelessWidget {
 
   static const _dotCenter = 20.0;
 
+  /// The same on both sides: the line must not push the card off centre.
+  static const _cardInset = 18.0;
+
   Color get _dot {
     if (lesson.isCancelled) return WearColors.cancelled;
     if (lesson.isSubstitution) return WearColors.substitution;
@@ -153,7 +156,7 @@ class _Row extends StatelessWidget {
         ),
       ),
       Padding(
-        padding: const EdgeInsets.only(left: 18.0, bottom: 5.0),
+        padding: const EdgeInsets.fromLTRB(_cardInset, 0.0, _cardInset, 5.0),
         child: EdgeFade(
           child: Opacity(
             opacity: passed ? 0.45 : 1.0,

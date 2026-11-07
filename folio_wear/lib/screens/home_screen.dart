@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // Round screen: keep content away from the curved edge.
-  static const _hPad = 28.0;
+  static const _hPad = 12.0;
 
   /// Kept as a date, so the choice lapses when that day is no longer next.
   DateTime? _chosenDay;

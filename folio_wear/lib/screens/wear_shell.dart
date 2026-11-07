@@ -8,6 +8,12 @@ import 'notifications_screen.dart';
 import 'todos_screen.dart';
 import 'wear_settings_screen.dart';
 
+abstract final class WearShellTuning {
+  /// One click of the Galaxy Watch bezel reports a delta of 1.
+  static const crownStep = 45.0;
+  static const crownGlide = Duration(milliseconds: 160);
+}
+
 /// Pages change only with a horizontal swipe. Vertical scrolling and the crown
 /// stay on the current page, so a long list can't slip into the next one.
 class WearShell extends StatefulWidget {
@@ -29,7 +35,7 @@ class _WearShellState extends State<WearShell> {
   int _currentPage = 0;
 
   static const _pages = 4;
-  static const _crownStep = 120.0;
+  double? _crownTarget;
   static const _exitDistance = 60.0;
   static const _exitSteepness = 1.5;
 
@@ -55,8 +61,19 @@ class _WearShellState extends State<WearShell> {
     final ctrl = _scrollCtrls[_currentPage];
     if (!ctrl.hasClients) return;
     final pos = ctrl.position;
-    ctrl.jumpTo(
-        (pos.pixels + delta * _crownStep).clamp(0.0, pos.maxScrollExtent));
+    final from = _crownTarget ?? pos.pixels;
+    final target = (from + delta * WearShellTuning.crownStep)
+        .clamp(0.0, pos.maxScrollExtent);
+    _crownTarget = target;
+    ctrl
+        .animateTo(
+          target,
+          duration: WearShellTuning.crownGlide,
+          curve: Curves.easeOut,
+        )
+        .whenComplete(() {
+      if (_crownTarget == target) _crownTarget = null;
+    });
   }
 
   /// windowSwipeToDismiss is off, so the app handles the swipe-right exit.

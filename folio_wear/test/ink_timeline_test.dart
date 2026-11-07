@@ -87,6 +87,14 @@ void main() {
     return null;
   }
 
+  testWidgets('cards sit in the middle of the screen', (tester) async {
+    await _pump(tester, [lesson('Angol', t(9, 0))]);
+    final card = find
+        .ancestor(of: find.text('Angol'), matching: find.byType(Container))
+        .first;
+    expect(tester.getCenter(card).dx, 227 / 2);
+  });
+
   testWidgets('only the current lesson gets the card', (tester) async {
     await _pump(tester, [
       lesson('Történelem', t(8, 0)),

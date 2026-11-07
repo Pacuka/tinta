@@ -113,8 +113,8 @@ void main() {
     Future<void> openNextDay(WidgetTester tester) async {
       await fromNative('onTimetableReceived', withTomorrow());
       await tester.pump();
-      WearDataProvider.onRotaryInput!(4.0);
-      await tester.pump();
+      WearDataProvider.onRotaryInput!(12.0);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Holnap'));
       await tester.pump();
     }
@@ -127,8 +127,8 @@ void main() {
 
     testWidgets('no known next day hides the switcher', (tester) async {
       await _pumpShell(tester, lessons: 1);
-      WearDataProvider.onRotaryInput!(4.0);
-      await tester.pump();
+      WearDataProvider.onRotaryInput!(12.0);
+      await tester.pumpAndSettle();
       expect(find.byType(DaySwitcher), findsNothing);
     });
 
@@ -142,6 +142,29 @@ void main() {
       await tester.pump();
       expect(find.text('Holnapi tárgy'), findsNothing);
     });
+  });
+
+  testWidgets('one bezel step moves a small part of the screen',
+      (tester) async {
+    await _pumpShell(tester);
+    final position =
+        tester.state<ScrollableState>(find.byType(Scrollable).last).position;
+    WearDataProvider.onRotaryInput!(1.0);
+    await tester.pumpAndSettle();
+    expect(position.pixels, inInclusiveRange(1.0, 60.0));
+  });
+
+  testWidgets('quick bezel steps add up', (tester) async {
+    await _pumpShell(tester);
+    final position =
+        tester.state<ScrollableState>(find.byType(Scrollable).last).position;
+    for (var i = 0; i < 3; i++) {
+      WearDataProvider.onRotaryInput!(1.0);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await tester.pumpAndSettle();
+    final oneStep = WearShellTuning.crownStep;
+    expect(position.pixels, closeTo(oneStep * 3, 0.5));
   });
 
   testWidgets('crown past the end keeps the page', (tester) async {
