@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/wear_notification.dart';
 import '../providers/wear_data_provider.dart';
 import '../theme/wear_theme.dart';
+import '../widgets/edge_fade.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
 const _kCardBg = WearColors.surface;
@@ -126,9 +127,10 @@ class _NotifList extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
               (context, i) => Padding(
                 padding: const EdgeInsets.only(bottom: _kItemSpacing),
-                child: _NotifTile(item: items[i]),
+                child: EdgeFade(child: _NotifTile(item: items[i])),
               ),
               childCount: items.length,
+              addRepaintBoundaries: false,
             ),
           ),
           const SliverPadding(padding: EdgeInsets.only(bottom: 52.0)),

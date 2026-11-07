@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/day_state.dart';
 import '../models/wear_lesson.dart';
 import '../theme/wear_theme.dart';
+import 'edge_fade.dart';
 import 'ink_blot.dart';
 
 /// The day as a line of ink: lessons hang on it, the current one stands out.
@@ -150,9 +151,11 @@ class _Row extends StatelessWidget {
       ),
       Padding(
         padding: const EdgeInsets.only(left: 18.0, bottom: 5.0),
-        child: Opacity(
-          opacity: passed ? 0.45 : 1.0,
-          child: _card(_content()),
+        child: EdgeFade(
+          child: Opacity(
+            opacity: passed ? 0.45 : 1.0,
+            child: _card(_content()),
+          ),
         ),
       ),
     ]);

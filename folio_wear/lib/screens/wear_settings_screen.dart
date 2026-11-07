@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/wear_data_provider.dart';
 import '../theme/wear_theme.dart';
+import '../widgets/edge_fade.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
 const _kCardBg = WearColors.surface;
@@ -186,7 +187,7 @@ class _ItemBase extends StatelessWidget {
 
     return GestureDetector(
       onTap: enabled ? onTap : null,
-      child: Container(
+      child: EdgeFade(child: Container(
         height: _kItemH,
         margin: const EdgeInsets.only(bottom: 4.0),
         decoration: BoxDecoration(
@@ -254,7 +255,7 @@ class _ItemBase extends StatelessWidget {
             if (trailing != null) trailing!,
           ],
         ),
-      ),
+      )),
     );
   }
 }
