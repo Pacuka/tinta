@@ -11,7 +11,7 @@ extension Localization on String {
           "Draft": "Draft",
           "empty": "You have no messages.",
           "Send": "Send",
-          "recipients_failed": "Couldn't load the recipients. Check your connection and try again.",
+          "recipients_failed": "Couldn't load the recipients. You may be offline, or your school may have turned off messaging.",
         },
         "hu-HU": {
           "Messages": "Üzenetek",
@@ -21,7 +21,7 @@ extension Localization on String {
           "Draft": "Piszkozat",
           "empty": "Nincsenek üzeneteid.",
           "Send": "Küldés",
-          "recipients_failed": "Nem sikerült betölteni a címzetteket. Ellenőrizd a netet, és próbáld újra.",
+          "recipients_failed": "Nem sikerült betölteni a címzetteket. Lehet, hogy nincs net, vagy az iskolád kikapcsolta az üzenetküldést.",
         },
         "de-DE": {
           "Messages": "Nachrichten",
@@ -31,7 +31,7 @@ extension Localization on String {
           "Draft": "Entwurf",
           "empty": "Sie haben keine Nachrichten.",
           "Send": "Senden",
-          "recipients_failed": "Die Empfänger konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+          "recipients_failed": "Die Empfänger konnten nicht geladen werden. Vielleicht bist du offline, oder deine Schule hat Nachrichten deaktiviert.",
         },
       };
 

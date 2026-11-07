@@ -1,3 +1,4 @@
+import 'package:folio_kreta_api/models/attachment.dart';
 import 'package:folio_kreta_api/client/api.dart';
 
 import 'subject.dart';
@@ -164,6 +165,5 @@ class HomeworkAttachment {
 
   String downloadUrl(String iss) =>
       KretaAPI.downloadHomeworkAttachments(iss, id, type);
-  bool get isImage =>
-      name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png");
+  bool get isImage => isImageName(name);
 }

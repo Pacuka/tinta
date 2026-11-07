@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:folio_kreta_api/models/attachment.dart';
 import 'package:folio/helpers/attachment_helper.dart';
+import 'package:folio_mobile_ui/common/widgets/message/attachment_image.dart';
 import 'package:folio_mobile_ui/common/widgets/message/image_view.dart';
 import 'package:flutter/material.dart';
 
@@ -11,45 +10,16 @@ class AttachmentTile extends StatelessWidget {
   final Attachment attachment;
 
   Widget buildImage(BuildContext context) {
-    return FutureBuilder<String>(
-      future: attachment.download(context),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
-              child: Material(
-                child: InkWell(
-                  onTap: () {
-                    showModalBottomSheet(
-                      useRootNavigator: true,
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (context) {
-                        return ImageView(snapshot.data!);
-                      },
-                    );
-                  },
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: Ink.image(
-                    image: FileImage(File(snapshot.data ?? "")),
-                    height: 200.0,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-          );
-        } else {
-          return Center(
-              child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.secondary),
-          ));
-        }
+    return AttachmentImage(
+      name: attachment.name,
+      download: () => attachment.download(context),
+      onOpen: (path) {
+        showModalBottomSheet(
+          useRootNavigator: true,
+          isScrollControlled: true,
+          context: context,
+          builder: (context) => ImageView(path),
+        );
       },
     );
   }

@@ -1,6 +1,12 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:folio_kreta_api/client/api.dart';
 
+/// Phones often save photos as FOTO.JPG, so the case must not matter.
+bool isImageName(String name) {
+  final n = name.toLowerCase();
+  return n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".png");
+}
+
 class Attachment {
   Map? json;
   int id;
@@ -28,6 +34,5 @@ class Attachment {
   }
 
   String get downloadUrl => KretaAPI.downloadAttachment(id.toString());
-  bool get isImage =>
-      name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png");
+  bool get isImage => isImageName(name);
 }

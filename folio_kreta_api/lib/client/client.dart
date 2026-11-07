@@ -16,6 +16,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart' as http;
 import 'dart:async';
 
+/// File bytes of a download. An error page is not the file: saving it would
+/// show up as a broken attachment that never recovers.
+Uint8List? downloadedBytes(http.Response res) =>
+    res.statusCode >= 200 && res.statusCode < 300 ? res.bodyBytes : null;
+
 class KretaClient {
   /// The official app's API key, sent with every non-IDP request.
   static const _apiKey = "21ff6c25-d1da-4a68-a811-c881a6057463";
@@ -141,7 +146,7 @@ class KretaClient {
       if (json) {
         return jsonDecode(res.body);
       } else if (rawResponse) {
-        return res.bodyBytes;
+        return downloadedBytes(res);
       } else {
         return res.body;
       }
