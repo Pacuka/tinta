@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/wear_data_provider.dart';
 import '../theme/wear_theme.dart';
 import '../widgets/edge_fade.dart';
+import '../widgets/page_title.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
 const _kCardBg = WearColors.surface;
@@ -31,20 +32,7 @@ class WearSettingsScreen extends StatelessWidget {
               SliverPadding(
                 padding: const EdgeInsets.only(
                     top: 30.0, left: 28.0, right: 28.0, bottom: 8.0),
-            sliver: const SliverToBoxAdapter(
-              child: SizedBox(
-                width: double.infinity,
-                child: Text(
-                  'Beállítások',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xD9FFFFFF),
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
+                sliver: const SliverToBoxAdapter(child: PageTitle('Beállítások')),
               ),
 
               // Sync section

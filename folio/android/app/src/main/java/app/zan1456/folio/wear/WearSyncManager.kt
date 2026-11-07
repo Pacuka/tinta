@@ -86,6 +86,22 @@ class WearSyncManager(
             .addOnFailureListener { e -> Log.e(TAG, "sendNotifications: getNodes FAILED: ${e.message}", e) }
     }
 
+    /** Sends the average and upcoming homework/exams to the watch. */
+    fun sendExtras(json: String) {
+        prefs.edit().putString("extras", json).apply()
+        Log.d(TAG, "sendExtras: ${json.length} chars")
+        Wearable.getNodeClient(context).connectedNodes
+            .addOnSuccessListener { nodes ->
+                for (node in nodes) {
+                    Wearable.getMessageClient(context)
+                        .sendMessage(node.id, "/folio/extras", json.toByteArray(Charsets.UTF_8))
+                        .addOnSuccessListener { Log.d(TAG, "sendExtras OK to ${node.id}") }
+                        .addOnFailureListener { e -> Log.e(TAG, "sendExtras FAILED to ${node.id}: ${e.message}", e) }
+                }
+            }
+            .addOnFailureListener { e -> Log.e(TAG, "sendExtras: getNodes FAILED: ${e.message}", e) }
+    }
+
     /**
      * Reads cached data from SharedPreferences and pushes it to the watch.
      * Used by [WearMorningSyncWorker] without needing the Flutter engine.
@@ -95,6 +111,7 @@ class WearSyncManager(
         val notifications = prefs.getString("notifications", null)
         timetable?.let { sendTimetable(it) }
         notifications?.let { sendNotifications(it) }
+        prefs.getString("extras", null)?.let { sendExtras(it) }
     }
 
     // ── Morning sync scheduling ──────────────────────────────────────────────

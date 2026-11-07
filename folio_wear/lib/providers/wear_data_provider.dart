@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import '../models/wear_extras.dart';
 import '../models/wear_lesson.dart';
 import '../models/wear_notification.dart';
 
@@ -13,6 +14,7 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
 
   List<WearLesson> _lessons = [];
   List<WearNotification> _notifications = [];
+  WearExtras? _extras;
   DateTime? _lastSync;
   bool _connected = false;
   bool _isPaired = false;
@@ -27,6 +29,7 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
 
   List<WearLesson> get lessons => _lessons;
   List<WearNotification> get notifications => _notifications;
+  WearExtras? get extras => _extras;
   DateTime? get lastSync => _lastSync;
   bool get connected => _connected;
   bool get isPaired => _isPaired;
@@ -58,6 +61,9 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
         break;
       case 'onNotificationsReceived':
         _parseNotifications(call.arguments as String);
+        break;
+      case 'onExtrasReceived':
+        _parseExtras(call.arguments as String);
         break;
       case 'onConnectionChanged':
         _connected = call.arguments as bool;
@@ -107,6 +113,16 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
     }
   }
 
+  void _parseExtras(String json) {
+    final extras = WearExtras.tryParse(json);
+    if (extras == null) {
+      debugPrint('WearDataProvider: extras parse error');
+      return;
+    }
+    _extras = extras;
+    notifyListeners();
+  }
+
   Future<void> _loadCached() async {
     try {
       final result = await _channel.invokeMethod<Map>('getCachedData') as Map?;
@@ -116,6 +132,9 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
         }
         if (result['notifications'] != null) {
           _parseNotifications(result['notifications'] as String);
+        }
+        if (result['extras'] != null) {
+          _parseExtras(result['extras'] as String);
         }
         if (result['connected'] != null) {
           _connected = result['connected'] as bool;

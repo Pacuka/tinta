@@ -22,6 +22,7 @@ import 'package:folio_kreta_api/providers/homework_provider.dart';
 import 'package:folio_kreta_api/providers/message_provider.dart';
 import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
+import 'package:folio/api/providers/wear_extras.dart';
 import 'package:folio/api/providers/wear_provider.dart';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:flutter/widgets.dart';
@@ -118,6 +119,11 @@ Future<void> _syncAll(BuildContext context) async {
     syncStatus(Provider.of<GradeProvider>(context, listen: false).fetch()),
     syncStatus(Provider.of<TimetableProvider>(context, listen: false)
         .fetch(week: Week.current())),
+    // Needed by the watch's next school day, its failure changes nothing here.
+    syncStatus(fetchNextWeekIfNeeded(
+        DateTime.now(),
+        (week) => Provider.of<TimetableProvider>(context, listen: false)
+            .fetch(week: week))),
     syncStatus(Provider.of<ExamProvider>(context, listen: false).fetch()),
     syncStatus(Provider.of<HomeworkProvider>(context, listen: false)
         .fetch(from: DateTime.now().subtract(const Duration(days: 30)))),

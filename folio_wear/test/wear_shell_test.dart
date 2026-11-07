@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:folio_wear/providers/wear_data_provider.dart';
 import 'package:folio_wear/screens/wear_shell.dart';
+import 'package:folio_wear/widgets/day_switcher.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -76,6 +77,73 @@ void main() {
     expect(after, greaterThan(before + 100));
   });
 
+  testWidgets('page dots sit inside the ring', (tester) async {
+    await _pumpShell(tester);
+    tester.view.physicalSize = const Size(227, 227);
+    await tester.pump();
+    final dots = tester.getRect(find.byKey(WearShell.pageDotsKey));
+    // The ring takes the outer 14 points of the round screen.
+    expect(dots.bottom, lessThanOrEqualTo(227 - 18));
+  });
+
+  group('next day switcher', () {
+    String withTomorrow() {
+      final list = (jsonDecode(_timetable(1)) as List).cast<Map>();
+      final now = DateTime.now();
+      final day = DateTime(now.year, now.month, now.day + 1, 8);
+      return jsonEncode([
+        ...list,
+        {
+          ...list.first,
+          'id': 'next',
+          'subject': 'Holnapi tárgy',
+          'start': day.millisecondsSinceEpoch,
+          'end': day.add(const Duration(minutes: 45)).millisecondsSinceEpoch,
+        },
+      ]);
+    }
+
+    Future<void> fromNative(String method, Object? args) async {
+      final data = const StandardMethodCodec()
+          .encodeMethodCall(MethodCall(method, args));
+      await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .handlePlatformMessage(_channel.name, data, (_) {});
+    }
+
+    Future<void> openNextDay(WidgetTester tester) async {
+      await fromNative('onTimetableReceived', withTomorrow());
+      await tester.pump();
+      WearDataProvider.onRotaryInput!(4.0);
+      await tester.pump();
+      await tester.tap(find.text('Holnap'));
+      await tester.pump();
+    }
+
+    testWidgets('shows the next school day on tap', (tester) async {
+      await _pumpShell(tester);
+      await openNextDay(tester);
+      expect(find.text('Holnapi tárgy'), findsOneWidget);
+    });
+
+    testWidgets('no known next day hides the switcher', (tester) async {
+      await _pumpShell(tester, lessons: 1);
+      WearDataProvider.onRotaryInput!(4.0);
+      await tester.pump();
+      expect(find.byType(DaySwitcher), findsNothing);
+    });
+
+    testWidgets('choice is dropped when the next day goes away',
+        (tester) async {
+      await _pumpShell(tester);
+      await openNextDay(tester);
+      await fromNative('onTimetableReceived', _timetable(1));
+      await tester.pump();
+      await fromNative('onTimetableReceived', withTomorrow());
+      await tester.pump();
+      expect(find.text('Holnapi tárgy'), findsNothing);
+    });
+  });
+
   testWidgets('crown past the end keeps the page', (tester) async {
     await _pumpShell(tester);
     for (var i = 0; i < 20; i++) {
@@ -90,12 +158,17 @@ void main() {
     await _pumpShell(tester);
     await tester.fling(
         find.byType(WearShell), const Offset(-300, 0), 1000);
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.text('Frissítsd a Tintát a telefonon'), findsOneWidget);
+
+    await tester.fling(
+        find.byType(WearShell), const Offset(-300, 0), 1000);
+    await tester.pumpAndSettle();
     expect(find.text('Nincs értesítés'), findsOneWidget);
 
     await tester.fling(
         find.byType(WearShell), const Offset(-300, 0), 1000);
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
     expect(find.text('Beállítások'), findsOneWidget);
   });
 

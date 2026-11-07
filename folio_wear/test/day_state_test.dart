@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:folio_wear/models/day_state.dart';
 import 'package:folio_wear/models/wear_lesson.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 WearLesson lesson(DateTime start, DateTime end, {String status = 'normal'}) =>
     WearLesson(
@@ -96,5 +97,43 @@ void main() {
 
   test('empty list', () {
     expect(dayStateAt(const [], t(10, 0)).phase, DayPhase.noLessons);
+  });
+
+  final monday = DateTime(2026, 11, 9, 16);
+  final friday = DateTime(2026, 11, 13, 16);
+
+  test('next school day skips the weekend', () {
+    final next = lesson(DateTime(2026, 11, 16, 8), DateTime(2026, 11, 16, 9));
+    expect(nextSchoolDay([next], friday), DateTime(2026, 11, 16));
+  });
+
+  test('no later lesson gives null', () {
+    expect(nextSchoolDay([first], monday), isNull);
+  });
+
+  test('cancelled only day is skipped', () {
+    expect(
+        nextSchoolDay([
+          lesson(DateTime(2026, 11, 10, 8), DateTime(2026, 11, 10, 9),
+              status: 'cancelled'),
+          lesson(DateTime(2026, 11, 11, 8), DateTime(2026, 11, 11, 9)),
+        ], monday),
+        DateTime(2026, 11, 11));
+  });
+
+  test('label is tomorrow', () {
+    expect(nextDayLabel(DateTime(2026, 11, 10), monday), 'Holnap');
+  });
+
+  test('label is weekday', () async {
+    await initializeDateFormatting('hu');
+    expect(nextDayLabel(DateTime(2026, 11, 16), friday), 'hétfő');
+  });
+
+  test('sunday says tomorrow, saturday says the day', () async {
+    await initializeDateFormatting('hu');
+    final nextMonday = DateTime(2026, 11, 16);
+    expect(nextDayLabel(nextMonday, DateTime(2026, 11, 15, 10)), 'Holnap');
+    expect(nextDayLabel(nextMonday, DateTime(2026, 11, 14, 10)), 'hétfő');
   });
 }

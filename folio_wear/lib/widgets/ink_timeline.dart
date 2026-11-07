@@ -10,11 +10,16 @@ import 'ink_blot.dart';
 class InkTimeline extends StatelessWidget {
   final List<WearLesson> lessons;
   final DateTime now;
-  const InkTimeline({super.key, required this.lessons, required this.now});
+
+  /// The day to show, today when null.
+  final DateTime? day;
+  const InkTimeline(
+      {super.key, required this.lessons, required this.now, this.day});
 
   @override
   Widget build(BuildContext context) {
-    final today = lessons.where((l) => _sameDay(l.start, now)).toList();
+    final shown = day ?? now;
+    final today = lessons.where((l) => _sameDay(l.start, shown)).toList();
     final current = dayStateAt(lessons, now).current;
     if (today.isNotEmpty) {
       final held = today.where((l) => !l.isCancelled).toList();
@@ -33,29 +38,27 @@ class InkTimeline extends StatelessWidget {
       ]);
     }
 
-    final days = <DateTime, List<WearLesson>>{};
-    for (final l in lessons) {
-      days
-          .putIfAbsent(DateTime(l.start.year, l.start.month, l.start.day),
-              () => [])
-          .add(l);
-    }
-    final sorted = days.keys.toList()..sort();
+    // A free day: only the next school day, the phone is there for the rest.
+    final next = nextSchoolDay(lessons, now);
+    if (next == null) return const SizedBox.shrink();
     return Column(children: [
-      for (final day in sorted) ...[
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 4.0),
+      Padding(
+        padding: const EdgeInsets.only(top: 10.0, bottom: 4.0),
+        child: EdgeFade(
           child: Text(
-            DateFormat('EEEE', 'hu').format(day),
+            DateFormat('EEEE', 'hu').format(next),
             style: const TextStyle(
                 color: WearColors.muted,
                 fontSize: 11.0,
                 fontWeight: FontWeight.w600),
           ),
         ),
-        for (final (i, l) in days[day]!.indexed)
-          _Row(lesson: l, now: now, isCurrent: false, isFirst: i == 0),
-      ],
+      ),
+      for (final (i, l) in lessons
+          .where((l) => _sameDay(l.start, next))
+          .toList()
+          .indexed)
+        _Row(lesson: l, now: now, isCurrent: false, isFirst: i == 0),
     ]);
   }
 
@@ -217,7 +220,7 @@ class _DayEnd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = end.isAfter(now) ? const Color(0xFF555A68) : WearColors.ink;
-    return Row(children: [
+    return EdgeFade(child: Row(children: [
       Transform.translate(
         offset: const Offset(-5.0, 0.0),
         child: InkBlot(size: 20.0, color: color),
@@ -227,7 +230,7 @@ class _DayEnd extends StatelessWidget {
         'Vége: ${DateFormat('H:mm').format(end)}',
         style: const TextStyle(color: WearColors.muted, fontSize: 11.0),
       ),
-    ]);
+    ]));
   }
 }
 

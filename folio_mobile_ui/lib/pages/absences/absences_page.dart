@@ -40,6 +40,11 @@ class SubjectAbsence {
       {required this.subject, this.absences = const [], this.percentage = 0.0});
 }
 
+/// The timetable can already hold next week, that must not raise the number
+/// of lessons the absence percentages are counted from.
+Iterable<Lesson> lessonsHeldBy(Iterable<Lesson> lessons, DateTime now) =>
+    lessons.where((l) => !l.start.isAfter(now));
+
 class AbsencesPage extends StatefulWidget {
   const AbsencesPage({super.key});
 
@@ -67,7 +72,8 @@ class AbsencesPageState extends State<AbsencesPage>
     timetableProvider = Provider.of<TimetableProvider>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      for (final lesson in timetableProvider.lessons.values.expand((e) => e)) {
+      final lessons = timetableProvider.lessons.values.expand((e) => e);
+      for (final lesson in lessonsHeldBy(lessons, DateTime.now())) {
         if (!lesson.isEmpty &&
             lesson.subject.id != '' &&
             lesson.lessonYearIndex != null) {

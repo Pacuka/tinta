@@ -106,6 +106,11 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                     sync.sendNotifications(json)
                     result.success(null)
                 }
+                "sendExtras" -> {
+                    val json = call.argument<String>("json") ?: ""
+                    sync.sendExtras(json)
+                    result.success(null)
+                }
                 "isWatchConnected" -> {
                     sync.checkConnection()
                     result.success(sync.isConnected())

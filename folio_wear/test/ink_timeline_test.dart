@@ -33,7 +33,7 @@ WearLesson lesson(
 DateTime t(int h, int m) => DateTime(2026, 11, 9, h, m);
 
 Future<void> _pump(WidgetTester tester, List<WearLesson> lessons,
-    {Size size = const Size(227, 227), DateTime? now}) async {
+    {Size size = const Size(227, 227), DateTime? now, DateTime? day}) async {
   await initializeDateFormatting('hu');
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
@@ -41,7 +41,7 @@ Future<void> _pump(WidgetTester tester, List<WearLesson> lessons,
   await tester.pumpWidget(MaterialApp(
     home: Scaffold(
       body: SingleChildScrollView(
-        child: InkTimeline(lessons: lessons, now: now ?? t(8, 21)),
+        child: InkTimeline(lessons: lessons, now: now ?? t(8, 21), day: day),
       ),
     ),
   ));
@@ -116,6 +116,16 @@ void main() {
     expect(find.textContaining('Vége'), findsNothing);
   });
 
+  testWidgets('timeline shows the chosen day', (tester) async {
+    await _pump(tester, [
+      lesson('Történelem', t(8, 0)),
+      lesson('Holnapi', DateTime(2026, 11, 10, 8)),
+    ], day: DateTime(2026, 11, 10));
+    expect(find.text('Holnapi'), findsOneWidget);
+    expect(find.text('Történelem'), findsNothing);
+    expect(find.text('Vége: 8:45'), findsOneWidget);
+  });
+
   testWidgets('normal lesson shows time and room', (tester) async {
     await _pump(tester, [lesson('Angol', t(9, 0), room: '305')]);
     expect(find.text('9:00 · 305'), findsOneWidget);
@@ -133,15 +143,22 @@ void main() {
     expect(find.byIcon(Icons.videocam_rounded), findsOneWidget);
   });
 
-  testWidgets('no lessons today groups the week by day', (tester) async {
+  testWidgets('no lessons today shows the next school day only',
+      (tester) async {
     await _pump(tester, [
+      lesson('Múltheti', DateTime(2026, 11, 2, 8)),
       lesson('Matematika', DateTime(2026, 11, 10, 8)),
       lesson('Angol', DateTime(2026, 11, 11, 8)),
     ]);
     expect(find.text('kedd'), findsOneWidget);
-    expect(find.text('szerda'), findsOneWidget);
     expect(find.text('Matematika'), findsOneWidget);
-    expect(find.text('Angol'), findsOneWidget);
+    expect(find.text('Angol'), findsNothing);
+    expect(find.text('Múltheti'), findsNothing);
+  });
+
+  testWidgets('stale data lists nothing', (tester) async {
+    await _pump(tester, [lesson('Múltheti', DateTime(2026, 11, 2, 8))]);
+    expect(find.text('Múltheti'), findsNothing);
   });
 
   testWidgets('long names fit', (tester) async {

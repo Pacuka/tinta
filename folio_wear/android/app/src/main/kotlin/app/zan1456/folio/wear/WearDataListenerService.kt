@@ -82,6 +82,16 @@ class WearDataListenerService : WearableListenerService() {
                     MainActivity.methodChannel?.invokeMethod("onNotificationsReceived", json)
                 }
             }
+            "/folio/extras" -> {
+                val json = payload.toString(Charsets.UTF_8)
+                Log.d(TAG, "extras: ${json.length} chars")
+                if (WearConnectionHelper.isValidExtras(json)) {
+                    saveAndNotify("extras", json)
+                    Handler(Looper.getMainLooper()).post {
+                        MainActivity.methodChannel?.invokeMethod("onExtrasReceived", json)
+                    }
+                }
+            }
             "/folio/ping" -> {
                 Log.d(TAG, "ping: delivering cached data")
                 val prefs = getSharedPreferences("folio_wear", Context.MODE_PRIVATE)

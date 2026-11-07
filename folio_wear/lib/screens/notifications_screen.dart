@@ -5,6 +5,7 @@ import '../models/wear_notification.dart';
 import '../providers/wear_data_provider.dart';
 import '../theme/wear_theme.dart';
 import '../widgets/edge_fade.dart';
+import '../widgets/page_title.dart';
 import '../widgets/wear_curved_scrollbar.dart';
 
 const _kCardBg = WearColors.surface;
@@ -25,7 +26,11 @@ class NotificationsScreen extends StatelessWidget {
         final items = data.notifications;
         return items.isEmpty
             ? _EmptyState(data: data)
-            : _NotifList(items: items, scrollController: scrollController);
+            : _NotifList(
+                items: items,
+                average: data.extras?.average,
+                scrollController: scrollController,
+              );
       }),
     );
   }
@@ -94,8 +99,13 @@ class _EmptyState extends StatelessWidget {
 
 class _NotifList extends StatelessWidget {
   final List<WearNotification> items;
+  final double? average;
   final ScrollController scrollController;
-  const _NotifList({required this.items, required this.scrollController});
+  const _NotifList({
+    required this.items,
+    required this.average,
+    required this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -108,21 +118,25 @@ class _NotifList extends StatelessWidget {
           SliverPadding(
             padding: const EdgeInsets.only(
                 top: 30.0, left: 28.0, right: 28.0, bottom: 8.0),
-            sliver: const SliverToBoxAdapter(
-              child: SizedBox(
-                width: double.infinity,
-                child: Text(
-                  'Értesítések',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xD9FFFFFF),
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
+            sliver: const SliverToBoxAdapter(child: PageTitle('Értesítések')),
+          ),
+          if (average != null)
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              sliver: SliverToBoxAdapter(
+                child: EdgeFade(
+                  child: Text(
+                    'Tanulmányi átlag: ${average!.toStringAsFixed(2).replaceAll('.', ',')}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: WearColors.inkLight,
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) => Padding(

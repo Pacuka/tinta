@@ -58,7 +58,7 @@ class HomeRing extends StatelessWidget {
   List<Widget> _content(DayState s, DateTime now) => switch (s.phase) {
         DayPhase.inLesson => [
             _Small('${s.current!.lessonIndex}. óra'),
-            _Title(s.current!.subject),
+            _Subject(s.current!.subject),
             _Minutes(s.minutesLeft, WearColors.inkLight),
             _RoomChip(s.current!.room),
             if (s.next != null) ...[
@@ -69,12 +69,12 @@ class HomeRing extends StatelessWidget {
         DayPhase.inBreak => [
             const _Small('Szünet'),
             _Minutes(s.minutesLeft, WearColors.breakTeal),
-            _Title(s.next!.subject),
+            _Subject(s.next!.subject),
             _RoomChip(s.next!.room),
           ],
         DayPhase.beforeFirst => [
             const _Small('Első óra'),
-            _Title(s.next!.subject),
+            _Subject(s.next!.subject),
             if (s.minutesLeft <= 60)
               _Minutes(s.minutesLeft, WearColors.inkLight)
             else
@@ -147,6 +147,27 @@ class _Title extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
             color: Colors.white, fontSize: 19.0, fontWeight: FontWeight.w600),
+      );
+}
+
+class _Subject extends StatelessWidget {
+  final String text;
+  const _Subject(this.text);
+
+  static const _longName = 16;
+
+  @override
+  Widget build(BuildContext context) => Text(
+        text,
+        textAlign: TextAlign.center,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: text.length > _longName ? 15.0 : 19.0,
+          fontWeight: FontWeight.w600,
+          height: 1.1,
+        ),
       );
 }
 

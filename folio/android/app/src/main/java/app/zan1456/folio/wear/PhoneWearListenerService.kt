@@ -29,6 +29,8 @@ class PhoneWearListenerService : WearableListenerService() {
                     manager.sendNotifications(it)
                 }
 
+                prefs.getString("extras", null)?.let { manager.sendExtras(it) }
+
                 val channelAvailable = MainActivity.wearChannel != null
                 Log.d(TAG, "sync-request: wearChannel available=$channelAvailable")
                 android.os.Handler(android.os.Looper.getMainLooper()).post {

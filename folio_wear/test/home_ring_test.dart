@@ -114,6 +114,19 @@ void main() {
     });
   }
 
+  for (final size in const [Size(192, 192), Size(227, 227)]) {
+    testWidgets('long subject wraps instead of cutting at ${size.width}',
+        (tester) async {
+      const name = 'Informatika és digitális kultúra';
+      await _pump(tester, [lesson(name, '12', t(8, 0), 3)], () => t(8, 21),
+          size: size);
+      expect(tester.takeException(), isNull);
+      final text = tester.widget<Text>(find.text(name));
+      expect(text.maxLines, 2);
+      expect(text.style!.fontSize, 15.0);
+    });
+  }
+
   testWidgets('refreshes each minute', (tester) async {
     var now = t(8, 21);
     await _pump(tester, _day, () => now);

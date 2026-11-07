@@ -5,12 +5,15 @@ import '../providers/wear_data_provider.dart';
 import '../theme/wear_theme.dart';
 import 'home_screen.dart';
 import 'notifications_screen.dart';
+import 'todos_screen.dart';
 import 'wear_settings_screen.dart';
 
 /// Pages change only with a horizontal swipe. Vertical scrolling and the crown
 /// stay on the current page, so a long list can't slip into the next one.
 class WearShell extends StatefulWidget {
   const WearShell({super.key});
+
+  static const pageDotsKey = ValueKey('page-dots');
 
   @override
   State<WearShell> createState() => _WearShellState();
@@ -21,10 +24,11 @@ class _WearShellState extends State<WearShell> {
     ScrollController(),
     ScrollController(),
     ScrollController(),
+    ScrollController(),
   ];
   int _currentPage = 0;
 
-  static const _pages = 3;
+  static const _pages = 4;
   static const _crownStep = 120.0;
   static const _exitDistance = 60.0;
   static const _exitSteepness = 1.5;
@@ -95,8 +99,9 @@ class _WearShellState extends State<WearShell> {
               onPageChanged: _onPageChanged,
               children: [
                 HomeScreen(scrollController: _scrollCtrls[0]),
-                NotificationsScreen(scrollController: _scrollCtrls[1]),
-                WearSettingsScreen(scrollController: _scrollCtrls[2]),
+                TodosScreen(scrollController: _scrollCtrls[1]),
+                NotificationsScreen(scrollController: _scrollCtrls[2]),
+                WearSettingsScreen(scrollController: _scrollCtrls[3]),
               ],
             ),
           ),
@@ -110,10 +115,11 @@ class _WearShellState extends State<WearShell> {
 
           // Lapozó pontok — alul középen
           Positioned(
-            bottom: 9.0,
+            bottom: 20.0,
             left: 0,
             right: 0,
             child: Row(
+              key: WearShell.pageDotsKey,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (int i = 0; i < _pages; i++) ...[

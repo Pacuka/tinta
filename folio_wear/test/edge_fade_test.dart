@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:folio_wear/widgets/day_switcher.dart';
 import 'package:folio_wear/widgets/edge_fade.dart';
+import 'package:folio_wear/widgets/page_title.dart';
 
 void main() {
   test('middle of the screen stays full size', () {
@@ -41,6 +43,21 @@ void main() {
       ]),
     ));
   }
+
+  testWidgets('page titles fade with the list', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: PageTitle('Teendők')));
+    expect(
+        find.ancestor(of: find.text('Teendők'), matching: find.byType(EdgeFade)),
+        findsOneWidget);
+  });
+
+  testWidgets('day switcher fades with the list', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: DaySwitcher(nextLabel: 'Holnap', showNext: false, onChanged: (_) {}),
+    ));
+    expect(find.ancestor(of: find.text('Ma'), matching: find.byType(EdgeFade)),
+        findsOneWidget);
+  });
 
   testWidgets('item at the edge is painted through a transform',
       (tester) async {

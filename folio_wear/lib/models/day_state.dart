@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'wear_lesson.dart';
 
 enum DayPhase { inLesson, inBreak, beforeFirst, doneToday, noLessons }
@@ -66,6 +67,22 @@ DayState dayStateAt(List<WearLesson> lessons, DateTime now) {
     minutesLeft: _minutesUntil(soonest.start, now),
   );
 }
+
+/// The first later day with a lesson that is held.
+DateTime? nextSchoolDay(List<WearLesson> lessons, DateTime now) {
+  final dayEnd = DateTime(now.year, now.month, now.day + 1);
+  final later = lessons
+      .where((l) => !l.isCancelled && !l.start.isBefore(dayEnd))
+      .map((l) => DateTime(l.start.year, l.start.month, l.start.day))
+      .toList()
+    ..sort();
+  return later.isEmpty ? null : later.first;
+}
+
+String nextDayLabel(DateTime day, DateTime now) =>
+    _sameDay(day, DateTime(now.year, now.month, now.day + 1))
+        ? 'Holnap'
+        : DateFormat('EEEE', 'hu').format(day);
 
 bool _sameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;

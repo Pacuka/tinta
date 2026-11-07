@@ -19,6 +19,10 @@ import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/widgets.dart';
+import 'package:folio/api/providers/wear_extras.dart';
+import 'package:folio/helpers/average_helper.dart';
+import 'package:folio/models/settings.dart';
+import 'package:folio_kreta_api/models/grade.dart';
 
 /// Serializes Kréta data and sends it to the paired WearOS watch via
 /// Android's Wearable Data Layer API (method channel → WearSyncManager.kt).
@@ -32,8 +36,10 @@ class WearProvider with ChangeNotifier {
   DateTime? _lastSync;
   String _lastTimetableHash = '';
   String _lastNotificationsHash = '';
+  String _lastExtrasHash = '';
   String _lastTimetableJson = '';
   String _lastNotificationsJson = '';
+  String _lastExtrasJson = '';
 
   /// Non-null when the watch has sent a pairing request and needs confirmation.
   String? _pendingPairCode;
@@ -94,6 +100,8 @@ class WearProvider with ChangeNotifier {
 
     final tHash = _hash(timetableJson);
     final nHash = _hash(notifJson);
+    final extrasJson = _buildExtrasJson(ctx);
+    final eHash = _hash(extrasJson);
 
     if (tHash != _lastTimetableHash) {
       _lastTimetableHash = tHash;
@@ -102,6 +110,10 @@ class WearProvider with ChangeNotifier {
     if (nHash != _lastNotificationsHash) {
       _lastNotificationsHash = nHash;
       await _sendNotifications(notifJson);
+    }
+    if (eHash != _lastExtrasHash) {
+      _lastExtrasHash = eHash;
+      await _sendExtras(extrasJson);
     }
   }
 
@@ -112,8 +124,11 @@ class WearProvider with ChangeNotifier {
     final notifJson = _buildNotificationsJson(ctx);
     _lastTimetableHash = _hash(timetableJson);
     _lastNotificationsHash = _hash(notifJson);
+    final extrasJson = _buildExtrasJson(ctx);
+    _lastExtrasHash = _hash(extrasJson);
     await _sendTimetable(timetableJson);
     await _sendNotifications(notifJson);
+    await _sendExtras(extrasJson);
   }
 
   // ── JSON builders ────────────────────────────────────────────────────────
@@ -131,8 +146,11 @@ class WearProvider with ChangeNotifier {
       // This prevents stale "today-only" cache from showing wrong data next day.
       // KRÉTA also returns non-teaching days (e.g. autumn break) as
       // subject-less "lessons"; the watch would show them as "0. 0:00".
+      // Next week is only known from Friday, when the sync fetches it too.
       final lessons = [
-        ...(timetable.lessons[week] ?? []).where((l) => l.subject.name.isNotEmpty)
+        ...(timetable.lessons[week] ?? []).where((l) => l.subject.name.isNotEmpty),
+        ...(timetable.lessons[week.next()] ?? [])
+            .where((l) => l.subject.name.isNotEmpty),
       ]..sort((a, b) => a.start.compareTo(b.start));
 
       return jsonEncode(
@@ -266,6 +284,52 @@ class WearProvider with ChangeNotifier {
     }
   }
 
+  String _buildExtrasJson(BuildContext ctx) {
+    try {
+      final grades = Provider.of<GradeProvider>(ctx, listen: false).grades;
+      final homeworks =
+          Provider.of<HomeworkProvider>(ctx, listen: false).homework;
+      final exams = Provider.of<ExamProvider>(ctx, listen: false).exams;
+      final rounding =
+          Provider.of<SettingsProvider>(ctx, listen: false).rounding;
+      final midYear =
+          grades.where((g) => g.type == GradeType.midYear).toList();
+      return buildWearExtras(
+        items: [
+          for (final h in homeworks)
+            WearTodoItem(
+              id: h.id,
+              type: 'homework',
+              subject: wearSubjectName(h.subject),
+              due: h.deadline,
+            ),
+          for (final e in exams)
+            WearTodoItem(
+              id: e.id,
+              type: 'exam',
+              subject: wearSubjectName(e.subject),
+              due: e.writeDate,
+            ),
+        ],
+        average: wearStudyAverage([
+          for (final subject in midYear.map((g) => g.subject).toSet())
+            if (AverageHelper.averageEvals(
+                    midYear.where((g) => g.subject == subject).toList()) >
+                0)
+              (
+                average: AverageHelper.averageEvals(
+                    midYear.where((g) => g.subject == subject).toList()),
+                threshold: (subject.customRounding ?? rounding.toDouble()) / 10,
+              ),
+        ]),
+        now: DateTime.now(),
+      );
+    } catch (e) {
+      if (kDebugMode) print('WearProvider: buildExtrasJson error: $e');
+      return '';
+    }
+  }
+
   // ── Sending ──────────────────────────────────────────────────────────────
 
   Future<void> _sendTimetable(String json) async {
@@ -287,6 +351,16 @@ class WearProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       if (kDebugMode) print('WearProvider: sendNotifications error: $e');
+    }
+  }
+
+  Future<void> _sendExtras(String json) async {
+    if (json.isEmpty) return;
+    try {
+      await _channel.invokeMethod('sendExtras', {'json': json});
+      _lastExtrasJson = json;
+    } catch (e) {
+      if (kDebugMode) print('WearProvider: sendExtras error: $e');
     }
   }
 
@@ -320,6 +394,9 @@ class WearProvider with ChangeNotifier {
         }
         if (_lastNotificationsJson.isNotEmpty) {
           await _sendNotifications(_lastNotificationsJson);
+        }
+        if (_lastExtrasJson.isNotEmpty) {
+          await _sendExtras(_lastExtrasJson);
         }
         if (_lastTimetableJson.isEmpty && _lastNotificationsJson.isEmpty) {
           try {

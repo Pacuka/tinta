@@ -44,6 +44,7 @@ class MainActivity : FlutterActivity(),
                     result.success(mapOf(
                         "timetable"    to timetable,
                         "notifications" to notifications,
+                        "extras"       to prefs.getString("extras", null),
                         "connected"    to WearConnectionHelper.isConnected,
                         "offlineMode"  to prefs.getBoolean("offline_mode", false),
                         "isPaired"     to prefs.getBoolean("is_paired", false),
@@ -169,6 +170,12 @@ class MainActivity : FlutterActivity(),
             "/folio/notifications" -> {
                 val json = payload.toString(Charsets.UTF_8)
                 saveAndForward("notifications", json, "onNotificationsReceived")
+            }
+            "/folio/extras" -> {
+                val json = payload.toString(Charsets.UTF_8)
+                if (WearConnectionHelper.isValidExtras(json)) {
+                    saveAndForward("extras", json, "onExtrasReceived")
+                }
             }
             "/folio/ping" -> {
                 val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
