@@ -145,10 +145,11 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
 
     override fun onResume() {
         super.onResume()
+        if (WearSyncManager.wearUnavailable) return
         Log.d(TAG, "onResume: registering MessageClient listener")
         Wearable.getMessageClient(this).addListener(this)
             .addOnSuccessListener { Log.d(TAG, "MessageClient listener registered OK") }
-            .addOnFailureListener { e -> Log.e(TAG, "MessageClient addListener FAILED: ${e.message}", e) }
+            .addOnFailureListener { e -> WearSyncManager.logFailure(TAG, "MessageClient addListener", e) }
     }
 
     override fun onPause() {

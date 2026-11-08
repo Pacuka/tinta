@@ -3,6 +3,8 @@ package app.zan1456.folio.wear
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.wearable.Wearable
 import io.flutter.plugin.common.MethodChannel
 
@@ -22,12 +24,36 @@ class WearSyncManager(
 ) {
 
     private val TAG = "FolioPhone.WearSync"
+
+    companion object {
+        /**
+         * Set once the phone turns out to have no Wear OS services (no
+         * companion app, or a ROM without Google wear support). Further
+         * calls are skipped until the process restarts.
+         */
+        @Volatile
+        var wearUnavailable = false
+
+        /**
+         * Logs a failed Wearable call. A missing Wear API is normal on phones
+         * without a watch, so it gets one short line instead of a stack trace.
+         */
+        fun logFailure(tag: String, what: String, e: Exception) {
+            if ((e as? ApiException)?.statusCode == CommonStatusCodes.API_NOT_CONNECTED) {
+                if (!wearUnavailable) Log.w(tag, "$what: Wear OS not available on this phone, skipping watch sync")
+                wearUnavailable = true
+            } else {
+                Log.e(tag, "$what FAILED: ${e.message}", e)
+            }
+        }
+    }
     private val prefs: SharedPreferences =
         context.getSharedPreferences("folio_wear_phone", Context.MODE_PRIVATE)
 
     // ── Connection ───────────────────────────────────────────────────────────
 
     fun checkConnection() {
+        if (wearUnavailable) return
         Wearable.getNodeClient(context).connectedNodes
             .addOnSuccessListener { nodes ->
                 val connected = nodes.isNotEmpty()
@@ -38,9 +64,7 @@ class WearSyncManager(
                     flutterChannel.invokeMethod("onConnectionChanged", connected)
                 }
             }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "checkConnection FAILED: ${e.message}", e)
-            }
+            .addOnFailureListener { e -> logFailure(TAG, "checkConnection", e) }
     }
 
     fun isConnected(): Boolean = prefs.getBoolean("connected", false)
@@ -53,6 +77,7 @@ class WearSyncManager(
      */
     fun sendTimetable(json: String) {
         prefs.edit().putString("timetable", json).apply()
+        if (wearUnavailable) return
         Log.d(TAG, "sendTimetable: ${json.length} chars")
         Wearable.getNodeClient(context).connectedNodes
             .addOnSuccessListener { nodes ->
@@ -61,10 +86,10 @@ class WearSyncManager(
                     Wearable.getMessageClient(context)
                         .sendMessage(node.id, "/folio/timetable", json.toByteArray(Charsets.UTF_8))
                         .addOnSuccessListener { Log.d(TAG, "sendTimetable OK to ${node.id}") }
-                        .addOnFailureListener { e -> Log.e(TAG, "sendTimetable FAILED to ${node.id}: ${e.message}", e) }
+                        .addOnFailureListener { e -> logFailure(TAG, "sendTimetable to ${node.id}", e) }
                 }
             }
-            .addOnFailureListener { e -> Log.e(TAG, "sendTimetable: getNodes FAILED: ${e.message}", e) }
+            .addOnFailureListener { e -> logFailure(TAG, "sendTimetable: getNodes", e) }
     }
 
     /**
@@ -72,6 +97,7 @@ class WearSyncManager(
      */
     fun sendNotifications(json: String) {
         prefs.edit().putString("notifications", json).apply()
+        if (wearUnavailable) return
         Log.d(TAG, "sendNotifications: ${json.length} chars")
         Wearable.getNodeClient(context).connectedNodes
             .addOnSuccessListener { nodes ->
@@ -80,15 +106,16 @@ class WearSyncManager(
                     Wearable.getMessageClient(context)
                         .sendMessage(node.id, "/folio/notifications", json.toByteArray(Charsets.UTF_8))
                         .addOnSuccessListener { Log.d(TAG, "sendNotifications OK to ${node.id}") }
-                        .addOnFailureListener { e -> Log.e(TAG, "sendNotifications FAILED to ${node.id}: ${e.message}", e) }
+                        .addOnFailureListener { e -> logFailure(TAG, "sendNotifications to ${node.id}", e) }
                 }
             }
-            .addOnFailureListener { e -> Log.e(TAG, "sendNotifications: getNodes FAILED: ${e.message}", e) }
+            .addOnFailureListener { e -> logFailure(TAG, "sendNotifications: getNodes", e) }
     }
 
     /** Sends the average and upcoming homework/exams to the watch. */
     fun sendExtras(json: String) {
         prefs.edit().putString("extras", json).apply()
+        if (wearUnavailable) return
         Log.d(TAG, "sendExtras: ${json.length} chars")
         Wearable.getNodeClient(context).connectedNodes
             .addOnSuccessListener { nodes ->
@@ -96,10 +123,10 @@ class WearSyncManager(
                     Wearable.getMessageClient(context)
                         .sendMessage(node.id, "/folio/extras", json.toByteArray(Charsets.UTF_8))
                         .addOnSuccessListener { Log.d(TAG, "sendExtras OK to ${node.id}") }
-                        .addOnFailureListener { e -> Log.e(TAG, "sendExtras FAILED to ${node.id}: ${e.message}", e) }
+                        .addOnFailureListener { e -> logFailure(TAG, "sendExtras to ${node.id}", e) }
                 }
             }
-            .addOnFailureListener { e -> Log.e(TAG, "sendExtras: getNodes FAILED: ${e.message}", e) }
+            .addOnFailureListener { e -> logFailure(TAG, "sendExtras: getNodes", e) }
     }
 
     /**
@@ -137,6 +164,7 @@ class WearSyncManager(
 
     /** Sends the pairing confirmation code to the watch. */
     fun sendPairConfirm(code: String) {
+        if (wearUnavailable) return
         Log.d(TAG, "sendPairConfirm: code=$code")
         Wearable.getNodeClient(context).connectedNodes
             .addOnSuccessListener { nodes ->
@@ -144,9 +172,9 @@ class WearSyncManager(
                     Wearable.getMessageClient(context)
                         .sendMessage(node.id, "/folio/pair-confirm", code.toByteArray(Charsets.UTF_8))
                         .addOnSuccessListener { Log.d(TAG, "sendPairConfirm OK to ${node.id}") }
-                        .addOnFailureListener { e -> Log.e(TAG, "sendPairConfirm FAILED: ${e.message}") }
+                        .addOnFailureListener { e -> logFailure(TAG, "sendPairConfirm", e) }
                 }
             }
-            .addOnFailureListener { e -> Log.e(TAG, "sendPairConfirm: getNodes FAILED: ${e.message}") }
+            .addOnFailureListener { e -> logFailure(TAG, "sendPairConfirm: getNodes", e) }
     }
 }
