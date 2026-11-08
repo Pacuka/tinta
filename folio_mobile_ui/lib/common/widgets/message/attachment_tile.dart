@@ -14,12 +14,9 @@ class AttachmentTile extends StatelessWidget {
       name: attachment.name,
       download: () => attachment.download(context),
       onOpen: (path) {
-        showModalBottomSheet(
-          useRootNavigator: true,
-          isScrollControlled: true,
-          context: context,
+        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
           builder: (context) => ImageView(path),
-        );
+        ));
       },
     );
   }

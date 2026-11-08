@@ -13,40 +13,44 @@ class ImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // SizedBox.expand: in a bottom sheet the Stack would shrink to a strip.
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: PhotoView(
-              imageProvider: FileImage(File(path)),
-              maxScale: 4.0,
-              minScale: PhotoViewComputedScale.contained,
-              backgroundDecoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
+      child: SizedBox.expand(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: PhotoView(
+                imageProvider: FileImage(File(path)),
+                maxScale: 4.0,
+                minScale: PhotoViewComputedScale.contained,
+                backgroundDecoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _FloatingButton(child: const BackButton(color: Colors.white)),
-                  _FloatingButton(
-                    child: IconButton(
-                      onPressed: () => ShareHelper.shareFile(path),
-                      icon: const Icon(Icons.share_rounded,
-                          color: Colors.white),
-                      splashRadius: 24.0,
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _FloatingButton(
+                        child: const BackButton(color: Colors.white)),
+                    _FloatingButton(
+                      child: IconButton(
+                        onPressed: () => ShareHelper.shareFile(path),
+                        icon: const Icon(Icons.share_rounded,
+                            color: Colors.white),
+                        splashRadius: 24.0,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

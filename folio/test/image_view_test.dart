@@ -13,4 +13,30 @@ void main() {
         Offset.zero & tester.view.physicalSize / tester.view.devicePixelRatio);
     expect(find.byType(BackButton), findsOneWidget);
   });
+
+  // Message attachments open the picture in a bottom sheet, whose loose
+  // constraints let a bare Stack shrink to a strip at the bottom.
+  testWidgets('image fills the screen in a bottom sheet too', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (context) => const ImageView('nincs.png'),
+          ),
+          child: const Text('open'),
+        ),
+      ),
+    ));
+    await tester.tap(find.text('open'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    // Sheets are width-capped on wide test screens, so check the height.
+    final rect = tester.getRect(find.byType(PhotoView));
+    expect(rect.top, 0.0);
+    expect(rect.height,
+        tester.view.physicalSize.height / tester.view.devicePixelRatio);
+  });
 }
