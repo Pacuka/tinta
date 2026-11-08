@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Updates sent over from the phone app (never downloaded by the watch) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name="${applicationName}"
@@ -45,12 +47,18 @@
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <action android:name="com.google.android.gms.wearable.CHANNEL_EVENT" />
                 <data
                     android:host="*"
                     android:pathPrefix="/folio"
                     android:scheme="wear" />
             </intent-filter>
         </service>
+
+        <!-- Result of installing an update the phone sent -->
+        <receiver
+            android:name="app.zan1456.folio.wear.InstallResultReceiver"
+            android:exported="false" />
 
         <!-- Glance: the current lesson without opening the app -->
         <service

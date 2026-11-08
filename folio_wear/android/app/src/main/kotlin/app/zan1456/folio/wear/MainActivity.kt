@@ -109,6 +109,8 @@ class MainActivity : FlutterActivity(),
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume: registering listeners")
+        WearUpdateInstaller.activityResumed = true
+        WearUpdateInstaller.installIfPending(this)
         Wearable.getDataClient(this).addListener(this)
         Wearable.getMessageClient(this).addListener(this)
 
@@ -137,6 +139,7 @@ class MainActivity : FlutterActivity(),
     }
 
     override fun onPause() {
+        WearUpdateInstaller.activityResumed = false
         Wearable.getDataClient(this).removeListener(this)
         Wearable.getMessageClient(this).removeListener(this)
         super.onPause()

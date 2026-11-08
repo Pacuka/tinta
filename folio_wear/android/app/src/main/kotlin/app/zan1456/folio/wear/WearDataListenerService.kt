@@ -5,10 +5,12 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import app.zan1456.folio.wear.glance.GlanceData
+import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageEvent
+import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 
 class WearDataListenerService : WearableListenerService() {
@@ -114,8 +116,31 @@ class WearDataListenerService : WearableListenerService() {
                     MainActivity.methodChannel?.invokeMethod("onPairConfirmed", code)
                 }
             }
+            WearUpdateInstaller.VERSION_REQUEST_PATH ->
+                WearUpdateInstaller.sendVersion(this, messageEvent.sourceNodeId)
             else -> Log.w(TAG, "unknown message path: $path")
         }
+    }
+
+    // ── App update from the phone ───────────────────────────────────────────
+
+    override fun onChannelOpened(channel: ChannelClient.Channel) {
+        if (channel.path != WearUpdateInstaller.CHANNEL_PATH) return
+        val client = Wearable.getChannelClient(this)
+        if (!WearUpdateInstaller.isPaired(this)) {
+            Log.w(TAG, "update from an unpaired phone, refused")
+            client.close(channel)
+            return
+        }
+        WearUpdateInstaller.rememberSender(this, channel.nodeId)
+        val part = WearUpdateInstaller.partFile(this)
+        part.delete()
+        client.receiveFile(channel, android.net.Uri.fromFile(part), false)
+    }
+
+    override fun onInputClosed(channel: ChannelClient.Channel, closeReason: Int, appSpecificErrorCode: Int) {
+        if (channel.path != WearUpdateInstaller.CHANNEL_PATH) return
+        WearUpdateInstaller.onReceived(this, closeReason == ChannelClient.ChannelCallback.CLOSE_REASON_NORMAL)
     }
 
     override fun onConnectedNodes(connectedNodes: MutableList<com.google.android.gms.wearable.Node>) {
