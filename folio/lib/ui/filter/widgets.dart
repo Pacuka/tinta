@@ -214,7 +214,7 @@ Widget filterItemBuilder(
                         offset: const Offset(0, 21),
                         blurRadius: 23.0,
                         color: Theme.of(context).shadowColor.withValues(
-                              alpha: Theme.of(context).shadowColor.opacity *
+                              alpha: Theme.of(context).shadowColor.a *
                                   CurvedAnimation(
                                     parent: CurvedAnimation(
                                         parent: animation,

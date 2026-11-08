@@ -128,18 +128,21 @@ class AbsenceView extends StatelessWidget {
                   // https://discord.com/channels/1111649116020285532/1149964760130002945
                   Navigator.of(context).pop();
 
-                  if (outsideContext != null) {
+                  // This sheet is closed by now: answer on the page below.
+                  final outside = outsideContext;
+                  if (outside != null) {
                     ReverseSearch.getLessonByAbsence(absence, context)
                         .then((lesson) {
+                      if (!outside.mounted) return;
                       if (lesson != null) {
-                        TimetablePage.jump(outsideContext!, lesson: lesson);
+                        TimetablePage.jump(outside, lesson: lesson);
                       } else {
-                        ScaffoldMessenger.of(context)
+                        ScaffoldMessenger.of(outside)
                             .showSnackBar(CustomSnackBar(
                           content: Text("Cannot find lesson".i18n,
                               style: const TextStyle(color: Colors.white)),
-                          backgroundColor: AppColors.of(context).red,
-                          context: context,
+                          backgroundColor: AppColors.of(outside).red,
+                          context: outside,
                         ));
                       }
                     });

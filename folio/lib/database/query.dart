@@ -24,6 +24,18 @@ import 'package:folio_kreta_api/models/absence.dart';
 import 'package:folio_kreta_api/models/group_average.dart';
 import 'package:folio_kreta_api/models/subject_average.dart';
 
+/// Subject/teacher renames (id -> new name). An empty name means "not
+/// renamed": older versions saved "" for the field left blank, which showed
+/// up as an empty teacher name.
+Map<String, String> decodeRenames(String? json) {
+  if (json == null) return {};
+  return {
+    for (final e in (jsonDecode(json) as Map).entries)
+      if (e.value != null && e.value.toString().trim().isNotEmpty)
+        e.key.toString(): e.value.toString().trim(),
+  };
+}
+
 class DatabaseQuery {
   DatabaseQuery({required this.db});
 
@@ -41,8 +53,8 @@ class DatabaseQuery {
     List<Map> usersMap = await db.query("users");
     for (var user in usersMap) {
       final id = user["id"].toString();
-      final restored = await TokenVault.restore(
-          id, Map<String, dynamic>.from(user));
+      final restored =
+          await TokenVault.restore(id, Map<String, dynamic>.from(user));
       if (restored.needsMigration) {
         // Older version: move the inline tokens to secure storage now.
         final row = await TokenVault.stash(id, restored.row);
@@ -258,9 +270,7 @@ class UserDatabaseQuery {
     if (userData.isEmpty) return {};
     String? renamedSubjectsJson =
         userData.elementAt(0)["renamed_subjects"] as String?;
-    if (renamedSubjectsJson == null) return {};
-    return (jsonDecode(renamedSubjectsJson) as Map)
-        .map((key, value) => MapEntry(key.toString(), value.toString()));
+    return decodeRenames(renamedSubjectsJson);
   }
 
   Future<Map<String, String>> renamedTeachers({required String userId}) async {
@@ -269,9 +279,7 @@ class UserDatabaseQuery {
     if (userData.isEmpty) return {};
     String? renamedTeachersJson =
         userData.elementAt(0)["renamed_teachers"] as String?;
-    if (renamedTeachersJson == null) return {};
-    return (jsonDecode(renamedTeachersJson) as Map)
-        .map((key, value) => MapEntry(key.toString(), value.toString()));
+    return decodeRenames(renamedTeachersJson);
   }
 
   // goal planner
@@ -400,13 +408,14 @@ class UserDatabaseQuery {
   }
 
   /// Returns (registrationId, fcmToken). Both empty strings if not registered.
-  Future<({String registrationId, String fcmToken})> getNotificationSubscription(
-      {required String userId}) async {
+  Future<({String registrationId, String fcmToken})>
+      getNotificationSubscription({required String userId}) async {
     List<Map> userData =
         await db.query("user_data", where: "id = ?", whereArgs: [userId]);
     if (userData.isEmpty) return (registrationId: '', fcmToken: '');
     return (
-      registrationId: (userData.first["notification_registration_id"] as String?) ?? '',
+      registrationId:
+          (userData.first["notification_registration_id"] as String?) ?? '',
       fcmToken: (userData.first["notification_fcm_token"] as String?) ?? '',
     );
   }

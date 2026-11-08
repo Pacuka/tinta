@@ -60,6 +60,11 @@ Más szerverhez csak ezekben az esetekben fordul az app:
 - **Firka szerver:** csak ha témát osztasz meg vagy töltesz le.
 - **Google Fonts:** csak ha a beállításokban másik betűtípust választasz.
 
+A `tinta_push_firebase` mappában van egy Firebase-es push-kiegészítő, de ki van
+kapcsolva, és egyik kiadott APK-ban sincs benne. Csak akkor kapcsolnám be, ha a
+KRÉTA engedélyt adna arra, hogy push-értesítést küldjön a Tintának. Ha ez nem
+történik meg, a kiegészítőt eltávolítom.
+
 ## Hogyan készül?
 
 A Tinta kódjának nagy részét a Claude nevű AI írja. Én mondom meg, mit csináljon,

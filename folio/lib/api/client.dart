@@ -236,10 +236,10 @@ class FilcAPI {
     try {
       theme.json.remove('json');
       theme.json['is_public'] = theme.isPublic.toString();
-      theme.json['background_color'] = theme.backgroundColor.value.toString();
-      theme.json['panels_color'] = theme.panelsColor.value.toString();
-      theme.json['accent_color'] = theme.accentColor.value.toString();
-      theme.json['icon_color'] = theme.iconColor.value.toString();
+      theme.json['background_color'] = theme.backgroundColor.toARGB32().toString();
+      theme.json['panels_color'] = theme.panelsColor.toARGB32().toString();
+      theme.json['accent_color'] = theme.accentColor.toARGB32().toString();
+      theme.json['icon_color'] = theme.iconColor.toARGB32().toString();
       theme.json['shadow_effect'] = theme.shadowEffect.toString();
 
       // set theme mode or remove if unneccessary
@@ -316,11 +316,11 @@ class FilcAPI {
     try {
       gradeColors.json.remove('json');
       gradeColors.json['is_public'] = gradeColors.isPublic.toString();
-      gradeColors.json['five_color'] = gradeColors.fiveColor.value.toString();
-      gradeColors.json['four_color'] = gradeColors.fourColor.value.toString();
-      gradeColors.json['three_color'] = gradeColors.threeColor.value.toString();
-      gradeColors.json['two_color'] = gradeColors.twoColor.value.toString();
-      gradeColors.json['one_color'] = gradeColors.oneColor.value.toString();
+      gradeColors.json['five_color'] = gradeColors.fiveColor.toARGB32().toString();
+      gradeColors.json['four_color'] = gradeColors.fourColor.toARGB32().toString();
+      gradeColors.json['three_color'] = gradeColors.threeColor.toARGB32().toString();
+      gradeColors.json['two_color'] = gradeColors.twoColor.toARGB32().toString();
+      gradeColors.json['one_color'] = gradeColors.oneColor.toARGB32().toString();
 
       http.Response res = await http.post(
         Uri.parse(gradeColorsShare),

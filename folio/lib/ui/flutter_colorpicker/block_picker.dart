@@ -139,10 +139,10 @@ class _BlockPickerState extends State<BlockPicker> {
         color,
         (_currentColor != null &&
                 (widget.useInShowDialog ? true : widget.pickerColor != null))
-            ? (_currentColor?.value == color.value) &&
+            ? (_currentColor?.toARGB32() == color.toARGB32()) &&
                 (widget.useInShowDialog
                     ? true
-                    : widget.pickerColor?.value == color.value)
+                    : widget.pickerColor?.toARGB32() == color.toARGB32())
             : false,
         () => changeColor(color),
       ),

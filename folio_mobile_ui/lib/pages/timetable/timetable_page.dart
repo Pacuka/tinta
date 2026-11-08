@@ -100,6 +100,7 @@ class TimetablePageState extends State<TimetablePage>
   // Update timetable on user change
   Future<void> _userListener() async {
     await Provider.of<TimetableProvider>(context, listen: false).restoreUser();
+    if (!mounted) return;
     await Provider.of<KretaClient>(context, listen: false).refreshLogin();
     if (mounted) _controller.jump(_controller.currentWeek, context: context);
   }
@@ -705,7 +706,7 @@ Container(
                   .then((_) {
                 SystemChrome.setPreferredOrientations(
                     [DeviceOrientation.portraitUp]);
-                setSystemChrome(context);
+                if (context.mounted) setSystemChrome(context);
               });
             },
           ),

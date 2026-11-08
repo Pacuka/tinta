@@ -7,6 +7,7 @@ import 'package:folio_kreta_api/demo/demo_data.dart';
 import 'package:folio_kreta_api/models/note.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:folio_kreta_api/models/parse_each.dart';
 
 class NoteProvider with ChangeNotifier {
   late List<Note> _notes;
@@ -46,7 +47,7 @@ class NoteProvider with ChangeNotifier {
     List? notesJson = await Provider.of<KretaClient>(_context, listen: false)
         .getAPI(KretaAPI.notes(iss));
     if (notesJson == null) throw "Cannot fetch Notes for User ${user.id}";
-    List<Note> notes = notesJson.map((e) => Note.fromJson(e)).toList();
+    List<Note> notes = parseEach(notesJson, Note.fromJson, what: "note");
 
     if (notes.isNotEmpty || _notes.isNotEmpty) await store(notes);
   }

@@ -27,7 +27,6 @@ import 'package:folio/api/providers/news_provider.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/self_note_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
-import 'package:folio/helpers/notification_helper.dart';
 import 'package:folio/providers/third_party_provider.dart';
 import 'package:folio/theme/observer.dart';
 import 'package:folio/theme/theme.dart';
@@ -132,10 +131,6 @@ class _AppState extends State<App> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Tinta: no config from the Firka server; the KRÉTA user agent is
       // built locally (Config.initDeviceUserAgent).
-      // Register device for push notifications if a user is already signed in
-      if (user.user != null && settings.notificationsEnabled) {
-        NotificationHelper.initialize(user.user!, database);
-      }
     });
 
     return MultiProvider(

@@ -9,6 +9,7 @@ import 'package:folio_kreta_api/demo/demo_data.dart';
 import 'package:folio_kreta_api/models/absence.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:folio_kreta_api/models/parse_each.dart';
 
 class AbsenceProvider with ChangeNotifier {
   late List<Absence> _absences;
@@ -94,7 +95,7 @@ class AbsenceProvider with ChangeNotifier {
         .getAPI(KretaAPI.absences(iss));
     if (absencesJson == null) throw "Cannot fetch Absences for User ${user.id}";
     List<Absence> absences =
-        absencesJson.map((e) => Absence.fromJson(e)).toList();
+        parseEach(absencesJson, Absence.fromJson, what: "absence");
 
     if (absences.isNotEmpty || _absences.isNotEmpty) await store(absences);
   }

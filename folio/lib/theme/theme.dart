@@ -172,7 +172,6 @@ class AppTheme {
           fontFamily: _defaultFontFamily,
         ),
       ),
-      indicatorColor: accent,
       iconTheme: IconThemeData(color: lightColors.text.withValues(alpha: .75)),
       navigationBarTheme: NavigationBarThemeData(
         indicatorColor: accent.withValues(
@@ -327,6 +326,7 @@ class AppTheme {
             ? backgroundColor
             : null,
       ),
+      tabBarTheme: TabBarThemeData(indicatorColor: accent),
     );
   }
 
@@ -460,7 +460,6 @@ class AppTheme {
           fontFamily: _defaultFontFamily,
         ),
       ),
-      indicatorColor: accent,
       iconTheme: IconThemeData(color: darkColors.text.withValues(alpha: .75)),
       navigationBarTheme: NavigationBarThemeData(
         indicatorColor: accent.withValues(
@@ -613,6 +612,7 @@ class AppTheme {
             ? backgroundColor
             : null,
       ),
+      tabBarTheme: TabBarThemeData(indicatorColor: accent),
     );
   }
 }

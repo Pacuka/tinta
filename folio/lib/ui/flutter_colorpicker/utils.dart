@@ -23,9 +23,9 @@ bool useWhiteForeground(Color backgroundColor, {double bias = 0.0}) {
   // return 1.05 / (color.computeLuminance() + 0.05) > 4.5;
 
   // New:
-  int v = sqrt(pow(backgroundColor.red, 2) * 0.299 +
-          pow(backgroundColor.green, 2) * 0.587 +
-          pow(backgroundColor.blue, 2) * 0.114)
+  int v = sqrt(pow(backgroundColor.red8, 2) * 0.299 +
+          pow(backgroundColor.green8, 2) * 0.587 +
+          pow(backgroundColor.blue8, 2) * 0.114)
       .round();
   return v < 130 + bias ? true : false;
 }
@@ -195,10 +195,10 @@ String colorToHex(
   bool toUpperCase = true,
 }) {
   final String hex = (includeHashSign ? '#' : '') +
-      (enableAlpha ? _padRadix(color.alpha) : '') +
-      _padRadix(color.red) +
-      _padRadix(color.green) +
-      _padRadix(color.blue);
+      (enableAlpha ? _padRadix(color.alpha8) : '') +
+      _padRadix(color.red8) +
+      _padRadix(color.green8) +
+      _padRadix(color.blue8);
   return toUpperCase ? hex.toUpperCase() : hex;
 }
 
@@ -216,6 +216,11 @@ extension ColorExtension1 on String {
 
 // Extension from Color
 extension ColorExtension2 on Color {
+  // 0-255 channels; Color.red/green/blue/alpha are deprecated.
+  int get red8 => (r * 255.0).round().clamp(0, 255);
+  int get green8 => (g * 255.0).round().clamp(0, 255);
+  int get blue8 => (b * 255.0).round().clamp(0, 255);
+  int get alpha8 => (a * 255.0).round().clamp(0, 255);
   String toHexString({bool includeHashSign = false, bool enableAlpha = true, bool toUpperCase = true}) =>
       colorToHex(this, includeHashSign: false, enableAlpha: true, toUpperCase: true);
 }

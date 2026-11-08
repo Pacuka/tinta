@@ -7,6 +7,7 @@ import 'package:folio_kreta_api/demo/demo_data.dart';
 import 'package:folio_kreta_api/models/exam.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:folio_kreta_api/models/parse_each.dart';
 
 class ExamProvider with ChangeNotifier {
   late List<Exam> _exams;
@@ -80,7 +81,7 @@ class ExamProvider with ChangeNotifier {
     List? examsJson = await Provider.of<KretaClient>(_context, listen: false)
         .getAPI(KretaAPI.exams(iss));
     if (examsJson == null) throw "Cannot fetch Exams for User ${user.id}";
-    List<Exam> exams = examsJson.map((e) => Exam.fromJson(e)).toList();
+    List<Exam> exams = parseEach(examsJson, Exam.fromJson, what: "exam");
 
     if (exams.isNotEmpty || _exams.isNotEmpty) await store(exams);
   }

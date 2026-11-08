@@ -36,7 +36,7 @@ class HomeworkAttachmentTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
         onTap: () {
           attachment.open(context).then((value) {
-            if (!value) {
+            if (!value && context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
                 context: context,
                 content: Text("Failed to open attachment".i18n),

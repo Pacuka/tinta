@@ -19,7 +19,6 @@ import 'package:folio_kreta_api/client/client.dart';
 import 'package:folio_kreta_api/models/student.dart';
 import 'package:folio_kreta_api/models/week.dart';
 import 'package:flutter/material.dart';
-import 'package:folio/helpers/notification_helper.dart';
 import 'package:provider/provider.dart';
 
 enum LoginState {
@@ -117,12 +116,6 @@ Future newLoginAPI({
           await dbProvider.store.storeUser(user);
           Provider.of<UserProvider>(context, listen: false).addUser(user);
           Provider.of<UserProvider>(context, listen: false).setUser(user.id);
-
-          // Register device for push notifications
-          final sp = Provider.of<SettingsProvider>(context, listen: false);
-          if (sp.notificationsEnabled) {
-            NotificationHelper.initialize(user, dbProvider);
-          }
 
           // Get user data
           try {

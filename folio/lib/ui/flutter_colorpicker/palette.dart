@@ -351,9 +351,9 @@ class ColorPickerInputState extends State<ColorPickerInput> {
 
   @override
   Widget build(BuildContext context) {
-    if (inputColor != widget.color.value) {
+    if (inputColor != widget.color.toARGB32()) {
       textEditingController.text =
-          '#${widget.color.red.toRadixString(16).toUpperCase().padLeft(2, '0')}${widget.color.green.toRadixString(16).toUpperCase().padLeft(2, '0')}${widget.color.blue.toRadixString(16).toUpperCase().padLeft(2, '0')}${widget.enableAlpha ? widget.color.alpha.toRadixString(16).toUpperCase().padLeft(2, '0') : ''}';
+          '#${widget.color.red8.toRadixString(16).toUpperCase().padLeft(2, '0')}${widget.color.green8.toRadixString(16).toUpperCase().padLeft(2, '0')}${widget.color.blue8.toRadixString(16).toUpperCase().padLeft(2, '0')}${widget.enableAlpha ? widget.color.alpha8.toRadixString(16).toUpperCase().padLeft(2, '0') : ''}';
     }
     return Padding(
       padding: const EdgeInsets.only(top: 6.0, left: 12.0, right: 12.0),
@@ -401,7 +401,7 @@ class ColorPickerInputState extends State<ColorPickerInput> {
             final Color? color = colorFromHex(input);
             if (color != null) {
               widget.onColorChanged(color);
-              inputColor = color.value;
+              inputColor = color.toARGB32();
             }
           },
         ),
@@ -602,20 +602,20 @@ class ColorPickerSlider extends StatelessWidget {
               .toColor();
           break;
         case TrackType.red:
-          thumbOffset += (box.maxWidth - 30.0) * hsvColor.toColor().red / 0xff;
+          thumbOffset += (box.maxWidth - 30.0) * hsvColor.toColor().red8 / 0xff;
           thumbColor = hsvColor.toColor().withValues(alpha: 1.0);
           break;
         case TrackType.green:
           thumbOffset +=
-              (box.maxWidth - 30.0) * hsvColor.toColor().green / 0xff;
+              (box.maxWidth - 30.0) * hsvColor.toColor().green8 / 0xff;
           thumbColor = hsvColor.toColor().withValues(alpha: 1.0);
           break;
         case TrackType.blue:
-          thumbOffset += (box.maxWidth - 30.0) * hsvColor.toColor().blue / 0xff;
+          thumbOffset += (box.maxWidth - 30.0) * hsvColor.toColor().blue8 / 0xff;
           thumbColor = hsvColor.toColor().withValues(alpha: 1.0);
           break;
         case TrackType.alpha:
-          thumbOffset += (box.maxWidth - 30.0) * hsvColor.toColor().opacity;
+          thumbOffset += (box.maxWidth - 30.0) * hsvColor.toColor().a;
           thumbColor = hsvColor.toColor().withValues(alpha: hsvColor.alpha);
           break;
       }

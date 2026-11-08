@@ -106,19 +106,23 @@ class HomeworkProvider with ChangeNotifier {
     if (_homework.isEmpty) _homework = saved;
     final known = {for (final h in saved) h.id: h.json};
     List<Homework> homework = [];
+    if (!_context.mounted) return;
+    final kreta = Provider.of<KretaClient>(_context, listen: false);
     await Future.forEach(homeworkJson.cast<Map>(), (Map hw) async {
-      Map? e = await Provider.of<KretaClient>(_context, listen: false)
-          .getAPI(KretaAPI.homework(iss, id: hw["Uid"]));
+      Map? e = await kreta.getAPI(KretaAPI.homework(iss, id: hw["Uid"]));
       // Map<String, String> renamedSubjects = _settings.renamedSubjectsEnabled
       //     ? await _database.userQuery.renamedSubjects(userId: _user.user!.id)
       //     : {};
 
       if (e != null) {
-        Homework.carryModified(known[e["Uid"]], e);
-        Homework hmwrk = Homework.fromJson(e);
-        // hw.subject.renamedTo =
-        //     renamedSubjects.isNotEmpty ? renamedSubjects[hw.subject.id] : null;
-        homework.add(hmwrk);
+        // One broken homework must not drop the whole list.
+        try {
+          Homework.carryModified(known[e["Uid"]], e);
+          homework.add(Homework.fromJson(e));
+        } catch (error) {
+          // ignore: avoid_print
+          print("WARNING: skipped homework: ${error.runtimeType}");
+        }
       }
     });
 

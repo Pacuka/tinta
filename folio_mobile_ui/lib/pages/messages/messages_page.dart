@@ -7,7 +7,6 @@ import 'package:folio/ui/date_widget.dart';
 import 'package:folio_kreta_api/providers/message_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
 import 'package:folio_kreta_api/models/message.dart';
-import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/custom_snack_bar.dart';
 import 'package:folio_mobile_ui/common/empty.dart';
 import 'package:folio/ui/filter/sort.dart';
@@ -50,7 +49,6 @@ class MessagesPageState extends State<MessagesPage>
     messageProvider = Provider.of<MessageProvider>(context);
     updateProvider = Provider.of<UpdateProvider>(context);
 
-    final colorScheme = Theme.of(context).colorScheme;
     final settings = Provider.of<SettingsProvider>(context);
 
     List<String> nameParts = user.displayName?.split(" ") ?? ["?"];
@@ -357,59 +355,4 @@ Future<List<SendRecipient>?> loadComposeRecipients(
     if (seen.add(r.id ?? 0)) rs.add(r);
   }
   return failed && rs.isEmpty ? null : rs;
-}
-
-class _MessageFilterBar extends StatelessWidget {
-  const _MessageFilterBar({
-    required this.controller,
-    required this.labels,
-  });
-
-  final TabController controller;
-  final List<String> labels;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(labels.length, (i) {
-              final active = controller.index == i;
-              return GestureDetector(
-                onTap: () => controller.animateTo(i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  margin: const EdgeInsets.only(right: 8.0),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 18.0, vertical: 9.0),
-                  decoration: BoxDecoration(
-                    color: active
-                        ? colorScheme.secondaryContainer
-                        : colorScheme.surfaceContainerHigh,
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                  child: Text(
-                    labels[i],
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                      color: active
-                          ? colorScheme.onSecondaryContainer
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        );
-      },
-    );
-  }
 }

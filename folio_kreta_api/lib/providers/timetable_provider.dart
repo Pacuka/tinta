@@ -7,6 +7,7 @@ import 'package:folio_kreta_api/demo/demo_data.dart';
 import 'package:folio_kreta_api/models/lesson.dart';
 import 'package:folio_kreta_api/models/week.dart';
 import 'package:flutter/foundation.dart';
+import 'package:folio_kreta_api/models/parse_each.dart';
 
 class TimetableProvider with ChangeNotifier {
   Map<Week, List<Lesson>> lessons = {};
@@ -126,7 +127,7 @@ class TimetableProvider with ChangeNotifier {
       // throw "Cannot fetch Lessons for User ${user.id}";
     } else {
       List<Lesson> lessonsList =
-          lessonsJson.map((e) => Lesson.fromJson(e)).toList();
+          parseEach(lessonsJson, Lesson.fromJson, what: "lesson");
 
       lessons[week] = lessonsList;
 

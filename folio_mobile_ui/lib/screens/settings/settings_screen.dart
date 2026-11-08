@@ -22,7 +22,6 @@ import 'package:folio_mobile_ui/common/widgets/update/update_dialog.dart';
 import 'package:folio_mobile_ui/common/widgets/update/preview_banner.dart';
 import 'dart:io';
 
-import 'package:folio/helpers/notification_helper.dart';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/wear_provider.dart';
@@ -120,8 +119,6 @@ class SettingsScreenState extends State<SettingsScreen>
 
   double? _tempRounding;
   double? _tempCountdownMinutes;
-
-  late List<Grade> _editedSubjects;
 
   @override
   void initState() {
@@ -257,7 +254,7 @@ class SettingsScreenState extends State<SettingsScreen>
                       color: AppColors.of(context).text.withValues(alpha: .85)),
                   const SizedBox(width: 10.0),
                   Text(
-                    "rename_subjects".i18n,
+                    "rename_both".i18n,
                     style: TextStyle(
                       fontSize: 17.0,
                       fontWeight: FontWeight.w700,
@@ -296,7 +293,7 @@ class SettingsScreenState extends State<SettingsScreen>
                           : AppColors.of(context).text.withValues(alpha: .75),
                     ),
                     title: Text(
-                      subName ?? '',
+                      subName,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontStyle:
@@ -308,7 +305,7 @@ class SettingsScreenState extends State<SettingsScreen>
                       ),
                     ),
                     subtitle: Text(
-                      teachName ?? '',
+                      teachName,
                       style: TextStyle(
                         fontSize: 13.0,
                         color:
@@ -338,6 +335,15 @@ class SettingsScreenState extends State<SettingsScreen>
     );
   }
 
+  // A blank field means "keep the original name".
+  void _setRename(Map<String, String> renames, String id, String name) {
+    if (name.trim().isEmpty) {
+      renames.remove(id);
+    } else {
+      renames[id] = name.trim();
+    }
+  }
+
   /// Shows a dialog to rename the subject + teacher of a given [grade].
   void _showEditSubjectPopup(Grade grade) {
     _editSubjectNameCtrl.text = grade.subject.renamedTo ?? '';
@@ -364,7 +370,7 @@ class SettingsScreenState extends State<SettingsScreen>
               const SizedBox(width: 8.0),
               Expanded(
                 child: Text(
-                  grade.subject.name.capital() ?? '',
+                  grade.subject.name.capital(),
                   style: const TextStyle(fontSize: 17.0),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -419,7 +425,7 @@ class SettingsScreenState extends State<SettingsScreen>
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  hintText: "modified_name".i18n,
+                  hintText: grade.subject.name.capital(),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.close_rounded,
                         color: Colors.grey, size: 16.0),
@@ -450,7 +456,7 @@ class SettingsScreenState extends State<SettingsScreen>
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  hintText: "modified_name".i18n,
+                  hintText: grade.teacher.name,
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.close_rounded,
                         color: Colors.grey, size: 16.0),
@@ -473,12 +479,12 @@ class SettingsScreenState extends State<SettingsScreen>
               onPressed: () async {
                 final subs =
                     await db.userQuery.renamedSubjects(userId: userProv.id!);
-                subs[grade.subject.id] = _editSubjectNameCtrl.text;
+                _setRename(subs, grade.subject.id, _editSubjectNameCtrl.text);
                 await db.userStore
                     .storeRenamedSubjects(subs, userId: userProv.id!);
                 final teach =
                     await db.userQuery.renamedTeachers(userId: userProv.id!);
-                teach[grade.teacher.id ?? ''] = _editTeacherNameCtrl.text;
+                _setRename(teach, grade.teacher.id, _editTeacherNameCtrl.text);
                 await db.userStore
                     .storeRenamedTeachers(teach, userId: userProv.id!);
                 await _convertProviders();
@@ -548,74 +554,6 @@ class SettingsScreenState extends State<SettingsScreen>
       case VibrationStrength.strong:
         HapticFeedback.mediumImpact();
     }
-  }
-
-  Future<void> _checkFirebaseStatus(BuildContext context) async {
-    HapticFeedback.heavyImpact();
-    final db = Provider.of<DatabaseProvider>(context, listen: false);
-    final currentUser = Provider.of<UserProvider>(context, listen: false).user;
-    if (currentUser == null) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        content: Row(
-          children: [
-            const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2.5),
-            ),
-            const SizedBox(width: 16.0),
-            Text('firebase_checking'.i18n),
-          ],
-        ),
-      ),
-    );
-
-    final status = await NotificationHelper.checkStatus(currentUser, db);
-
-    if (!context.mounted) return;
-    Navigator.of(context, rootNavigator: true).pop();
-
-    final (IconData icon, Color color, String message) = switch (status) {
-      NotificationRegistrationStatus.registered => (
-          Icons.check_circle_rounded,
-          Colors.green,
-          'firebase_reg_registered'.i18n,
-        ),
-      NotificationRegistrationStatus.tokenMismatch => (
-          Icons.warning_rounded,
-          Colors.orange,
-          'firebase_reg_token_mismatch'.i18n,
-        ),
-      NotificationRegistrationStatus.notRegistered => (
-          Icons.cancel_rounded,
-          Colors.red,
-          'firebase_reg_not_registered'.i18n,
-        ),
-      NotificationRegistrationStatus.noToken => (
-          Icons.warning_rounded,
-          Colors.orange,
-          'firebase_reg_no_token'.i18n,
-        ),
-    };
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        icon: Icon(icon, color: color, size: 36.0),
-        title: Text('firebase_reg_title'.i18n),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('done'.i18n),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildSliderCard({
@@ -696,13 +634,6 @@ class SettingsScreenState extends State<SettingsScreen>
     updateProvider = Provider.of<UpdateProvider>(context);
 
     if (settings.developerMode) devmodeCountdown = -1;
-
-    final gradeProvider = Provider.of<GradeProvider>(context);
-    _editedSubjects = gradeProvider.grades
-        .where((e) => e.teacher.isRenamed || e.subject.isRenamed)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.subject.name.compareTo(b.subject.name));
 
     final allSections = _buildAllSections(context);
 
@@ -2178,56 +2109,13 @@ Container(
             isSeparated: false,
             children: [
               PanelButton(
-                padding: const EdgeInsets.only(left: 14.0, right: 6.0),
+                padding: const EdgeInsets.only(left: 14.0, right: 14.0),
                 onPressed: () => _showRenamePickerPopup(),
-                trailingDivider: true,
-                title: Text("rename_subjects".i18n,
-                    style: TextStyle(
-                        color: AppColors.of(context).text.withValues(
-                            alpha:
-                                settings.renamedSubjectsEnabled ? .95 : .25))),
-                leading: Icon(Icons.school_outlined,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(
-                        alpha: settings.renamedSubjectsEnabled ? .95 : .25)),
-                trailing: Switch(
-                  onChanged: (v) async {
-                    _haptic();
-                    settings.update(renamedSubjectsEnabled: v);
-                    await _convertProviders();
-                    setState(() {});
-                  },
-                  value: settings.renamedSubjectsEnabled,
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                ),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
-              ),
-              PanelButton(
-                padding: const EdgeInsets.only(left: 14.0, right: 6.0),
-                onPressed: () => _showRenamePickerPopup(),
-                trailingDivider: true,
-                title: Text("rename_teachers".i18n,
-                    style: TextStyle(
-                        color: AppColors.of(context).text.withValues(
-                            alpha:
-                                settings.renamedTeachersEnabled ? .95 : .25))),
-                leading: Icon(Icons.person_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(
-                        alpha: settings.renamedTeachersEnabled ? .95 : .25)),
-                trailing: Switch(
-                  onChanged: (v) async {
-                    _haptic();
-                    settings.update(renamedTeachersEnabled: v);
-                    await _convertProviders();
-                    setState(() {});
-                  },
-                  value: settings.renamedTeachersEnabled,
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                ),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
+                title: Text("rename_both".i18n),
+                leading: const Icon(Icons.school_outlined, size: 22.0),
+                trailing: Icon(Icons.chevron_right_rounded,
+                    color: AppColors.of(context).text.withValues(alpha: .55)),
+                borderRadius: const BorderRadius.all(Radius.circular(12.0)),
               ),
             ],
           ),

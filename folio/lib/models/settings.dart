@@ -446,11 +446,11 @@ class SettingsProvider extends ChangeNotifier {
       "notifications_bitfield": _notificationsBitfield,
       "developer_mode": _developerMode ? 1 : 0,
       "dev_live_fake_lessons": _devLiveFakeLessons ? 1 : 0,
-      "grade_color1": _gradeColors[0].value,
-      "grade_color2": _gradeColors[1].value,
-      "grade_color3": _gradeColors[2].value,
-      "grade_color4": _gradeColors[3].value,
-      "grade_color5": _gradeColors[4].value,
+      "grade_color1": _gradeColors[0].toARGB32(),
+      "grade_color2": _gradeColors[1].toARGB32(),
+      "grade_color3": _gradeColors[2].toARGB32(),
+      "grade_color4": _gradeColors[3].toARGB32(),
+      "grade_color5": _gradeColors[4].toARGB32(),
       "update_channel": _updateChannel.index,
       "vibration_strength": _vibrate.index,
       "ab_weeks": _abWeeks ? 1 : 0,
@@ -464,11 +464,11 @@ class SettingsProvider extends ChangeNotifier {
       "bell_delay": _bellDelay,
       "grade_opening_fun": _gradeOpeningFun ? 1 : 0,
       "icon_pack": _iconPack.name,
-      "custom_accent_color": _customAccentColor.value,
-      "custom_background_color": _customBackgroundColor.value,
-      "custom_highlight_color": _customHighlightColor.value,
-      "custom_icon_color": _customIconColor.value,
-      "custom_text_color": _customTextColor.value,
+      "custom_accent_color": _customAccentColor.toARGB32(),
+      "custom_background_color": _customBackgroundColor.toARGB32(),
+      "custom_highlight_color": _customHighlightColor.toARGB32(),
+      "custom_icon_color": _customIconColor.toARGB32(),
+      "custom_text_color": _customTextColor.toARGB32(),
       "shadow_effect": _shadowEffect ? 1 : 0,
       "premium_scopes": jsonEncode(_premiumScopes),
       "premium_token": _premiumAccessToken,
@@ -478,7 +478,7 @@ class SettingsProvider extends ChangeNotifier {
       "renamed_subjects_italics": _renamedSubjectsItalics ? 1 : 0,
       "renamed_teachers_enabled": _renamedTeachersEnabled ? 1 : 0,
       "renamed_teachers_italics": _renamedTeachersItalics ? 1 : 0,
-      "live_activity_color": _liveActivityColor.value,
+      "live_activity_color": _liveActivityColor.toARGB32(),
       "welcome_message": _welcomeMessage,
       "app_icon": _appIcon,
       "current_theme_id": _currentThemeId,
@@ -663,9 +663,11 @@ class SettingsProvider extends ChangeNotifier {
   String get premiumAccessToken => _premiumAccessToken;
   String get premiumLogin => _premiumLogin;
   String get lastAccountId => _lastAccountId;
-  bool get renamedSubjectsEnabled => _renamedSubjectsEnabled;
+  // Renames always apply now: the separate on/off switches made a rename seem
+  // broken until switched on. The stored values are kept for old settings.
+  bool get renamedSubjectsEnabled => true;
   bool get renamedSubjectsItalics => _renamedSubjectsItalics;
-  bool get renamedTeachersEnabled => _renamedTeachersEnabled;
+  bool get renamedTeachersEnabled => true;
   bool get renamedTeachersItalics => _renamedTeachersItalics;
   Color get liveActivityColor => _liveActivityColor;
   String get welcomeMessage => _welcomeMessage;
@@ -1081,11 +1083,11 @@ class SettingsProvider extends ChangeNotifier {
       accentColor:
           AccentColor.values[map["accent_color"] ?? _accentColor.index],
       gradeColors: [
-        Color(map["grade_color1"] ?? _gradeColors[0].value),
-        Color(map["grade_color2"] ?? _gradeColors[1].value),
-        Color(map["grade_color3"] ?? _gradeColors[2].value),
-        Color(map["grade_color4"] ?? _gradeColors[3].value),
-        Color(map["grade_color5"] ?? _gradeColors[4].value),
+        Color(map["grade_color1"] ?? _gradeColors[0].toARGB32()),
+        Color(map["grade_color2"] ?? _gradeColors[1].toARGB32()),
+        Color(map["grade_color3"] ?? _gradeColors[2].toARGB32()),
+        Color(map["grade_color4"] ?? _gradeColors[3].toARGB32()),
+        Color(map["grade_color5"] ?? _gradeColors[4].toARGB32()),
       ],
       newsEnabled: map["news"] == 1,
       seenNews: map["seen_news"],
@@ -1115,15 +1117,15 @@ class SettingsProvider extends ChangeNotifier {
       iconPack: Map.fromEntries(
           IconPack.values.map((e) => MapEntry(e.name, e)))[map["icon_pack"]]!,
       customAccentColor:
-          Color(map["custom_accent_color"] ?? _customAccentColor.value),
+          Color(map["custom_accent_color"] ?? _customAccentColor.toARGB32()),
       customBackgroundColor:
-          Color(map["custom_background_color"] ?? _customBackgroundColor.value),
+          Color(map["custom_background_color"] ?? _customBackgroundColor.toARGB32()),
       customHighlightColor:
-          Color(map["custom_highlight_color"] ?? _customHighlightColor.value),
+          Color(map["custom_highlight_color"] ?? _customHighlightColor.toARGB32()),
       customIconColor:
-          Color(map["custom_icon_color"] ?? _customIconColor.value),
+          Color(map["custom_icon_color"] ?? _customIconColor.toARGB32()),
       customTextColor:
-          Color(map["custom_text_color"] ?? _customTextColor.value),
+          Color(map["custom_text_color"] ?? _customTextColor.toARGB32()),
       shadowEffect: map["shadow_effect"] == 1,
       premiumScopes:
           jsonDecode(map["premium_scopes"] ?? _premiumScopes).cast<String>(),

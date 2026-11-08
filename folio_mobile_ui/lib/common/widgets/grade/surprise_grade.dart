@@ -128,12 +128,12 @@ Widget build(BuildContext context) {
       return FadeTransition(
         opacity: _revealAnimFade,
         child: Material(
-          color: Colors.black.withOpacity(0.75),
+          color: Colors.black.withValues(alpha: 0.75),
           child: Container(
             color: Theme.of(context)
                 .colorScheme
                 .secondary
-                .withOpacity(0.05),
+                .withValues(alpha: 0.05),
             child: Container(
               decoration: const BoxDecoration(
                 gradient: RadialGradient(
@@ -218,11 +218,11 @@ Widget build(BuildContext context) {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 32.0, vertical: 20.0),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.3),
+                                        color: Colors.white.withValues(alpha: 0.3),
                                         borderRadius:
                                             BorderRadius.circular(24.0),
                                         border: Border.all(
-                                            color: Colors.black.withOpacity(0.3),
+                                            color: Colors.black.withValues(alpha: 0.3),
                                             width: 1.0),
                                       ),
                                       child: Row(
@@ -254,7 +254,7 @@ Widget build(BuildContext context) {
                                                           .capital(),
                                                   style: TextStyle(
                                                       color: Colors.white
-                                                          .withOpacity(0.8),
+                                                          .withValues(alpha: 0.8),
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 24.0,
@@ -275,7 +275,7 @@ Widget build(BuildContext context) {
                                                   "${widget.grade.value.weight}%",
                                                   style: TextStyle(
                                                     color: Colors.white
-                                                        .withOpacity(0.7),
+                                                        .withValues(alpha: 0.7),
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 20.0,
                                                   ),
@@ -314,7 +314,7 @@ Widget build(BuildContext context) {
                   child: Text(
                     "open_subtitle".i18n,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontWeight: FontWeight.w600,
                       fontSize: 24.0,
                     ),
@@ -368,14 +368,14 @@ Widget build(BuildContext context) {
                                       color: gradeColor(
                                               context: context,
                                               value: widget.grade.value.value)
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                       blurRadius: 24.0,
                                     ),
                                     Shadow(
                                       color: gradeColor(
                                               context: context,
                                               value: widget.grade.value.value)
-                                          .withOpacity(0.3),
+                                          .withValues(alpha: 0.3),
                                       offset: const Offset(-3, -3),
                                     ),
                                   ],

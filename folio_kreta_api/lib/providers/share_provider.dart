@@ -43,18 +43,18 @@ class ShareProvider extends ChangeNotifier {
       'display_name': displayName,
       'background_color': (settings.customBackgroundColor ??
               SettingsProvider.defaultSettings().customBackgroundColor)
-          ?.value,
+          ?.toARGB32(),
       'panels_color': (settings.customHighlightColor ??
               SettingsProvider.defaultSettings().customHighlightColor)
-          ?.value,
+          ?.toARGB32(),
       'accent_color': (settings.customAccentColor ??
                   SettingsProvider.defaultSettings().customAccentColor)
-              ?.value ??
-          const Color(0xFF3D7BF4).value,
+              ?.toARGB32() ??
+          const Color(0xFF3D7BF4).toARGB32(),
       'icon_color': (settings.customIconColor ??
                   SettingsProvider.defaultSettings().customIconColor)
-              ?.value ??
-          const Color(0x00000000).value,
+              ?.toARGB32() ??
+          const Color(0x00000000).toARGB32(),
       'shadow_effect': settings.shadowEffect,
       'theme_mode': settings.theme == ThemeMode.dark
           ? 'dark'
@@ -90,15 +90,15 @@ class ShareProvider extends ChangeNotifier {
                   "is_public": false,
                   "nickname": "Anonymous",
                   "five_color":
-                      SettingsProvider.defaultSettings().gradeColors[4].value,
+                      SettingsProvider.defaultSettings().gradeColors[4].toARGB32(),
                   "four_color":
-                      SettingsProvider.defaultSettings().gradeColors[3].value,
+                      SettingsProvider.defaultSettings().gradeColors[3].toARGB32(),
                   "three_color":
-                      SettingsProvider.defaultSettings().gradeColors[2].value,
+                      SettingsProvider.defaultSettings().gradeColors[2].toARGB32(),
                   "two_color":
-                      SettingsProvider.defaultSettings().gradeColors[1].value,
+                      SettingsProvider.defaultSettings().gradeColors[1].toARGB32(),
                   "one_color":
-                      SettingsProvider.defaultSettings().gradeColors[0].value,
+                      SettingsProvider.defaultSettings().gradeColors[0].toARGB32(),
                 }),
         );
         return theme;
@@ -139,15 +139,15 @@ Future<List<SharedTheme>> getAllPublicThemes(BuildContext context,
                   "is_public": false,
                   "nickname": "Anonymous",
                   "five_color":
-                      SettingsProvider.defaultSettings().gradeColors[4].value,
+                      SettingsProvider.defaultSettings().gradeColors[4].toARGB32(),
                   "four_color":
-                      SettingsProvider.defaultSettings().gradeColors[3].value,
+                      SettingsProvider.defaultSettings().gradeColors[3].toARGB32(),
                   "three_color":
-                      SettingsProvider.defaultSettings().gradeColors[2].value,
+                      SettingsProvider.defaultSettings().gradeColors[2].toARGB32(),
                   "two_color":
-                      SettingsProvider.defaultSettings().gradeColors[1].value,
+                      SettingsProvider.defaultSettings().gradeColors[1].toARGB32(),
                   "one_color":
-                      SettingsProvider.defaultSettings().gradeColors[0].value,
+                      SettingsProvider.defaultSettings().gradeColors[0].toARGB32(),
                 }),
         );
 
@@ -172,11 +172,11 @@ Future<List<SharedTheme>> getAllPublicThemes(BuildContext context,
       'public_id': const Uuid().v4(),
       'is_public': isPublic,
       'nickname': 'Anonymous',
-      'five_color': settings.gradeColors[4].value,
-      'four_color': settings.gradeColors[3].value,
-      'three_color': settings.gradeColors[2].value,
-      'two_color': settings.gradeColors[1].value,
-      'one_color': settings.gradeColors[0].value,
+      'five_color': settings.gradeColors[4].toARGB32(),
+      'four_color': settings.gradeColors[3].toARGB32(),
+      'three_color': settings.gradeColors[2].toARGB32(),
+      'two_color': settings.gradeColors[1].toARGB32(),
+      'one_color': settings.gradeColors[0].toARGB32(),
     };
 
     SharedGradeColors gradeColors = SharedGradeColors.fromJson(gradeColorsJson);
@@ -202,15 +202,15 @@ Future<List<SharedTheme>> getAllPublicThemes(BuildContext context,
                 "is_public": false,
                 "nickname": "Anonymous",
                 "five_color":
-                    SettingsProvider.defaultSettings().gradeColors[4].value,
+                    SettingsProvider.defaultSettings().gradeColors[4].toARGB32(),
                 "four_color":
-                    SettingsProvider.defaultSettings().gradeColors[3].value,
+                    SettingsProvider.defaultSettings().gradeColors[3].toARGB32(),
                 "three_color":
-                    SettingsProvider.defaultSettings().gradeColors[2].value,
+                    SettingsProvider.defaultSettings().gradeColors[2].toARGB32(),
                 "two_color":
-                    SettingsProvider.defaultSettings().gradeColors[1].value,
+                    SettingsProvider.defaultSettings().gradeColors[1].toARGB32(),
                 "one_color":
-                    SettingsProvider.defaultSettings().gradeColors[0].value,
+                    SettingsProvider.defaultSettings().gradeColors[0].toARGB32(),
               },
       );
       return gradeColors;

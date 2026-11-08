@@ -121,7 +121,7 @@ class _MessagePopupState extends State<MessagePopup> {
         ],
       ),
     );
-    if (sure != true || !mounted) return;
+    if (sure != true || !mounted || !widget.outsideContext.mounted) return;
     final provider =
         Provider.of<MessageProvider>(widget.outsideContext, listen: false);
     final messenger = ScaffoldMessenger.of(widget.outsideContext);

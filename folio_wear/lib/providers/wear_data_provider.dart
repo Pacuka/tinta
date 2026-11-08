@@ -125,7 +125,7 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
 
   Future<void> _loadCached() async {
     try {
-      final result = await _channel.invokeMethod<Map>('getCachedData') as Map?;
+      final result = await _channel.invokeMethod<Map>('getCachedData');
       if (result != null) {
         if (result['timetable'] != null) {
           _parseTimetable(result['timetable'] as String);

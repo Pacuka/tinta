@@ -11,6 +11,7 @@ import 'package:folio_kreta_api/models/group_average.dart';
 import 'package:folio_kreta_api/models/subject_average.dart';
 import 'package:folio_kreta_api/providers/grade_provider.i18n.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_kreta_api/models/parse_each.dart';
 
 class GradeProvider with ChangeNotifier {
   // Private
@@ -193,7 +194,7 @@ Future<void> unseenAll() async {
     List? groupsJson = fetched[1];
 
     if (gradesJson == null) throw "Cannot fetch Grades for User ${user.id}";
-    List<Grade> grades = gradesJson.map((e) => Grade.fromJson(e)).toList();
+    List<Grade> grades = parseEach(gradesJson, Grade.fromJson, what: "grade");
 
     if (grades.isNotEmpty || _grades.isNotEmpty) await store(grades);
 
@@ -213,13 +214,15 @@ Future<void> unseenAll() async {
       throw "Cannot fetch Class Averages for User ${user.id}";
     }
     final groupAvgs =
-        groupAvgJson.map((e) => GroupAverage.fromJson(e)).toList();
+        parseEach(groupAvgJson, GroupAverage.fromJson,
+            what: "group average");
     await storeGroupAvg(groupAvgs);
 
     final List? subjectAvgJson = avgFetched[1];
     if (subjectAvgJson != null) {
       final subjectAvgs =
-          subjectAvgJson.map((e) => SubjectAverage.fromJson(e)).toList();
+          parseEach(subjectAvgJson, SubjectAverage.fromJson,
+              what: "subject average");
       await storeSubjectAvg(subjectAvgs);
     }
   }

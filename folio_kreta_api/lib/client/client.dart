@@ -21,6 +21,31 @@ import 'dart:async';
 Uint8List? downloadedBytes(http.Response res) =>
     res.statusCode >= 200 && res.statusCode < 300 ? res.bodyBytes : null;
 
+enum AuthRetry { none, resend, refresh }
+
+/// What to do after a 401. It usually means the access token expired while
+/// the app was open, so the first attempt gets one retry: with the token a
+/// parallel request already refreshed ([AuthRetry.resend]), or after a
+/// refresh. Never for the IDP itself: the refresh goes through it and would
+/// wait for itself.
+AuthRetry unauthorizedRetry({
+  required String url,
+  required bool autoHeader,
+  required int attempt,
+  required String? sentAuth,
+  required String? currentToken,
+}) {
+  if (attempt > 0 || !autoHeader || BaseKreta.isIdpUrl(url)) {
+    return AuthRetry.none;
+  }
+  if (currentToken != null &&
+      currentToken.isNotEmpty &&
+      sentAuth != "Bearer $currentToken") {
+    return AuthRetry.resend;
+  }
+  return AuthRetry.refresh;
+}
+
 class KretaClient {
   /// The official app's API key, sent with every non-IDP request.
   static const _apiKey = "21ff6c25-d1da-4a68-a811-c881a6057463";
@@ -51,7 +76,6 @@ class KretaClient {
   late final DatabaseProvider _database;
   DatabaseProvider get database => _database;
   late final StatusProvider _status;
-
 
   KretaClient({
     this.accessToken,
@@ -125,17 +149,10 @@ class KretaClient {
             .timeout(requestTimeout);
         _status.triggerRequest(res);
 
-        if (res.statusCode == 401) {
-          headerMap.remove("authorization");
-          print("DEBUG: 401 error, refreshing login");
-          print("DEBUG: 401 error, URL: $url");
-          //await refreshLogin();
-        } else {
+        if (res.statusCode != 401 ||
+            !await _retryAfter401(url, autoHeader, i, headerMap)) {
           break;
         }
-
-        // Wait before retrying
-        await Future.delayed(const Duration(milliseconds: 1500));
       }
 
       if (res == null) throw "Login error";
@@ -211,15 +228,10 @@ class KretaClient {
         res = await client
             .post(Uri.parse(url), headers: headerMap, body: body)
             .timeout(requestTimeout);
-        if (res.statusCode == 401) {
-          //await refreshLogin();
-          headerMap.remove("authorization");
-        } else {
+        if (res.statusCode != 401 ||
+            !await _retryAfter401(url, autoHeader, i, headerMap)) {
           break;
         }
-
-        // Wait before retrying
-        await Future.delayed(const Duration(milliseconds: 1500));
       }
 
       if (res == null) throw "Login error";
@@ -382,90 +394,37 @@ class KretaClient {
     }
   }
 
-  Future<dynamic> sendFilesAPI(
-    String url, {
-    Map<String, String>? headers,
-    bool autoHeader = true,
-    Map<String, String>? body,
-  }) async {
-    Map<String, String> headerMap;
-
-    if (headers != null) {
-      headerMap = headers;
-    } else {
-      headerMap = {};
-    }
-
-    if (accessToken == null || accessToken == '') {
-      accessToken = _user.user?.accessToken;
-    }
-
-    try {
-      http.StreamedResponse? res;
-
-      for (int i = 0; i < 3; i++) {
-        if (autoHeader) {
-          if (!headerMap.containsKey("authorization") && accessToken != null) {
-            headerMap["authorization"] = "Bearer $accessToken";
-          }
-          if (!headerMap.containsKey("user-agent") && _roleUserAgent != null) {
-            headerMap["user-agent"] = _roleUserAgent!;
-          }
-          if (!headerMap.containsKey("content-type")) {
-            headerMap["content-type"] = "multipart/form-data";
-          }
-          if (_sendApiKey &&
-              !headerMap.containsKey("apiKey") &&
-              !BaseKreta.isIdpUrl(url)) {
-            headerMap["apiKey"] = _apiKey;
-          }
-          if (url.contains('kommunikacio/uzenetek')) {
-            headerMap["X-Uzenet-Lokalizacio"] = "hu-HU";
-          }
-        }
-
-        var request = http.MultipartRequest("POST", Uri.parse(url));
-
-        // request.files.add(value)
-
-        request.fields.addAll(body ?? {});
-        request.headers.addAll(headers ?? {});
-
-        res = await request.send();
-
-        if (res.statusCode == 401) {
-          headerMap.remove("authorization");
-          //await refreshLogin();
-        } else {
-          break;
-        }
-      }
-
-      if (res == null) throw "Login error";
-
-      print(res.statusCode);
-
-      return res.statusCode;
-    } on http.ClientException catch (error) {
-      print(
-          "ERROR: KretaClient.postAPI ($url) ClientException: ${error.message}");
-    } catch (error) {
-      print("ERROR: KretaClient.postAPI ($url) ${error.runtimeType}: $error");
-    }
-  }
-
   // In-flight token refresh, per user. Account switching and screens can call
   // refreshLogin() several times at once; KRÉTA rotates the refresh token, so
   // parallel calls with the same token could be rejected (invalid_grant).
   Future<String?>? _refreshing;
   String? _refreshingUserId;
 
-  Future<String?> refreshLogin() {
+  /// Drops the rejected token from [headerMap] (the next attempt adds the
+  /// current one) and refreshes if needed. false = don't retry.
+  Future<bool> _retryAfter401(String url, bool autoHeader, int attempt,
+      Map<String, String> headerMap) async {
+    final retry = unauthorizedRetry(
+      url: url,
+      autoHeader: autoHeader,
+      attempt: attempt,
+      sentAuth: headerMap.remove("authorization"),
+      currentToken: accessToken,
+    );
+    if (retry == AuthRetry.none) return false;
+    if (retry == AuthRetry.resend) return true;
+    print("DEBUG: 401, refreshing login");
+    return await refreshLogin(force: true) == 'success';
+  }
+
+  /// [force]: refresh even if the token isn't expired by the phone's clock
+  /// (KRÉTA rejected it, or the clock is off).
+  Future<String?> refreshLogin({bool force = false}) {
     final userId = _user.user?.id;
     if (userId == null) return Future.value(null);
     final running = _refreshing;
     if (running != null && _refreshingUserId == userId) return running;
-    final future = _refreshLogin().whenComplete(() {
+    final future = _refreshLogin(force: force).whenComplete(() {
       if (_refreshingUserId == userId) {
         _refreshing = null;
         _refreshingUserId = null;
@@ -476,7 +435,7 @@ class KretaClient {
     return future;
   }
 
-  Future<String?> _refreshLogin() async {
+  Future<String?> _refreshLogin({bool force = false}) async {
     User? loginUser = _user.user;
     if (loginUser == null) return null;
 
@@ -494,7 +453,7 @@ class KretaClient {
 
     refreshToken ??= loginUser.refreshToken;
 
-    if (!DateTime.now().isAfter(loginUser.accessTokenExpire)) {
+    if (!force && !DateTime.now().isAfter(loginUser.accessTokenExpire)) {
       return 'success';
     }
 

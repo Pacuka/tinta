@@ -59,7 +59,6 @@ class ProfileScreenState extends State<ProfileScreen>
   List<DigitalCertification>? _certifications;
   bool _contactLoading = false;
   bool _certsLoading = false;
-  String? _contactError;
   String? _certsError;
 
   @override
@@ -95,7 +94,6 @@ class ProfileScreenState extends State<ProfileScreen>
     setState(() {
       _contactLoading = true;
       _certsLoading = true;
-      _contactError = null;
       _certsError = null;
     });
 
@@ -111,7 +109,6 @@ class ProfileScreenState extends State<ProfileScreen>
     } catch (_) {
       if (mounted) {
         setState(() {
-          _contactError = "error_loading".i18n;
           _contactLoading = false;
         });
       }

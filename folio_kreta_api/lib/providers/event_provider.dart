@@ -7,6 +7,7 @@ import 'package:folio_kreta_api/demo/demo_data.dart';
 import 'package:folio_kreta_api/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:folio_kreta_api/models/parse_each.dart';
 
 class EventProvider with ChangeNotifier {
   late List<Event> _events;
@@ -47,7 +48,7 @@ class EventProvider with ChangeNotifier {
     List? eventsJson = await Provider.of<KretaClient>(_context, listen: false)
         .getAPI(KretaAPI.events(iss));
     if (eventsJson == null) throw "Cannot fetch Events for User ${user.id}";
-    List<Event> events = eventsJson.map((e) => Event.fromJson(e)).toList();
+    List<Event> events = parseEach(eventsJson, Event.fromJson, what: "event");
 
     if (events.isNotEmpty || _events.isNotEmpty) await store(events);
   }
