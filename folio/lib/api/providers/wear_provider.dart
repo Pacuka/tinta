@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -19,10 +21,28 @@ import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/widgets.dart';
+import 'package:folio/api/client.dart';
 import 'package:folio/api/providers/wear_extras.dart';
+import 'package:folio/models/release.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:folio/helpers/average_helper.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_kreta_api/models/grade.dart';
+
+/// The watch app's version from its `/folio/watch-version` message
+/// (`{"name":"1.6.1","code":10}`), or null if it can't be read.
+String? parseWatchVersion(String json) {
+  try {
+    final name = (jsonDecode(json) as Map)['name'];
+    return name is String && name.isNotEmpty ? name : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Where a watch update is: download on the phone, transfer, then the
+/// watch's own install prompt.
+enum WearUpdateState { idle, downloading, sending, waitingForWatch, done, failed }
 
 /// Serializes Kréta data and sends it to the paired WearOS watch via
 /// Android's Wearable Data Layer API (method channel → WearSyncManager.kt).
@@ -43,6 +63,20 @@ class WearProvider with ChangeNotifier {
 
   /// Non-null when the watch has sent a pairing request and needs confirmation.
   String? _pendingPairCode;
+
+  String? _watchVersion;
+  WearUpdateState _updateState = WearUpdateState.idle;
+  double _updateProgress = 0;
+  String? _updateError;
+  Timer? _updateTimeout;
+
+  /// Version of the Tinta app on the watch, once the watch has told it.
+  String? get watchVersion => _watchVersion;
+  WearUpdateState get updateState => _updateState;
+
+  /// Download progress 0..1 while [updateState] is downloading.
+  double get updateProgress => _updateProgress;
+  String? get updateError => _updateError;
 
   bool get watchConnected => _watchConnected;
   bool get syncEnabled => _syncEnabled;
@@ -85,7 +119,82 @@ class WearProvider with ChangeNotifier {
 
   Future<bool> refreshConnection() async {
     await _checkConnection();
+    if (_watchConnected) await requestWatchVersion();
     return _watchConnected;
+  }
+
+  /// Asks the watch for its app version; the answer arrives as
+  /// `onWatchVersion`.
+  Future<void> requestWatchVersion() async {
+    try {
+      await _channel.invokeMethod('requestWatchVersion');
+    } catch (_) {}
+  }
+
+  // ── Watch app update ─────────────────────────────────────────────────────
+
+  /// Downloads the watch installer of [release] and sends it to the watch.
+  /// The watch then shows the system install prompt; its answer arrives as
+  /// `onWearUpdateResult`.
+  Future<void> updateWatch(Release release) async {
+    final asset = pickWearApk(release.downloads);
+    if (asset == null) return _failUpdate('Nincs óra-app ebben a kiadásban.');
+    _setUpdate(WearUpdateState.downloading, progress: 0);
+    final File apk;
+    try {
+      final dir = await getTemporaryDirectory();
+      apk = File('${dir.path}/folio_update_wear-${release.version}.apk');
+      final response = await FilcAPI.downloadRelease(asset);
+      if (response == null || response.statusCode != 200) {
+        return _failUpdate('Nem sikerült letölteni.');
+      }
+      final total = response.contentLength ?? asset.size;
+      var received = 0;
+      final sink = apk.openWrite();
+      await response.stream.map((chunk) {
+        received += chunk.length;
+        if (total > 0) {
+          _updateProgress = received / total;
+          notifyListeners();
+        }
+        return chunk;
+      }).pipe(sink);
+    } catch (_) {
+      return _failUpdate('Nem sikerült letölteni.');
+    }
+
+    _setUpdate(WearUpdateState.sending);
+    bool sent = false;
+    try {
+      sent = await _channel
+              .invokeMethod<bool>('sendWearUpdate', {'path': apk.path}) ??
+          false;
+    } catch (_) {}
+    if (!sent) return _failUpdate('Nem sikerült átküldeni az órára.');
+
+    _setUpdate(WearUpdateState.waitingForWatch);
+    // No answer means the prompt was never confirmed (or the watch app was
+    // closed and won't open again soon): let the user try again.
+    _updateTimeout?.cancel();
+    _updateTimeout = Timer(const Duration(minutes: 5), () {
+      if (_updateState == WearUpdateState.waitingForWatch) {
+        _failUpdate('Az óra nem válaszolt.');
+      }
+    });
+  }
+
+  void _setUpdate(WearUpdateState state, {double? progress}) {
+    _updateState = state;
+    if (progress != null) _updateProgress = progress;
+    _updateError = null;
+    notifyListeners();
+  }
+
+  void _failUpdate(String message) {
+    _updateTimeout?.cancel();
+    _updateState = WearUpdateState.failed;
+    _updateError = message;
+    notifyListeners();
   }
 
   // ── Public sync entry point ──────────────────────────────────────────────
@@ -385,6 +494,7 @@ class WearProvider with ChangeNotifier {
       case 'onConnectionChanged':
         _watchConnected = call.arguments as bool;
         notifyListeners();
+        if (_watchConnected) await requestWatchVersion();
         break;
       case 'onSyncRequested':
         // Re-send last in-memory JSON if available; otherwise fall back to
@@ -402,6 +512,25 @@ class WearProvider with ChangeNotifier {
           try {
             await _channel.invokeMethod('sendCachedToWatch');
           } catch (_) {}
+        }
+        break;
+      case 'onWatchVersion':
+        final version = parseWatchVersion(call.arguments as String? ?? '');
+        if (version != null && version != _watchVersion) {
+          _watchVersion = version;
+          notifyListeners();
+        }
+        break;
+      case 'onWearUpdateResult':
+        final result = call.arguments as String? ?? '';
+        if (result == 'ok') {
+          _updateTimeout?.cancel();
+          _setUpdate(WearUpdateState.done);
+          await requestWatchVersion();
+        } else {
+          _failUpdate(result == 'error:aborted'
+              ? 'A telepítést megszakították az órán.'
+              : 'Az óra nem tudta telepíteni.');
         }
         break;
       case 'onPairRequest':

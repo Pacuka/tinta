@@ -33,6 +33,29 @@ ReleaseDownload? pickApk(List<ReleaseDownload> downloads,
   return apks.first;
 }
 
+/// The watch installer (tinta-wear) among a release's files.
+ReleaseDownload? pickWearApk(List<ReleaseDownload> downloads) {
+  for (final d in downloads) {
+    final url = d.url.toLowerCase();
+    if (url.endsWith(".apk") && url.contains("tinta-wear")) return d;
+  }
+  return null;
+}
+
+/// The newest stable release that has a watch installer and is newer than
+/// [watchVersion]. Null while the watch hasn't told its version.
+Release? pickWearUpdate(List<Release> releases, String? watchVersion) {
+  if (watchVersion == null || watchVersion.isEmpty) return null;
+  final current = Version.fromString(watchVersion);
+  Release? best;
+  for (final r in releases) {
+    if (r.prerelease || pickWearApk(r.downloads) == null) continue;
+    if (best == null || r.version.compareTo(best.version) == 1) best = r;
+  }
+  if (best == null || best.version.compareTo(current) != 1) return null;
+  return best;
+}
+
 class Release {
   String tag;
   Version version;
