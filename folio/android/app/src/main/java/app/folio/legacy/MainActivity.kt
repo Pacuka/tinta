@@ -131,6 +131,14 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                     sync.sendCachedData()
                     result.success(null)
                 }
+                "requestWatchVersion" -> {
+                    sync.requestWatchVersion()
+                    result.success(null)
+                }
+                "sendWearUpdate" -> {
+                    val path = call.argument<String>("path") ?: ""
+                    sync.sendUpdateFile(path) { ok -> result.success(ok) }
+                }
                 "sendPairConfirm" -> {
                     val code = call.argument<String>("code") ?: ""
                     sync.sendPairConfirm(code)

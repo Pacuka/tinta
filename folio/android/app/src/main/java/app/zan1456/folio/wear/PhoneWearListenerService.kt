@@ -44,6 +44,14 @@ class PhoneWearListenerService : WearableListenerService() {
                     MainActivity.wearChannel?.invokeMethod("onPairRequest", code)
                 }
             }
+            "/folio/watch-version", "/folio/wear-update-result" -> {
+                val method = if (messageEvent.path == "/folio/watch-version") "onWatchVersion"
+                             else "onWearUpdateResult"
+                val payload = messageEvent.data.toString(Charsets.UTF_8)
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    MainActivity.wearChannel?.invokeMethod(method, payload)
+                }
+            }
             else -> Log.w(TAG, "unknown path: ${messageEvent.path}")
         }
     }

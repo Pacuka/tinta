@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.Wearable
+import java.io.File
 import io.flutter.plugin.common.MethodChannel
 
 /**
@@ -159,6 +161,63 @@ class WearSyncManager(
     }
 
     fun getSyncEnabled(): Boolean = prefs.getBoolean("sync_enabled", true)
+
+    // ── Watch app update ─────────────────────────────────────────────────────
+
+    /** Asks the watch for its app version; it answers on /folio/watch-version. */
+    fun requestWatchVersion() {
+        if (wearUnavailable) return
+        Wearable.getNodeClient(context).connectedNodes
+            .addOnSuccessListener { nodes ->
+                for (node in nodes) {
+                    Wearable.getMessageClient(context)
+                        .sendMessage(node.id, "/folio/version-request", ByteArray(0))
+                        .addOnFailureListener { e -> logFailure(TAG, "requestWatchVersion", e) }
+                }
+            }
+            .addOnFailureListener { e -> logFailure(TAG, "requestWatchVersion: getNodes", e) }
+    }
+
+    /**
+     * Streams the watch installer at [path] to the watch over a channel.
+     * [done] gets true once the whole file went through; called once, on the
+     * main thread.
+     */
+    fun sendUpdateFile(path: String, done: (Boolean) -> Unit) {
+        val file = File(path)
+        var finished = false
+        val main = android.os.Handler(android.os.Looper.getMainLooper())
+        fun finish(ok: Boolean) = main.post {
+            if (finished) return@post
+            finished = true
+            Log.d(TAG, "sendUpdateFile: ${if (ok) "sent" else "failed"}")
+            done(ok)
+        }
+        if (wearUnavailable || !file.exists()) { finish(false); return }
+
+        val client = Wearable.getChannelClient(context)
+        Wearable.getNodeClient(context).connectedNodes
+            .addOnSuccessListener { nodes ->
+                val node = nodes.firstOrNull { it.isNearby } ?: nodes.firstOrNull()
+                if (node == null) { finish(false); return@addOnSuccessListener }
+                client.openChannel(node.id, "/folio/wear-update")
+                    .addOnSuccessListener { channel ->
+                        client.registerChannelCallback(channel, object : ChannelClient.ChannelCallback() {
+                            override fun onOutputClosed(c: ChannelClient.Channel, closeReason: Int, appSpecificErrorCode: Int) {
+                                finish(closeReason == CLOSE_REASON_NORMAL)
+                            }
+                            override fun onChannelClosed(c: ChannelClient.Channel, closeReason: Int, appSpecificErrorCode: Int) {
+                                finish(false)
+                            }
+                        })
+                        Log.d(TAG, "sendUpdateFile: ${file.length()} bytes to ${node.id}")
+                        client.sendFile(channel, android.net.Uri.fromFile(file))
+                            .addOnFailureListener { e -> logFailure(TAG, "sendUpdateFile", e); finish(false) }
+                    }
+                    .addOnFailureListener { e -> logFailure(TAG, "sendUpdateFile: openChannel", e); finish(false) }
+            }
+            .addOnFailureListener { e -> logFailure(TAG, "sendUpdateFile: getNodes", e); finish(false) }
+    }
 
     // ── Pairing ───────────────────────────────────────────────────────────────
 

@@ -25,6 +25,7 @@ import 'dart:io';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/wear_provider.dart';
+import 'package:folio/models/release.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:folio/helpers/quick_actions.dart';
 import 'package:folio/helpers/subject.dart';
@@ -2651,6 +2652,8 @@ Container(
                   bottom: Radius.circular(4.0),
                 ),
               ),
+              if (connected && wear.watchVersion != null)
+                _buildWatchAppRow(context, wear),
               PanelButton(
                 padding: const EdgeInsets.only(left: 14.0, right: 14.0),
                 onPressed: syncEnabled
@@ -2691,6 +2694,78 @@ Container(
           ),
         );
       },
+    );
+  }
+
+  /// The watch app's version, and its update from the phone when a newer
+  /// release has a watch installer.
+  Widget _buildWatchAppRow(BuildContext context, WearProvider wear) {
+    final release = pickWearUpdate(updateProvider.releases, wear.watchVersion);
+    final state = wear.updateState;
+    final busy = state == WearUpdateState.downloading ||
+        state == WearUpdateState.sending ||
+        state == WearUpdateState.waitingForWatch;
+
+    final String title;
+    String status;
+    switch (state) {
+      case WearUpdateState.downloading:
+        title = 'Óra-app letöltése';
+        status = '${(wear.updateProgress * 100).round()}%';
+      case WearUpdateState.sending:
+        title = 'Átküldés az órára…';
+        status = 'Pár percig tarthat';
+      case WearUpdateState.waitingForWatch:
+        title = 'Hagyd jóvá az órán';
+        status = 'Nyisd meg a Tintát';
+      case WearUpdateState.done:
+        title = 'Az óra-app frissült';
+        status = wear.watchVersion!;
+      case WearUpdateState.failed:
+        title = wear.updateError ?? 'Nem sikerült a frissítés';
+        status = 'Újra';
+      case WearUpdateState.idle:
+        title = release != null ? 'Óra-app frissítése' : 'Óra-app';
+        status = release != null
+            ? '${wear.watchVersion} → ${release.version}'
+            : wear.watchVersion!;
+    }
+    final canStart = release != null && !busy;
+
+    return PanelButton(
+      padding: const EdgeInsets.only(left: 14.0, right: 14.0),
+      onPressed: canStart
+          ? () {
+              _haptic();
+              wear.updateWatch(release);
+            }
+          : null,
+      title: Text(
+        title,
+        style: TextStyle(
+          color: AppColors.of(context).text.withValues(alpha: .85),
+        ),
+      ),
+      leading: Icon(
+        canStart ? Icons.system_update_rounded : Icons.info_outline_rounded,
+        size: 22.0,
+        color: canStart
+            ? Theme.of(context).colorScheme.secondary
+            : AppColors.of(context).text.withValues(alpha: .6),
+      ),
+      trailing: Text(
+        status,
+        style: TextStyle(
+          fontSize: 12.0,
+          color: canStart
+              ? Theme.of(context).colorScheme.secondary
+              : AppColors.of(context).text.withValues(alpha: .4),
+        ),
+      ),
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(4.0),
+        bottom: Radius.circular(4.0),
+      ),
     );
   }
 
