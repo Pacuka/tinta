@@ -97,7 +97,25 @@ class WearProvider with ChangeNotifier {
   DateTime? get lastSync => _lastSync;
   String? get pendingPairCode => _pendingPairCode;
 
+  static WearProvider? _current;
+
+  /// The last account was removed: clears what the watch was sent.
+  static Future<void> forgetLoggedOut() async => _current?._forget();
+
+  Future<void> _forget() async {
+    _lastTimetableHash = '';
+    _lastNotificationsHash = '';
+    _lastExtrasHash = '';
+    _lastTimetableJson = '';
+    _lastNotificationsJson = '';
+    _lastExtrasJson = '';
+    try {
+      await _channel.invokeMethod('sendLogout');
+    } catch (_) {}
+  }
+
   WearProvider() {
+    _current = this;
     _channel.setMethodCallHandler(_handleNativeCall);
     _init();
   }

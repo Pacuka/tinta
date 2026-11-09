@@ -68,6 +68,10 @@ class WearDataListenerService : WearableListenerService() {
         val path = messageEvent.path
         val payload = messageEvent.data
         Log.d(TAG, "onMessageReceived: path=$path payloadSize=${payload.size}")
+        if (path in WearDataReset.DATA_PATHS && !WearUpdateInstaller.isPaired(this)) {
+            Log.d(TAG, "not paired, data ignored")
+            return
+        }
         when (path) {
             "/folio/timetable" -> {
                 val json = payload.toString(Charsets.UTF_8)
@@ -114,6 +118,13 @@ class WearDataListenerService : WearableListenerService() {
                 }
                 Handler(Looper.getMainLooper()).post {
                     MainActivity.methodChannel?.invokeMethod("onPairConfirmed", code)
+                }
+            }
+            WearDataReset.LOGOUT_PATH -> {
+                // The activity's listener is gone while it is paused.
+                WearDataReset.clear(this)
+                Handler(Looper.getMainLooper()).post {
+                    MainActivity.methodChannel?.invokeMethod("onLoggedOut", null)
                 }
             }
             WearUpdateInstaller.VERSION_REQUEST_PATH ->

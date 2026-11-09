@@ -1,3 +1,4 @@
+import 'package:folio/api/providers/wear_provider.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/models/user.dart';
 import 'package:folio_kreta_api/models/student.dart';
@@ -45,6 +46,7 @@ class UserProvider with ChangeNotifier {
       setUser(_users.keys.first);
     } else {
       await _settings.update(lastAccountId: "");
+      await WearProvider.forgetLoggedOut();
     }
     notifyListeners();
   }

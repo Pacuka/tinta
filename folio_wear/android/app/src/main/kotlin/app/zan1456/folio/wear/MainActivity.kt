@@ -86,6 +86,12 @@ class MainActivity : FlutterActivity(),
                     result.success(null)
                 }
 
+                "clearData" -> {
+                    WearDataReset.clear(this)
+                    Log.d(TAG, "clearData")
+                    result.success(null)
+                }
+
                 "setIsPaired" -> {
                     val paired = call.arguments as Boolean
                     prefs.edit().putBoolean("is_paired", paired).apply()
@@ -167,6 +173,7 @@ class MainActivity : FlutterActivity(),
         val path = messageEvent.path
         val payload = messageEvent.data
         Log.d(TAG, "onMessageReceived: path=$path size=${payload.size}")
+        if (path in WearDataReset.DATA_PATHS && !WearUpdateInstaller.isPaired(this)) return
         when (path) {
             "/folio/timetable" -> {
                 val json = payload.toString(Charsets.UTF_8)

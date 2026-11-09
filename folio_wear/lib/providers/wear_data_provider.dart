@@ -73,6 +73,11 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
       case 'onRotaryInput':
         onRotaryInput?.call((call.arguments as num).toDouble());
         break;
+      case 'onLoggedOut':
+        _forget();
+        _updatePairingRetry();
+        notifyListeners();
+        break;
       case 'onPairConfirmed':
         final code = call.arguments as String;
         if (code == _pairingCode) {
@@ -80,6 +85,8 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
           _updatePairingRetry();
           try { await _channel.invokeMethod('setIsPaired', true); } catch (_) {}
           notifyListeners();
+          // Data sent before the pairing was ignored: ask for it now.
+          await requestSync();
         }
         break;
     }
@@ -205,11 +212,20 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
     try { await _channel.invokeMethod('requestSync'); } catch (_) {}
   }
 
-  Future<void> unpair() async {
+  /// Drops the phone's data from memory (native storage is cleared too).
+  void _forget() {
     _isPaired = false;
+    _lessons = [];
+    _notifications = [];
+    _extras = null;
+    _lastSync = null;
+  }
+
+  Future<void> unpair() async {
+    _forget();
     _pairingCode = _generateCode();
     try {
-      await _channel.invokeMethod('setIsPaired', false);
+      await _channel.invokeMethod('clearData');
       await _channel.invokeMethod('setPairingCode', _pairingCode);
     } catch (_) {}
     _updatePairingRetry();

@@ -131,6 +131,10 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                     sync.sendCachedData()
                     result.success(null)
                 }
+                "sendLogout" -> {
+                    sync.sendLogout()
+                    result.success(null)
+                }
                 "requestWatchVersion" -> {
                     sync.requestWatchVersion()
                     result.success(null)

@@ -165,6 +165,21 @@ class WearSyncManager(
     // ── Watch app update ─────────────────────────────────────────────────────
 
     /** Asks the watch for its app version; it answers on /folio/watch-version. */
+    /** Logged out on the phone: the watch forgets the school data too. */
+    fun sendLogout() {
+        prefs.edit().remove("timetable").remove("notifications").remove("extras").apply()
+        if (wearUnavailable) return
+        Wearable.getNodeClient(context).connectedNodes
+            .addOnSuccessListener { nodes ->
+                for (node in nodes) {
+                    Wearable.getMessageClient(context)
+                        .sendMessage(node.id, "/folio/logout", ByteArray(0))
+                        .addOnFailureListener { e -> logFailure(TAG, "sendLogout", e) }
+                }
+            }
+            .addOnFailureListener { e -> logFailure(TAG, "sendLogout: getNodes", e) }
+    }
+
     fun requestWatchVersion() {
         if (wearUnavailable) return
         Wearable.getNodeClient(context).connectedNodes
