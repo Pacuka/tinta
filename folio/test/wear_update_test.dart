@@ -24,6 +24,22 @@ void main() {
     expect(pickWearApk(files.take(2).toList()), isNull);
   });
 
+  test('pickWearApk takes the file for the watch ABI, else the universal one', () {
+    final files = [
+      d("v1.6.2", "Tinta-1.6.2-armeabi-v7a.apk"),
+      d("v1.6.2", "tinta-wear-1.6.2.apk"),
+      d("v1.6.2", "tinta-wear-1.6.2-arm64-v8a.apk"),
+      d("v1.6.2", "tinta-wear-1.6.2-armeabi-v7a.apk"),
+    ];
+    expect(pickWearApk(files, abis: ["armeabi-v7a", "armeabi"])?.url,
+        endsWith("tinta-wear-1.6.2-armeabi-v7a.apk"));
+    expect(pickWearApk(files, abis: ["arm64-v8a", "armeabi-v7a"])?.url,
+        endsWith("tinta-wear-1.6.2-arm64-v8a.apk"));
+    expect(pickWearApk(files, abis: ["x86_64"])?.url,
+        endsWith("tinta-wear-1.6.2.apk"));
+    expect(pickWearApk(files)?.url, endsWith("tinta-wear-1.6.2.apk"));
+  });
+
   group('pickWearUpdate', () {
     final releases = [
       r("v1.7.0", ["tinta-wear-1.7.0.apk"], pre: true),
@@ -51,5 +67,12 @@ void main() {
     expect(parseWatchVersion('{"name":"1.6.1","code":10}'), "1.6.1");
     expect(parseWatchVersion('nem json'), isNull);
     expect(parseWatchVersion('{"code":10}'), isNull);
+  });
+
+  test('parseWatchAbis reads the list, empty for old watches', () {
+    expect(parseWatchAbis('{"name":"1.6.2","abis":["armeabi-v7a","armeabi"]}'),
+        ["armeabi-v7a", "armeabi"]);
+    expect(parseWatchAbis('{"name":"1.6.1","code":10}'), isEmpty);
+    expect(parseWatchAbis('nem json'), isEmpty);
   });
 }

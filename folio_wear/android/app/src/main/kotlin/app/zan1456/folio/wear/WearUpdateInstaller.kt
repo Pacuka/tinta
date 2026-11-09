@@ -8,6 +8,7 @@ import android.content.pm.PackageInstaller
 import android.os.Build
 import android.util.Log
 import com.google.android.gms.wearable.Wearable
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
@@ -60,7 +61,9 @@ object WearUpdateInstaller {
         val info = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
         val code = if (Build.VERSION.SDK_INT >= 28) info.longVersionCode
                    else @Suppress("DEPRECATION") info.versionCode.toLong()
-        val json = JSONObject().put("name", info.versionName).put("code", code).toString()
+        // The phone picks the one-ABI installer from these (smaller over BT).
+        val json = JSONObject().put("name", info.versionName).put("code", code)
+            .put("abis", JSONArray(Build.SUPPORTED_ABIS.toList())).toString()
         Wearable.getMessageClient(ctx).sendMessage(nodeId, VERSION_PATH, json.toByteArray())
             .addOnFailureListener { e -> Log.w(TAG, "sendVersion failed: ${e.message}") }
     }

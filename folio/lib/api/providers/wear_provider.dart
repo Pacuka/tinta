@@ -40,6 +40,17 @@ String? parseWatchVersion(String json) {
   }
 }
 
+/// The ABIs the watch can run, best first (`"abis"` in the same message);
+/// empty for watch apps that don't send them.
+List<String> parseWatchAbis(String json) {
+  try {
+    final abis = (jsonDecode(json) as Map)['abis'];
+    return abis is List ? abis.whereType<String>().toList() : const [];
+  } catch (_) {
+    return const [];
+  }
+}
+
 /// Where a watch update is: download on the phone, transfer, then the
 /// watch's own install prompt.
 enum WearUpdateState { idle, downloading, sending, waitingForWatch, done, failed }
@@ -65,6 +76,7 @@ class WearProvider with ChangeNotifier {
   String? _pendingPairCode;
 
   String? _watchVersion;
+  List<String> _watchAbis = const [];
   WearUpdateState _updateState = WearUpdateState.idle;
   double _updateProgress = 0;
   String? _updateError;
@@ -139,7 +151,7 @@ class WearProvider with ChangeNotifier {
   /// The watch then shows the system install prompt; its answer arrives as
   /// `onWearUpdateResult`.
   Future<void> updateWatch(Release release) async {
-    final asset = pickWearApk(release.downloads);
+    final asset = pickWearApk(release.downloads, abis: _watchAbis);
     if (asset == null) return _failUpdate('Nincs óra-app ebben a kiadásban.');
     _setUpdate(WearUpdateState.downloading, progress: 0);
     final File apk;
@@ -542,7 +554,9 @@ class WearProvider with ChangeNotifier {
         }
         break;
       case 'onWatchVersion':
-        final version = parseWatchVersion(call.arguments as String? ?? '');
+        final json = call.arguments as String? ?? '';
+        final version = parseWatchVersion(json);
+        _watchAbis = parseWatchAbis(json);
         if (version != null && version != _watchVersion) {
           _watchVersion = version;
           notifyListeners();

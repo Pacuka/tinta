@@ -33,13 +33,28 @@ ReleaseDownload? pickApk(List<ReleaseDownload> downloads,
   return apks.first;
 }
 
-/// The watch installer (tinta-wear) among a release's files.
-ReleaseDownload? pickWearApk(List<ReleaseDownload> downloads) {
-  for (final d in downloads) {
+/// The watch installer (tinta-wear) among a release's files. With the
+/// watch's [abis] (best first) the matching one-ABI file is picked, which is
+/// about half the size of the universal one; it matters over Bluetooth.
+ReleaseDownload? pickWearApk(List<ReleaseDownload> downloads,
+    {List<String> abis = const []}) {
+  final apks = downloads.where((d) {
     final url = d.url.toLowerCase();
-    if (url.endsWith(".apk") && url.contains("tinta-wear")) return d;
+    return url.endsWith(".apk") && url.contains("tinta-wear");
+  }).toList();
+  if (apks.isEmpty) return null;
+  for (final abi in abis) {
+    for (final apk in apks) {
+      if (apk.url.toLowerCase().endsWith("-${abi.toLowerCase()}.apk")) {
+        return apk;
+      }
+    }
   }
-  return null;
+  for (final apk in apks) {
+    final url = apk.url.toLowerCase();
+    if (!url.contains("-armeabi") && !url.contains("-arm64")) return apk;
+  }
+  return apks.first;
 }
 
 /// The newest stable release that has a watch installer and is newer than

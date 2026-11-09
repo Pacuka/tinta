@@ -33,4 +33,14 @@ done
 cp "$root/folio_wear/build/app/outputs/flutter-apk/app-release.apk" \
   "$out/tinta-wear-$version.apk"
 
+# One-ABI copies for the phone-to-watch update (half the size over
+# Bluetooth). Separate builds, not --split-per-abi, so the version code
+# stays the same as the universal file's.
+for abi in armeabi-v7a:android-arm arm64-v8a:android-arm64; do
+  (cd "$root/folio_wear" && flutter build apk --release \
+    --target-platform "${abi#*:}")
+  cp "$root/folio_wear/build/app/outputs/flutter-apk/app-release.apk" \
+    "$out/tinta-wear-$version-${abi%%:*}.apk"
+done
+
 (cd "$out" && sha256sum tinta-*.apk > SHA256SUMS && cat SHA256SUMS)
