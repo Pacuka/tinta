@@ -69,6 +69,8 @@ class WearProvider with ChangeNotifier {
   double _updateProgress = 0;
   String? _updateError;
   Timer? _updateTimeout;
+  Timer? _updatePoll;
+  Version? _updateTarget;
 
   /// Version of the Tinta app on the watch, once the watch has told it.
   String? get watchVersion => _watchVersion;
@@ -173,6 +175,7 @@ class WearProvider with ChangeNotifier {
     if (!sent) return _failUpdate('Nem sikerült átküldeni az órára.');
 
     _setUpdate(WearUpdateState.waitingForWatch);
+    _updateTarget = release.version;
     // No answer means the prompt was never confirmed (or the watch app was
     // closed and won't open again soon): let the user try again.
     _updateTimeout?.cancel();
@@ -181,6 +184,29 @@ class WearProvider with ChangeNotifier {
         _failUpdate('Az óra nem válaszolt.');
       }
     });
+    // The install restarts the watch app, which can cut off its "ok"
+    // answer: also ask its version until it reports the new one.
+    _updatePoll?.cancel();
+    _updatePoll = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (_updateState != WearUpdateState.waitingForWatch) {
+        _updatePoll?.cancel();
+      } else if (_watchConnected) {
+        requestWatchVersion();
+      }
+    });
+  }
+
+  /// True once the watch reports [version] at least the one being sent.
+  bool _reachedTarget(String version) {
+    final target = _updateTarget;
+    if (target == null) return false;
+    return Version.fromString(version).compareTo(target) >= 0;
+  }
+
+  void _finishUpdate() {
+    _updateTimeout?.cancel();
+    _updatePoll?.cancel();
+    _setUpdate(WearUpdateState.done);
   }
 
   void _setUpdate(WearUpdateState state, {double? progress}) {
@@ -192,6 +218,7 @@ class WearProvider with ChangeNotifier {
 
   void _failUpdate(String message) {
     _updateTimeout?.cancel();
+    _updatePoll?.cancel();
     _updateState = WearUpdateState.failed;
     _updateError = message;
     notifyListeners();
@@ -520,12 +547,16 @@ class WearProvider with ChangeNotifier {
           _watchVersion = version;
           notifyListeners();
         }
+        if (version != null &&
+            _updateState == WearUpdateState.waitingForWatch &&
+            _reachedTarget(version)) {
+          _finishUpdate();
+        }
         break;
       case 'onWearUpdateResult':
         final result = call.arguments as String? ?? '';
         if (result == 'ok') {
-          _updateTimeout?.cancel();
-          _setUpdate(WearUpdateState.done);
+          _finishUpdate();
           await requestWatchVersion();
         } else {
           _failUpdate(result == 'error:aborted'
