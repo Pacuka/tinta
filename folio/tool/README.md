@@ -13,6 +13,8 @@ A különbség egyetlen csomagcsere: az alkalmazás a `tinta_push` csomagot hasz
 
 A további paraméterek (pl. `--target-platform`, `--build-number`, `--split-debug-info`) mindkét szkriptnek átadhatók.
 
+**A GitHubos kiadás jelenleg nem ezzel a szkripttel készül**, hanem a `../tool/release.sh`-val (telefonos APK-k, óra-APK-k, SHA256SUMS, debug-szimbólumok egy lépésben). Ez a `github` változatot fordítja, de a `tinta_push` alapváltozatával, vagyis Firebase nélkül, mert `tool/push.json` még nincs. Ha a push egyszer bekapcsolható, a `release.sh` telefonos lépését kell a `build-firebase.sh`-ra cserélni.
+
 ## `tool/push.json` (nincs a gitben)
 
 A Firebase-projekt adatai, `--dart-define-from-file` formátumban:

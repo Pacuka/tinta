@@ -15,4 +15,8 @@ flutter pub get
 defines=()
 [ -f tool/push.json ] && defines+=(--dart-define-from-file=tool/push.json)
 flutter build apk --release --flavor github "${defines[@]}" "$@"
-echo "OK: build/app/outputs/flutter-apk/app-github-release.apk (Firebase-zel)"
+if [ ${#defines[@]} -gt 0 ]; then
+  echo "OK: build/app/outputs/flutter-apk/app-github-release.apk (Firebase-zel, push bekapcsolva)"
+else
+  echo "OK: build/app/outputs/flutter-apk/app-github-release.apk (Firebase-csomaggal, de tool/push.json nélkül: a push ki van kapcsolva)"
+fi
