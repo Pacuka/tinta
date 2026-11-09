@@ -5,6 +5,11 @@ class WearNotification {
   final String type; // "grade" | "absence" | "message" | "note" | "exam" | "homework"
   final int? gradeValue; // 1-5; null for non-grade types
   final DateTime timestamp;
+  /// Short facts for the detail view (teacher, weight, …); empty from
+  /// phones older than 1.6.2.
+  final List<String> lines;
+  /// Longer text for the detail view (message or note text).
+  final String text;
 
   const WearNotification({
     required this.id,
@@ -13,6 +18,8 @@ class WearNotification {
     required this.type,
     this.gradeValue,
     required this.timestamp,
+    this.lines = const [],
+    this.text = '',
   });
 
   factory WearNotification.fromJson(Map<String, dynamic> json) {
@@ -23,6 +30,8 @@ class WearNotification {
       type: json['type'] as String,
       gradeValue: json['gradeValue'] as int?,
       timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
+      lines: (json['lines'] as List?)?.whereType<String>().toList() ?? const [],
+      text: json['text'] as String? ?? '',
     );
   }
 
@@ -33,5 +42,7 @@ class WearNotification {
         'type': type,
         'gradeValue': gradeValue,
         'timestamp': timestamp.millisecondsSinceEpoch,
+        'lines': lines,
+        'text': text,
       };
 }

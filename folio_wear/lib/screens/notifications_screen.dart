@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/wear_notification.dart';
@@ -7,6 +8,7 @@ import '../theme/wear_theme.dart';
 import '../widgets/edge_fade.dart';
 import '../widgets/page_title.dart';
 import '../widgets/wear_curved_scrollbar.dart';
+import 'notification_detail_screen.dart';
 
 const _kCardBg = WearColors.surface;
 // Round screen: keep content away from the curved edge.
@@ -73,8 +75,8 @@ class _EmptyState extends StatelessWidget {
             GestureDetector(
               onTap: data.requestSync,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 22.0, vertical: 9.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 22.0, vertical: 9.0),
                 decoration: BoxDecoration(
                   color: WearColors.ink.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(24.0),
@@ -160,134 +162,116 @@ class _NotifTile extends StatelessWidget {
   final WearNotification item;
   const _NotifTile({required this.item});
 
-  int? get _gradeNum {
-    if (item.gradeValue != null && item.gradeValue! >= 1 && item.gradeValue! <= 5) {
-      return item.gradeValue;
-    }
-    if (item.type != 'grade') return null;
-    final last = item.body.split('–').last.trim();
-    final n = int.tryParse(last);
-    return (n != null && n >= 1 && n <= 5) ? n : null;
-  }
-
-  static const _typeColor = {
-    'grade':    Color(0xFFFFCC80),
-    'absence':  Color(0xFFEF9A9A),
-    'message':  Color(0xFF90CAF9),
-    'note':     Color(0xFFCE93D8),
-    'exam':     Color(0xFFFFAB91),
-    'homework': Color(0xFFA5D6A7),
-  };
-
-  static const _typeIcon = {
-    'grade':    Icons.grade_rounded,
-    'absence':  Icons.event_busy_rounded,
-    'message':  Icons.mail_rounded,
-    'note':     Icons.sticky_note_2_rounded,
-    'exam':     Icons.quiz_rounded,
-    'homework': Icons.assignment_rounded,
-  };
-
   @override
   Widget build(BuildContext context) {
-    final color = _typeColor[item.type] ?? Colors.white70;
-    final icon  = _typeIcon[item.type]  ?? Icons.notifications_rounded;
-    final gradeNum = _gradeNum;
-    final isGrade  = item.type == 'grade';
-    final now      = DateTime.now();
-    final isToday  = item.timestamp.year == now.year &&
+    final color = notificationTypeColor[item.type] ?? Colors.white70;
+    final icon = notificationTypeIcon[item.type] ?? Icons.notifications_rounded;
+    final gradeNum = notificationGrade(item);
+    final isGrade = item.type == 'grade';
+    final now = DateTime.now();
+    final isToday = item.timestamp.year == now.year &&
         item.timestamp.month == now.month &&
         item.timestamp.day == now.day;
-    final timeStr  = DateFormat(isToday ? 'HH:mm' : 'MM.dd.').format(item.timestamp);
+    final timeStr =
+        DateFormat(isToday ? 'HH:mm' : 'MM.dd.').format(item.timestamp);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: _kHPad),
-      child: Container(
-        decoration: BoxDecoration(
-          color: _kCardBg,
-          borderRadius: BorderRadius.circular(_kRadius),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Leading icon / grade badge
-            Container(
-              width: 34.0,
-              height: 34.0,
-              decoration: BoxDecoration(
-                color: gradeNum != null
-                    ? WearColors.cobalt
-                    : color.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: gradeNum != null
-                  ? Center(
-                      child: Text(
-                        '$gradeNum',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          height: 1.0,
-                        ),
-                      ),
-                    )
-                  : Icon(icon, size: 16.0, color: color),
-            ),
-            const SizedBox(width: 10.0),
-
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => NotificationDetailScreen(item: item),
+          ));
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: _kCardBg,
+            borderRadius: BorderRadius.circular(_kRadius),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Leading icon / grade badge
+              Container(
+                width: 34.0,
+                height: 34.0,
+                decoration: BoxDecoration(
+                  color: gradeNum != null
+                      ? WearColors.cobalt
+                      : color.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: gradeNum != null
+                    ? Center(
                         child: Text(
-                          item.title,
-                          style: const TextStyle(
+                          '$gradeNum',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w900,
                             color: Colors.white,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                            height: 1.1,
+                            height: 1.0,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(width: 4.0),
+                      )
+                    : Icon(icon, size: 16.0, color: color),
+              ),
+              const SizedBox(width: 10.0),
+
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              height: 1.1,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          timeStr,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            fontSize: 8.5,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (item.body.isNotEmpty) ...[
+                      const SizedBox(height: 2.0),
                       Text(
-                        timeStr,
+                        item.body,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          fontSize: 8.5,
-                          height: 1.4,
+                          color: isGrade
+                              ? color.withValues(alpha: 0.7)
+                              : Colors.white.withValues(alpha: 0.46),
+                          fontSize: 10.5,
+                          height: 1.3,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                  ),
-                  if (item.body.isNotEmpty) ...[
-                    const SizedBox(height: 2.0),
-                    Text(
-                      item.body,
-                      style: TextStyle(
-                        color: isGrade
-                            ? color.withValues(alpha: 0.7)
-                            : Colors.white.withValues(alpha: 0.46),
-                        fontSize: 10.5,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

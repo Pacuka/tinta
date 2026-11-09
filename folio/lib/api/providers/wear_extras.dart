@@ -12,13 +12,26 @@ class WearTodoItem {
   final String type; // "homework" | "exam"
   final String subject;
   final DateTime due;
+  /// For the watch's detail view: exam topic, short facts, homework text.
+  final String title;
+  final List<String> lines;
+  final String text;
 
   const WearTodoItem({
     required this.id,
     required this.type,
     required this.subject,
     required this.due,
+    this.title = '',
+    this.lines = const [],
+    this.text = '',
   });
+}
+
+/// Long text for the watch's detail view, cut so the message stays small.
+String wearDetailText(String text) {
+  final t = text.trim();
+  return t.length <= 600 ? t : '${t.substring(0, 600).trimRight()}…';
 }
 
 String wearSubjectName(GradeSubject subject) =>
@@ -62,6 +75,9 @@ String buildWearExtras({
               'type': t.type,
               'subject': t.subject,
               'due': t.due.millisecondsSinceEpoch,
+              if (t.title.isNotEmpty) 'title': t.title,
+              if (t.lines.isNotEmpty) 'lines': t.lines,
+              if (t.text.isNotEmpty) 'text': t.text,
             })
         .toList(),
   });

@@ -5,12 +5,19 @@ class WearTodo {
   final String type; // "homework" | "exam"
   final String subject;
   final DateTime due;
+  /// Detail view: exam topic, short facts, homework text (phone 1.6.2+).
+  final String title;
+  final List<String> lines;
+  final String text;
 
   const WearTodo({
     required this.id,
     required this.type,
     required this.subject,
     required this.due,
+    this.title = '',
+    this.lines = const [],
+    this.text = '',
   });
 
   bool get isExam => type == 'exam';
@@ -20,6 +27,10 @@ class WearTodo {
         type: json['type'] as String,
         subject: json['subject'] as String,
         due: DateTime.fromMillisecondsSinceEpoch(json['due'] as int),
+        title: json['title'] as String? ?? '',
+        lines: (json['lines'] as List?)?.whereType<String>().toList() ??
+            const [],
+        text: json['text'] as String? ?? '',
       );
 }
 

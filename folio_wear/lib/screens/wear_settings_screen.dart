@@ -84,6 +84,18 @@ class WearSettingsScreen extends StatelessWidget {
                 ),
               ),
 
+              if (data.appVersion.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Text(
+                    'Tinta ${data.appVersion}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      fontSize: 10.5,
+                    ),
+                  ),
+                ),
+
               const SliverPadding(padding: EdgeInsets.only(bottom: 52.0)),
             ],
           ),

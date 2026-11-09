@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/day_state.dart';
 import '../models/wear_extras.dart';
+import '../models/wear_notification.dart';
 import '../providers/wear_data_provider.dart';
 import '../theme/wear_theme.dart';
 import '../widgets/edge_fade.dart';
 import '../widgets/page_title.dart';
 import '../widgets/minute_ticker.dart';
 import '../widgets/wear_curved_scrollbar.dart';
+import 'notification_detail_screen.dart';
 
 // Round screen: keep content away from the curved edge.
 const _kHPad = 22.0;
@@ -46,8 +49,8 @@ class TodosScreen extends StatelessWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, i) => Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                          _kHPad, 0.0, _kHPad, 4.0),
+                      padding:
+                          const EdgeInsets.fromLTRB(_kHPad, 0.0, _kHPad, 4.0),
                       child: EdgeFade(child: _Tile(todos[i], now)),
                     ),
                     childCount: todos.length,
@@ -96,50 +99,70 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) {
     final color =
         todo.isExam ? const Color(0xFFF48FB1) : const Color(0xFFFFE082);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-      decoration: BoxDecoration(
-        color: WearColors.surface,
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Row(children: [
-        Container(
-          width: 30.0,
-          height: 30.0,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.18),
-            shape: BoxShape.circle,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => NotificationDetailScreen(
+            item: WearNotification(
+              id: todo.id,
+              title: todo.subject,
+              body: todo.title,
+              type: todo.type,
+              timestamp: todo.due,
+              lines: todo.lines,
+              text: todo.text,
+            ),
+            datePrefix: todo.isExam ? '' : 'Határidő: ',
           ),
-          child: Icon(
-            todo.isExam ? Icons.quiz_rounded : Icons.assignment_rounded,
-            size: 15.0,
-            color: color,
-          ),
+        ));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: WearColors.surface,
+          borderRadius: BorderRadius.circular(20.0),
         ),
-        const SizedBox(width: 10.0),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                todo.subject,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
+        child: Row(children: [
+          Container(
+            width: 30.0,
+            height: 30.0,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              todo.isExam ? Icons.quiz_rounded : Icons.assignment_rounded,
+              size: 15.0,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 10.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  todo.subject,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              Text(
-                _dayLabel,
-                style:
-                    const TextStyle(color: WearColors.muted, fontSize: 10.5),
-              ),
-            ],
+                Text(
+                  _dayLabel,
+                  style:
+                      const TextStyle(color: WearColors.muted, fontSize: 10.5),
+                ),
+              ],
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 }

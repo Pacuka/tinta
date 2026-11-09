@@ -23,6 +23,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:folio/api/client.dart';
 import 'package:folio/api/providers/wear_extras.dart';
+import 'package:folio/utils/format.dart';
+import 'package:folio_kreta_api/models/absence.dart';
 import 'package:folio/models/release.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:folio/helpers/average_helper.dart';
@@ -407,6 +409,12 @@ class WearProvider with ChangeNotifier {
               [g.description, value].where((s) => s.isNotEmpty).join(' – '),
           'type': 'grade',
           'gradeValue': g.value.value > 0 ? g.value.value : null,
+          'lines': [
+            g.mode.description.escapeHtml().capital(),
+            if (g.value.weight != 100 && g.value.weight > 0)
+              'Súly: ${g.value.weight}%',
+            g.teacher.name,
+          ].where((s) => s.isNotEmpty).toList(),
           'timestamp': g.date.millisecondsSinceEpoch,
         });
       }
@@ -417,6 +425,7 @@ class WearProvider with ChangeNotifier {
           'title': m.subject,
           'body': m.author,
           'type': 'message',
+          'text': wearDetailText(m.content.escapeHtml()),
           'timestamp': m.date.millisecondsSinceEpoch,
         });
       }
@@ -427,6 +436,8 @@ class WearProvider with ChangeNotifier {
           'title': n.title,
           'body': n.content,
           'type': 'note',
+          'lines': [n.teacher.name].where((s) => s.isNotEmpty).toList(),
+          'text': wearDetailText(n.content.escapeHtml()),
           'timestamp': n.date.millisecondsSinceEpoch,
         });
       }
@@ -434,9 +445,18 @@ class WearProvider with ChangeNotifier {
       for (final a in absences) {
         items.add({
           'id': a.id,
-          'title': 'Hiányzás',
+          'title': a.delay > 0 ? 'Késés' : 'Hiányzás',
           'body': a.subject.name,
           'type': 'absence',
+          'lines': [
+            if (a.lessonIndex != null) '${a.lessonIndex}. óra',
+            if (a.delay > 0) '${a.delay} perc',
+            switch (a.state) {
+              Justification.excused => 'Igazolt',
+              Justification.unexcused => 'Igazolatlan',
+              Justification.pending => 'Igazolásra vár',
+            },
+          ],
           'timestamp': a.date.millisecondsSinceEpoch,
         });
       }
@@ -468,6 +488,12 @@ class WearProvider with ChangeNotifier {
               type: 'homework',
               subject: wearSubjectName(h.subject),
               due: h.deadline,
+              lines: [
+                h.teacher.name,
+                if (h.attachments.isNotEmpty)
+                  '${h.attachments.length} csatolmány (a telefonon)',
+              ].where((s) => s.isNotEmpty).toList(),
+              text: wearDetailText(h.content.escapeHtml()),
             ),
           for (final e in exams)
             WearTodoItem(
@@ -475,6 +501,11 @@ class WearProvider with ChangeNotifier {
               type: 'exam',
               subject: wearSubjectName(e.subject),
               due: e.writeDate,
+              title: e.description.escapeHtml(),
+              lines: [
+                e.mode?.description.escapeHtml().capital() ?? '',
+                e.teacher.name,
+              ].where((s) => s.isNotEmpty).toList(),
             ),
         ],
         average: wearStudyAverage([

@@ -35,6 +35,10 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
   bool get isPaired => _isPaired;
   String get pairingCode => _pairingCode;
 
+  /// The watch app's version, for the bottom of Settings.
+  String get appVersion => _appVersion;
+  String _appVersion = '';
+
   /// False until the saved state is read, so a paired watch doesn't flash
   /// the pairing screen on start.
   bool get loaded => _loaded;
@@ -148,6 +152,9 @@ class WearDataProvider with ChangeNotifier, WidgetsBindingObserver {
         }
         if (result['isPaired'] != null) {
           _isPaired = result['isPaired'] as bool;
+        }
+        if (result['appVersion'] is String) {
+          _appVersion = result['appVersion'] as String;
         }
         if (result['pairingCode'] != null) {
           _pairingCode = result['pairingCode'] as String;

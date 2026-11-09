@@ -49,7 +49,8 @@ class MainActivity : FlutterActivity(),
                         "connected"    to WearConnectionHelper.isConnected,
                         "offlineMode"  to prefs.getBoolean("offline_mode", false),
                         "isPaired"     to prefs.getBoolean("is_paired", false),
-                        "pairingCode"  to prefs.getString("pairing_code", "")
+                        "pairingCode"  to prefs.getString("pairing_code", ""),
+                        "appVersion"   to packageManager.getPackageInfo(packageName, 0).versionName
                     ))
                 }
 
