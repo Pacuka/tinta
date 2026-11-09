@@ -2,7 +2,7 @@ name: folio_wear
 description: "Tinta Wear OS companion app – unofficial e-KRÉTA client for Wear OS"
 publish_to: "none"
 
-version: 1.6.1+10
+version: 1.6.2+11
 
 environment:
   sdk: ^3.6.0

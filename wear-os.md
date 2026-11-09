@@ -46,11 +46,11 @@ Ezt csak egyszer kell megcsinálni.
 
 Töltsd le a legfrissebb `tinta-wear-….apk` fájlt a [Releases](https://github.com/Pacuka/tinta/releases/latest) oldalról. Lépj abba a mappába, ahol a fájl van, és futtasd a saját fájlnévvel:
 
-    adb install tinta-wear-1.6.1.apk
+    adb install tinta-wear-1.6.2.apk
 
 Ha az `adb devices` több eszközt is mutat, add meg, melyikre menjen:
 
-    adb -s IP-CÍM:MÁSIK-PORT install tinta-wear-1.6.1.apk
+    adb -s IP-CÍM:MÁSIK-PORT install tinta-wear-1.6.2.apk
 
 Sikeres telepítés után a parancs ezt írja ki: `Success`.
 
@@ -71,7 +71,7 @@ Kész: az órán megjelennek a mai órák és az értesítések.
 
 **1.6.2-től a telefonról is lehet:** a telefonon nyisd meg a Tintát (**Beállítások → Egyéb → WearOS**). Ha van újabb óra-app, ott látod az **Óra-app frissítése** sort a két verziószámmal. Koppints rá: a telefon letölti és átküldi az órára (Bluetooth-on ez pár percig is eltarthat). Utána nyisd meg a Tintát az órán, és hagyd jóvá a frissítést. Az első alkalommal az óra engedélyt kér az „ismeretlen appok” telepítéséhez: kapcsold be, és utána magától folytatja. Az óra ehhez sem megy ki az internetre, mindent a telefon tölt le.
 
-Ha a telefonos frissítés nem megy (vagy az órán még 1.6.2-nél régebbi Tinta van), töltsd le az új `tinta-wear` fájlt, és ismételd meg a 3. lépést. Ha a géped már párosítva van, elég a 2. lépésből az `adb connect`. A beállításaid megmaradnak.
+Ha a telefonos frissítés nem megy (vagy az órán még 1.6.2-nél régebbi Tinta van), töltsd le az új `tinta-wear-<verzió>.apk` fájlt (a végződés nélkülit; az `-armeabi-v7a` és `-arm64-v8a` végűeket a telefon küldi át), és ismételd meg a 3. lépést. Ha a géped már párosítva van, elég a 2. lépésből az `adb connect`. A beállításaid megmaradnak.
 
 ## 7. Ha végeztél
 
