@@ -90,6 +90,13 @@ object WearUpdateInstaller {
     fun installIfPending(ctx: Context) {
         val apk = pendingFile(ctx)
         if (!apk.exists() || installing) return
+        // The install restarts the app, often before it can delete the file:
+        // a copy of what is already installed must not be installed again.
+        if (!isNewer(ctx, apk)) {
+            Log.d(TAG, "pending update is already installed, deleted")
+            finish(ctx, "ok")
+            return
+        }
         installing = true
         askedPermission = !ctx.packageManager.canRequestPackageInstalls()
         try {
@@ -116,6 +123,22 @@ object WearUpdateInstaller {
             finish(ctx, "error:install")
         }
     }
+
+    /** False if [apk] is not this app or is the installed version (or older). */
+    private fun isNewer(ctx: Context, apk: File): Boolean {
+        val pm = ctx.packageManager
+        val archive = pm.getPackageArchiveInfo(apk.path, 0) ?: return false
+        if (archive.packageName != ctx.packageName) return false
+        val installed = pm.getPackageInfo(ctx.packageName, 0)
+        val newCode = versionCode(archive)
+        val oldCode = versionCode(installed)
+        return newCode > oldCode ||
+            (newCode == oldCode && archive.versionName != installed.versionName)
+    }
+
+    private fun versionCode(info: android.content.pm.PackageInfo): Long =
+        if (Build.VERSION.SDK_INT >= 28) info.longVersionCode
+        else @Suppress("DEPRECATION") info.versionCode.toLong()
 
     /** The user left the prompt; retried once if it was only the permission. */
     fun onAborted(ctx: Context) {
