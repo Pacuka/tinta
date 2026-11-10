@@ -30,6 +30,8 @@ import 'package:flutter/foundation.dart';
 import 'package:folio/models/config.dart';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio/helpers/update_helper.dart';
+import 'package:folio/helpers/reduce_transparency.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/app.dart';
 import 'package:flutter/services.dart';
@@ -94,10 +96,15 @@ void main() async {
     // Old update APKs: fire and forget, never blocks startup.
     unawaited(cleanupOldUpdateApks());
 
-    runApp(App(
-      database: startup.database,
-      settings: startup.settings,
-      user: startup.user,
+    await LiquidGlassWidgets.initialize();
+    await ReduceTransparency.init();
+    runApp(LiquidGlassWidgets.wrap(
+      brightnessResolver: Theme.maybeBrightnessOf,
+      child: App(
+        database: startup.database,
+        settings: startup.settings,
+        user: startup.user,
+      ),
     ));
   } catch (error, stackTrace) {
     runApp(MaterialApp(

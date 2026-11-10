@@ -74,6 +74,8 @@ import 'package:folio/api/providers/update_provider.dart';
 import 'package:folio/api/providers/wear_provider.dart';
 import 'package:folio_mobile_ui/pages/grades/calculator/grade_calculator_provider.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:folio/helpers/reduce_transparency.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 class App extends StatefulWidget {
   final SettingsProvider settings;
@@ -292,7 +294,17 @@ class _AppState extends State<App> {
                   return I18n(
                     initialLocale: Locale(
                         settings.language, settings.language.toUpperCase()),
-                    child: InkSplashIntro(child: app),
+                    child: InkSplashIntro(
+                      // iOS "Reduce Transparency" → solid glass; null lets
+                      // the package read the system flags itself.
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: ReduceTransparency.enabled,
+                        builder: (context, reduce, _) => GlassAccessibilityScope(
+                          reduceTransparency: reduce ? true : null,
+                          child: app,
+                        ),
+                      ),
+                    ),
                   );
                 },
                 title: "Tinta",

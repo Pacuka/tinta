@@ -20,7 +20,7 @@
 - iPhone-on görgethető listában nem lehet natív (platform view) elem.
 - `import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';` az egyetlen import, `src/` soha.
 - Minden szöveg, ami a felhasználó elé kerül, helyes magyar (a meglévő i18n kulcsokat kell használni, ahol vannak).
-- A munka külön ágon megy (`uveg-glass`, git worktree a `tinta` ág HEAD-jéről, miután a widgetes munka commitolva van). A `glass-spike` ág és a worktree eldobható.
+- A munka külön ágon megy (`uveg-glass`, a `tinta` ág 8bb80ac4 commitjáról, a fő mappában). A `glass-spike` ág és a worktree eldobható.
 - Csak helyi commit. Pusht és kiadást csak a felhasználó kérésére.
 
 ## Review Focus

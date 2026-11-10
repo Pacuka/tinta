@@ -9,6 +9,7 @@ import WebKit
 @objc class AppDelegate: FlutterAppDelegate {
     private var methodChannel: FlutterMethodChannel?
     private var tokenRotationObserver: NSObjectProtocol?
+    private var accessibilityChannel: FlutterMethodChannel?
 
     override func application(
         _ application: UIApplication,
@@ -59,6 +60,30 @@ import WebKit
                     "bundleId": bundleId,
                 ])
             }
+        }
+
+        // Üveg theme: Flutter doesn't expose "Reduce Transparency", so report
+        // it (and its changes) to Dart (lib/helpers/reduce_transparency.dart).
+        accessibilityChannel = FlutterMethodChannel(
+            name: "app.zan1456.folio/accessibility",
+            binaryMessenger: controller as! FlutterBinaryMessenger
+        )
+        accessibilityChannel?.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
+            if call.method == "reduceTransparency" {
+                result(UIAccessibility.isReduceTransparencyEnabled)
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.accessibilityChannel?.invokeMethod(
+                "reduceTransparencyChanged",
+                arguments: UIAccessibility.isReduceTransparencyEnabled
+            )
         }
 
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
