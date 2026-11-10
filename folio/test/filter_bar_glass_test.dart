@@ -92,6 +92,27 @@ void main() {
     expect(find.text('3'), findsOneWidget);
   });
 
+  testWidgets('the count badge sits beside its label, not above it',
+      (tester) async {
+    final items = [
+      const Tab(text: 'Összes'),
+      Tab(
+          child: Row(mainAxisSize: MainAxisSize.min, children: const [
+        Text('Számonkérés'),
+        SizedBox(width: 6),
+        Text('3'),
+      ])),
+    ];
+    await tester.pumpWidget(_app(AccentColor.uveg, _Host(items: items)));
+    final label = tester.getCenter(find.text('Számonkérés'));
+    final badge = tester.getCenter(find.text('3'));
+    expect((label.dy - badge.dy).abs(), lessThan(2.0));
+    expect(badge.dx, greaterThan(label.dx));
+    // Same baseline as a plain segment.
+    expect((tester.getCenter(find.text('Összes')).dy - label.dy).abs(),
+        lessThan(2.0));
+  });
+
   testWidgets('censored keeps real labels hidden', (tester) async {
     await tester.pumpWidget(
         _app(AccentColor.uveg, const _Host(items: _tabs, censored: true)));

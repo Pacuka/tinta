@@ -39,6 +39,9 @@ class FilterBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _FilterBarState extends State<FilterBar> {
   List<double> censoredItemsWidth = [];
+  // Üveg: tells the edge fade whether more filters hide off-screen.
+  final ScrollController _glassScroll = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -49,13 +52,19 @@ class _FilterBarState extends State<FilterBar> {
   }
 
   @override
+  void dispose() {
+    _glassScroll.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    if (widget.pillStyle && !widget.censored && isGlassTheme(context)) {
-      final segments = widget.items.map(_glassSegment).toList();
-      if (!segments.contains(null)) {
-        return _glassBar(context, segments.cast<GlassSegment>());
-      }
+    if (widget.pillStyle &&
+        !widget.censored &&
+        isGlassTheme(context) &&
+        widget.items.every((item) => _glassParts(item) != null)) {
+      return _glassBar(context);
     }
     final tabbar = TabBar(
       controller: widget.controller,
@@ -80,8 +89,8 @@ class _FilterBarState extends State<FilterBar> {
               ? BoxDecoration(
                   color: colorScheme.secondary.withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(14.0),
-                  border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.12)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.12)),
                 )
               : BoxDecoration(
                   color: colorScheme.secondary.withValues(alpha: 0.12),
@@ -159,48 +168,85 @@ class _FilterBarState extends State<FilterBar> {
 
   /// Üveg: the filter pills as a Liquid Glass segmented control, driven by
   /// the same [TabController] as the pages below it.
-  Widget _glassBar(BuildContext context, List<GlassSegment> segments) {
+  Widget _glassBar(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final controller = widget.controller;
+    final selectedStyle = TextStyle(
+        color: colorScheme.secondary,
+        fontWeight: FontWeight.w600,
+        fontSize: 15.0);
+    final unselectedStyle = TextStyle(
+        color: AppColors.of(context).text.withValues(alpha: 0.7),
+        fontWeight: FontWeight.w600,
+        fontSize: 15.0);
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 48.0,
       padding: widget.padding,
       alignment: Alignment.centerLeft,
       child: AnimatedBuilder(
-        animation: controller.animation!,
-        builder: (context, _) => GlassSegmentedControl.scrollable(
-          segments: segments,
-          selectedIndex: controller.animation!.value.round(),
-          onSegmentSelected: (i) {
-            controller.animateTo(i);
-            widget.onTap?.call(i);
-          },
-          height: 40.0,
-          quality: tintaGlassQuality,
-          settings: tintaBarSettings(dark),
-          indicatorSettings: tintaIndicatorSettings(),
-          indicatorColor: tintaIndicatorColor(dark),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 14),
-          selectedTextStyle: TextStyle(
-              color: colorScheme.secondary,
-              fontWeight: FontWeight.w600,
-              fontSize: 15.0),
-          unselectedTextStyle: TextStyle(
-              color: AppColors.of(context).text.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w600,
-              fontSize: 15.0),
-        ),
+        animation: Listenable.merge([controller.animation!, _glassScroll]),
+        builder: (context, _) {
+          final selected = controller.animation!.value.round();
+          final bar = GlassSegmentedControl.scrollable(
+            segments: [
+              for (final (i, item) in widget.items.indexed)
+                _glassSegment(
+                    item, i == selected ? selectedStyle : unselectedStyle),
+            ],
+            selectedIndex: selected,
+            onSegmentSelected: (i) {
+              controller.animateTo(i);
+              widget.onTap?.call(i);
+            },
+            scrollController: _glassScroll,
+            height: 40.0,
+            quality: tintaGlassQuality,
+            settings: tintaBarSettings(dark),
+            indicatorSettings: tintaIndicatorSettings(),
+            indicatorColor: tintaIndicatorColor(dark),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 14),
+            selectedTextStyle: selectedStyle,
+            unselectedTextStyle: unselectedStyle,
+          );
+          return _edgeFade(bar);
+        },
       ),
     );
   }
 
-  /// A plain `Tab(text:)`, or a tab whose child holds a label and a count
-  /// (the home page's unread badges). Anything else keeps the old TabBar.
-  GlassSegment? _glassSegment(Widget item) {
+  /// Fades the side where more filters are hidden, so a cut-off label
+  /// ("Üzenete") reads as "scroll for more" instead of a glitch.
+  Widget _edgeFade(Widget child) {
+    final pos = _glassScroll.hasClients && _glassScroll.positions.length == 1
+        ? _glassScroll.position
+        : null;
+    if (pos == null || !pos.hasContentDimensions) return child;
+    final fadeLeft = pos.pixels > pos.minScrollExtent + 1;
+    final fadeRight = pos.pixels < pos.maxScrollExtent - 1;
+    if (!fadeLeft && !fadeRight) return child;
+    return ShaderMask(
+      blendMode: BlendMode.dstIn,
+      shaderCallback: (bounds) => LinearGradient(
+        colors: [
+          fadeLeft ? Colors.transparent : Colors.black,
+          Colors.black,
+          Colors.black,
+          fadeRight ? Colors.transparent : Colors.black,
+        ],
+        stops: const [0, 0.08, 0.92, 1],
+      ).createShader(bounds),
+      child: child,
+    );
+  }
+
+  /// The label and optional count of a filter: a plain `Tab(text:)`, or a
+  /// tab whose child holds a label and a count (the home page's unread
+  /// badges). Null for anything else, which keeps the old TabBar.
+  (String, String?)? _glassParts(Widget item) {
     if (item is! Tab) return null;
-    if (item.text != null) return GlassSegment(label: item.text);
+    if (item.text != null) return (item.text!, null);
     final texts = <String>[];
     void collect(Widget? w) {
       if (w is Text && w.data != null) {
@@ -216,26 +262,41 @@ class _FilterBarState extends State<FilterBar> {
 
     collect(item.child);
     if (texts.isEmpty || texts.length > 2) return null;
-    if (texts.length == 1) return GlassSegment(label: texts.first);
+    return (texts.first, texts.length == 2 ? texts[1] : null);
+  }
+
+  /// The package stacks an icon above its label, so a counted filter is
+  /// built as one "icon" row (label + badge) to keep the badge beside it.
+  GlassSegment _glassSegment(Widget item, TextStyle style) {
+    final (label, count) = _glassParts(item)!;
+    if (count == null) return GlassSegment(label: label);
     final colorScheme = Theme.of(context).colorScheme;
     return GlassSegment(
-      label: texts.first,
-      icon: Container(
-        constraints: const BoxConstraints(minWidth: 18.0),
-        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
-        decoration: BoxDecoration(
-          color: colorScheme.secondary,
-          borderRadius: BorderRadius.circular(9.0),
-        ),
-        child: Text(
-          texts[1],
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 11.0,
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onSecondary,
+      id: label,
+      semanticLabel: "$label, $count",
+      icon: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, maxLines: 1, style: style),
+          const SizedBox(width: 6.0),
+          Container(
+            constraints: const BoxConstraints(minWidth: 18.0),
+            padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
+            decoration: BoxDecoration(
+              color: colorScheme.secondary,
+              borderRadius: BorderRadius.circular(9.0),
+            ),
+            child: Text(
+              count,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.0,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSecondary,
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
