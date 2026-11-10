@@ -30,7 +30,7 @@ class RoundedBottomSheet extends StatelessWidget {
         shape: LiquidVerticalRoundedSuperellipse(
             topRadius: borderRadius, bottomRadius: 0),
         settings:
-            tintaBarSettings(Theme.of(context).brightness == Brightness.dark),
+            tintaSheetSettings(Theme.of(context).brightness == Brightness.dark),
         quality: tintaGlassQuality,
         child: content,
       );

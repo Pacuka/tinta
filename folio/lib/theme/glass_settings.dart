@@ -10,6 +10,14 @@ LiquidGlassSettings tintaBarSettings(bool dark) =>
     (dark ? LiquidGlassSettings.ios27Dark : LiquidGlassSettings.ios27Light)
         .copyWith(blur: 6);
 
+/// Sheets hold a lot of text, so on light glass the content behind must
+/// stay a colour wash, never readable words (Redmi, "Több" sheet). Dark
+/// keeps the bar material: the modal barrier already hides what's behind.
+LiquidGlassSettings tintaSheetSettings(bool dark) => dark
+    ? tintaBarSettings(true)
+    : tintaBarSettings(false)
+        .copyWith(blur: 20, glassColor: const Color(0xC8F8F8F8));
+
 /// The sliding lens of tab bars. 0 aberration counts as "unset" in the
 /// package's indicator merge and brings back its 0.15 rainbow rim.
 LiquidGlassSettings tintaIndicatorSettings() =>

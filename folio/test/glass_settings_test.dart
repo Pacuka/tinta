@@ -10,6 +10,14 @@ void main() {
     expect(tintaBarSettings(false).blur, 6);
   });
 
+  test('light sheets are frosted harder than bars, dark ones are not', () {
+    expect(tintaSheetSettings(false).blur,
+        greaterThan(tintaBarSettings(false).blur));
+    expect(tintaSheetSettings(false).glassColor.a,
+        greaterThan(tintaBarSettings(false).glassColor.a));
+    expect(tintaSheetSettings(true), tintaBarSettings(true));
+  });
+
   test('indicator lens has no rainbow rim (0 would mean "unset")', () {
     expect(tintaIndicatorSettings().chromaticAberration, 0.001);
   });
