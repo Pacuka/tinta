@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:folio/theme/colors/colors.dart';
 import 'package:folio_kreta_api/models/homework.dart';
+import 'package:folio/utils/format.dart';
 import 'package:i18n_extension/i18n_extension.dart' show I18n;
 import 'package:intl/intl.dart';
 import 'homework_view.i18n.dart';
@@ -79,7 +80,7 @@ class _HomeworkHistoryState extends State<HomeworkHistory> {
                     ),
                     const SizedBox(height: 4.0),
                     SelectableText(
-                      v.content,
+                      v.content.escapeHtml(),
                       style: TextStyle(
                         color: text.withValues(alpha: 0.9),
                         fontSize: 14.0,
