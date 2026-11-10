@@ -15,6 +15,10 @@ import 'package:folio_mobile_ui/screens/navigation/nabar.dart';
 import 'package:folio_mobile_ui/screens/navigation/navbar_item.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_route.dart';
 import 'package:folio_mobile_ui/screens/navigation/navigation_route_handler.dart';
+import 'package:folio_kreta_api/models/lesson.dart';
+import 'package:folio_kreta_api/models/week.dart';
+import 'package:folio_mobile_ui/common/widgets/lesson/lesson_viewable.dart';
+import 'package:folio_mobile_ui/pages/timetable/timetable_page.dart';
 import 'package:folio_mobile_ui/screens/navigation/notification_open.dart';
 import 'package:folio_mobile_ui/screens/navigation/status_bar.dart';
 import 'package:folio_mobile_ui/screens/news/news_view.dart';
@@ -31,6 +35,7 @@ import 'package:folio_mobile_ui/common/screens.i18n.dart';
 import 'package:folio/api/providers/news_provider.dart';
 import 'package:folio/api/providers/sync.dart';
 import 'package:folio/helpers/update_notifier.dart';
+import 'package:folio/helpers/home_widget_helper.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:folio/providers/goal_provider.dart';
 import 'dart:io' show Platform;
@@ -161,6 +166,7 @@ class NavigationScreenState extends State<NavigationScreen>
     // A tapped notification opens what it is about.
     UpdateNotifier.tapped.addListener(_onNotificationTap);
     UpdateNotifier.checkLaunchTap();
+    HomeWidgetHelper.listenTaps();
 
     // initial sync
     _lastSync = DateTime.now();
@@ -188,7 +194,10 @@ class NavigationScreenState extends State<NavigationScreen>
     if (payload == null) return;
     UpdateNotifier.tapped.value = null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) openFromNotification(context, payload, setPage: setPage);
+      if (mounted) {
+        openFromNotification(context, payload,
+            setPage: navigateToPage, openLesson: _openLesson);
+      }
     });
   }
 
@@ -217,6 +226,16 @@ class NavigationScreenState extends State<NavigationScreen>
   }
 
   void setPage(String page) => setState(() => selected.name = page);
+
+  /// Timetable on the lesson's day, with the lesson's popup on top.
+  void _openLesson(Lesson lesson) {
+    customRoute(navigationPageRoute((context) => TimetablePage(
+          initialDay: lesson.date,
+          initialWeek: Week.fromDate(lesson.date),
+        )));
+    setPage("timetable");
+    TimetableLessonPopup.show(context: context, lesson: lesson);
+  }
 
   void navigateToPage(String page) {
     setState(() => selected.name = page);

@@ -24,6 +24,7 @@ import 'package:folio_kreta_api/providers/note_provider.dart';
 import 'package:folio_kreta_api/providers/timetable_provider.dart';
 import 'package:folio/api/providers/wear_extras.dart';
 import 'package:folio/api/providers/wear_provider.dart';
+import 'package:folio/helpers/home_widget_helper.dart';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -69,6 +70,10 @@ Future<void> _syncAll(BuildContext context) async {
       Provider.of<EventProvider>(context, listen: false).fetch(),
       Provider.of<AbsenceProvider>(context, listen: false).fetch(),
     ]);
+    if (context.mounted) {
+      HomeWidgetHelper.save(Provider.of<WearProvider>(context, listen: false)
+          .timetableJson(context));
+    }
     return Future.value();
   }
 
@@ -194,6 +199,11 @@ Future<void> _syncAll(BuildContext context) async {
             .map((h) => h.id),
         lessons: week ?? const [],
       );
+    } catch (_) {}
+    // Home/lock screen widget: today's and next lessons.
+    try {
+      HomeWidgetHelper.save(
+          Provider.of<WearProvider>(context, listen: false).timetableJson(context));
     } catch (_) {}
     // Push fresh data to the paired WearOS watch (no-op if not paired/enabled)
     try {

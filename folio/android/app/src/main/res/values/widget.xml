@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Órarend-widget: a Kobalt téma színei (tinta_palettes.dart). -->
+<resources>
+    <color name="widget_bg">#FFF6F7F9</color>
+    <color name="widget_card">#FFFFFFFF</color>
+    <color name="widget_text">#FF12141C</color>
+    <color name="widget_text_dim">#FF6B7080</color>
+    <color name="widget_accent">#FF2440C8</color>
+    <color name="widget_container">#FFDCE2FF</color>
+    <dimen name="widget_radius">24dp</dimen>
+</resources>

@@ -28,6 +28,7 @@ import 'package:folio_kreta_api/models/absence.dart';
 import 'package:folio/models/release.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:folio/helpers/average_helper.dart';
+import 'package:folio/helpers/home_widget_helper.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_kreta_api/models/grade.dart';
 
@@ -111,6 +112,7 @@ class WearProvider with ChangeNotifier {
     _lastTimetableJson = '';
     _lastNotificationsJson = '';
     _lastExtrasJson = '';
+    await HomeWidgetHelper.clear();
     try {
       await _channel.invokeMethod('sendLogout');
     } catch (_) {}
@@ -300,6 +302,10 @@ class WearProvider with ChangeNotifier {
   }
 
   // ── JSON builders ────────────────────────────────────────────────────────
+
+  /// The same two-week lesson list the watch gets; also feeds the
+  /// home/lock screen widget (works without a watch or sync enabled).
+  String timetableJson(BuildContext ctx) => _buildTimetableJson(ctx);
 
   String _buildTimetableJson(BuildContext ctx) {
     try {

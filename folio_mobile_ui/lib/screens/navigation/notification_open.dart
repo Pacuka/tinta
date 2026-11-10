@@ -5,6 +5,9 @@ import 'package:folio_kreta_api/providers/exam_provider.dart';
 import 'package:folio_kreta_api/providers/grade_provider.dart';
 import 'package:folio_kreta_api/providers/homework_provider.dart';
 import 'package:folio_kreta_api/providers/message_provider.dart';
+import 'package:folio_kreta_api/providers/timetable_provider.dart';
+import 'package:folio_kreta_api/models/lesson.dart';
+import 'package:folio_kreta_api/models/week.dart';
 import 'package:folio_mobile_ui/common/widgets/absence/absence_view.dart';
 import 'package:folio_mobile_ui/common/widgets/exam/exam_view.dart';
 import 'package:folio_mobile_ui/common/widgets/grade/grade_view.dart';
@@ -16,6 +19,8 @@ import 'package:folio_mobile_ui/pages/messages/messages_page.dart';
 import 'package:provider/provider.dart';
 
 /// Opens what a tapped notification is about (see [notificationPayload]).
+/// The home screen widget uses the same payloads ("timetable",
+/// `lesson:<start ms>`).
 ///
 /// The background check may have seen the item before the app did, so when
 /// it is missing the matching provider is refreshed once. If it still can't
@@ -24,6 +29,7 @@ Future<void> openFromNotification(
   BuildContext context,
   String payload, {
   required void Function(String page) setPage,
+  required void Function(Lesson lesson) openLesson,
 }) async {
   final (type, id) = parseNotificationPayload(payload);
 
@@ -81,6 +87,17 @@ Future<void> openFromNotification(
       }
     case "timetable":
       setPage("timetable");
+    case "lesson":
+      final start = int.tryParse(id ?? "");
+      if (start == null) return setPage("timetable");
+      final p = Provider.of<TimetableProvider>(context, listen: false);
+      final at = DateTime.fromMillisecondsSinceEpoch(start);
+      final lesson = await find(
+          () => p.lessons.values.expand((l) => l).toList(),
+          (l) => l.start.millisecondsSinceEpoch == start,
+          () => p.fetch(week: Week.fromDate(at)));
+      if (!context.mounted) return;
+      lesson != null ? openLesson(lesson) : setPage("timetable");
     case "consulting":
       push(const ConsultingPage());
   }

@@ -61,6 +61,20 @@
         <receiver
             android:name="app.zan1456.folio.live_activity.LiveLessonAlarmReceiver"
             android:exported="false" />
+        <receiver
+            android:name="app.zan1456.folio.widget.TimetableWidget"
+            android:label="Órarend"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/timetable_widget_info" />
+        </receiver>
     </application>
 
     <meta-data android:name="flutterEmbedding" android:value="2" />

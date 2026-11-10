@@ -1,5 +1,6 @@
 package app.zan1456.folio
 
+import android.content.Intent
 import android.util.Log
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
@@ -10,14 +11,17 @@ import io.flutter.plugin.common.MethodChannel
 import app.zan1456.folio.live_activity.LiveLessonNotificationManager
 import app.zan1456.folio.live_activity.LiveLessonScheduler
 import app.zan1456.folio.wear.WearSyncManager
+import app.zan1456.folio.widget.TimetableWidget
 
 class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener {
 
     private val LIVE_ACTIVITY_CHANNEL = "app.zan1456.folio/android_live_activity"
     private val WEAR_CHANNEL = "app.zan1456.folio/wear_sync"
+    private val WIDGET_CHANNEL = "app.zan1456.folio/home_widget"
     private val TAG = "FolioPhone.MainActivity"
 
     private var wearSync: WearSyncManager? = null
+    private var widgetChannel: MethodChannel? = null
 
     companion object {
         var wearChannel: MethodChannel? = null
@@ -80,6 +84,27 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                         val cookieManager = android.webkit.CookieManager.getInstance()
                         val cookies = cookieManager.getCookie(url) ?: ""
                         result.success(cookies)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+
+        widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WIDGET_CHANNEL)
+        widgetChannel!!.setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "save" -> {
+                        TimetableWidget.save(this, call.argument<String>("json") ?: "[]")
+                        result.success(null)
+                    }
+                    "clear" -> {
+                        TimetableWidget.clear(this)
+                        result.success(null)
+                    }
+                    // Hidegindításkor a Dart kérdezi meg, widgetről nyitották-e meg.
+                    "takeLaunchTap" -> {
+                        val target = intent?.getStringExtra(TimetableWidget.EXTRA_OPEN)
+                        intent?.removeExtra(TimetableWidget.EXTRA_OPEN)
+                        result.success(target)
                     }
                     else -> result.notImplemented()
                 }
@@ -153,6 +178,14 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
         }
 
         sync.checkConnection()
+    }
+
+    // A widget koppintása, amikor az app már fut (singleTop).
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val target = intent.getStringExtra(TimetableWidget.EXTRA_OPEN) ?: return
+        intent.removeExtra(TimetableWidget.EXTRA_OPEN)
+        widgetChannel?.invokeMethod("open", target)
     }
 
     override fun onResume() {
