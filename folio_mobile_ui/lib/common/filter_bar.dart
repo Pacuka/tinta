@@ -173,7 +173,7 @@ class _FilterBarState extends State<FilterBar> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final controller = widget.controller;
     final selectedStyle = TextStyle(
-        color: colorScheme.secondary,
+        color: tintaSelectedColor(colorScheme, dark),
         fontWeight: FontWeight.w600,
         fontSize: 15.0);
     final unselectedStyle = TextStyle(

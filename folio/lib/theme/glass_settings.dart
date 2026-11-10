@@ -22,3 +22,18 @@ Color tintaIndicatorColor(bool dark) => dark
 
 /// Premium left a rainbow rim on the lens; standard renders it clean.
 const GlassQuality tintaGlassQuality = GlassQuality.standard;
+
+/// Selected tab/filter label. On light glass the wallpaper palette's
+/// accent is too pale to read (Redmi, 2026-11-10), so it is darkened until
+/// it reaches 4.5:1 against the surface; dark mode keeps the accent.
+Color tintaSelectedColor(ColorScheme colorScheme, bool dark) {
+  final accent = colorScheme.secondary;
+  if (dark) return accent;
+  final surface = colorScheme.surface.computeLuminance();
+  var hsl = HSLColor.fromColor(accent);
+  while (hsl.lightness > 0.05 &&
+      (surface + 0.05) / (hsl.toColor().computeLuminance() + 0.05) < 4.5) {
+    hsl = hsl.withLightness(hsl.lightness - 0.03);
+  }
+  return hsl.toColor();
+}

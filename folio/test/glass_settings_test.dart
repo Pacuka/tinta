@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:folio/theme/glass_settings.dart';
@@ -20,5 +21,26 @@ void main() {
 
   test('glass widgets use the standard shader', () {
     expect(tintaGlassQuality, GlassQuality.standard);
+  });
+
+  test('selected label is dark enough on light glass', () {
+    // A wallpaper palette like the one on the Redmi: pale secondary.
+    const pale = Color(0xFF8DB4E2);
+    const light = ColorScheme.light(
+        primary: pale, secondary: pale, surface: Color(0xFFEDEFF3));
+    final dark = ColorScheme.fromSeed(
+        seedColor: const Color(0xFF7FA6D9), brightness: Brightness.dark);
+    double contrast(Color a, Color b) {
+      final la = a.computeLuminance(), lb = b.computeLuminance();
+      return (max(la, lb) + 0.05) / (min(la, lb) + 0.05);
+    }
+
+    final picked = tintaSelectedColor(light, false);
+    expect(contrast(picked, light.surface), greaterThanOrEqualTo(4.5));
+    // Still the same blue, only darker.
+    expect(
+        (HSLColor.fromColor(picked).hue - HSLColor.fromColor(pale).hue).abs(),
+        lessThan(1.0));
+    expect(tintaSelectedColor(dark, true), dark.secondary);
   });
 }

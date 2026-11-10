@@ -77,8 +77,8 @@ class Navbar extends StatelessWidget {
           indicatorColor: tintaIndicatorColor(dark),
           indicatorExpansion:
               const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          selectedIconColor: colorScheme.secondary,
-          selectedLabelColor: colorScheme.secondary,
+          selectedIconColor: tintaSelectedColor(colorScheme, dark),
+          selectedLabelColor: tintaSelectedColor(colorScheme, dark),
           unselectedIconColor: colorScheme.onSurface,
           unselectedLabelColor: colorScheme.onSurface,
         ),
