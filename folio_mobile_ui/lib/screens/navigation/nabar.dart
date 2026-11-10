@@ -1,9 +1,10 @@
 import 'dart:io' show Platform;
-import 'dart:ui' show ImageFilter;
 
 import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
+import 'package:folio/theme/glass_settings.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:folio_mobile_ui/screens/navigation/navbar_item.dart';
 
 class Navbar extends StatelessWidget {
@@ -59,50 +60,27 @@ class Navbar extends StatelessWidget {
     }
 
     if (glass) {
-      // Üveg: floating frosted capsule with a rim of light on top.
+      // Üveg on Android: Liquid Glass tab bar (refraction, rim light, lens).
       return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 10.0),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(36.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: dark ? 0.45 : 0.12),
-                  blurRadius: 28,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(36.0),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  height: 64.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(36.0),
-                    border: Border.all(
-                        color: Colors.white
-                            .withValues(alpha: dark ? 0.16 : 0.7)),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: const [0.0, 0.06, 1.0],
-                      colors: [
-                        Colors.white.withValues(alpha: dark ? 0.22 : 0.85),
-                        colorScheme.surfaceContainerHigh
-                            .withValues(alpha: dark ? 0.42 : 0.55),
-                        colorScheme.surfaceContainerHigh
-                            .withValues(alpha: dark ? 0.42 : 0.55),
-                      ],
-                    ),
-                  ),
-                  child: row,
-                ),
-              ),
-            ),
-          ),
+        top: false,
+        child: GlassTabBar.bottom(
+          tabs: [
+            for (final i in items)
+              GlassTab(icon: i.icon, activeIcon: i.activeIcon, label: i.title),
+          ],
+          selectedIndex: selectedIndex,
+          onTabSelected: onSelected,
+          verticalPadding: 8,
+          quality: tintaGlassQuality,
+          settings: tintaBarSettings(dark),
+          indicatorSettings: tintaIndicatorSettings(),
+          indicatorColor: tintaIndicatorColor(dark),
+          indicatorExpansion:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          selectedIconColor: colorScheme.secondary,
+          selectedLabelColor: colorScheme.secondary,
+          unselectedIconColor: colorScheme.onSurface,
+          unselectedLabelColor: colorScheme.onSurface,
         ),
       );
     }
