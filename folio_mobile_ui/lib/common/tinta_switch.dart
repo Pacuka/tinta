@@ -38,7 +38,8 @@ class TintaSwitch extends StatelessWidget {
       return Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: activeColor,
+        // = the old Switch(activeColor:), which only coloured the thumb
+        activeThumbColor: activeColor,
         materialTapTargetSize: materialTapTargetSize,
       );
     }

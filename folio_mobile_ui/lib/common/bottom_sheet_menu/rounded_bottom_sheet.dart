@@ -3,6 +3,7 @@ import 'package:folio/theme/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
 import 'package:folio/helpers/hyper_os.dart';
+import 'package:folio_mobile_ui/common/glass_backdrop.dart';
 import 'package:folio/theme/glass_settings.dart';
 
 class RoundedBottomSheet extends StatelessWidget {
@@ -27,6 +28,18 @@ class RoundedBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A sheet opened from an Üveg main page captures that page's Theme,
+    // whose scaffold colour is transparent (so the backdrop shows). Inside
+    // the sheet everything must see the real page colour again.
+    final page = GlassPageBackground.maybeOf(context);
+    if (page != null &&
+        Theme.of(context).scaffoldBackgroundColor != page) {
+      final theme = Theme.of(context);
+      return Theme(
+        data: theme.copyWith(scaffoldBackgroundColor: page),
+        child: Builder(builder: build),
+      );
+    }
     final content = _content(context);
     // Üveg: a see-through tinted panel with a lit rim, NOT live glass. A
     // live-glass sheet re-samples everything behind it every frame; at this

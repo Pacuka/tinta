@@ -80,17 +80,26 @@ class _WashPainter extends CustomPainter {
 /// Üveg: the main pages run with a transparent scaffoldBackgroundColor so
 /// [GlassBackdrop] shows. This hands down the real page colour for the few
 /// places that still need it (frosted headers).
-class GlassPageBackground extends InheritedWidget {
+class GlassPageBackground extends InheritedTheme {
   const GlassPageBackground(
       {super.key, required this.color, required super.child});
 
   final Color color;
 
+  /// The real page colour, or null outside the Üveg main pages.
+  static Color? maybeOf(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<GlassPageBackground>()
+      ?.color;
+
   static Color of(BuildContext context) =>
-      context
-          .dependOnInheritedWidgetOfExactType<GlassPageBackground>()
-          ?.color ??
-      Theme.of(context).scaffoldBackgroundColor;
+      maybeOf(context) ?? Theme.of(context).scaffoldBackgroundColor;
+
+  // An InheritedTheme, so bottom sheets and dialogs opened from the main
+  // pages capture it next to the transparent-scaffold Theme and can undo
+  // that override (a sheet came out black in light mode, 2026-11-16).
+  @override
+  Widget wrap(BuildContext context, Widget child) =>
+      GlassPageBackground(color: color, child: child);
 
   @override
   bool updateShouldNotify(GlassPageBackground old) => old.color != color;
