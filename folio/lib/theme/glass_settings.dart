@@ -18,6 +18,10 @@ LiquidGlassSettings tintaSheetSettings(bool dark) => dark
     : tintaBarSettings(false)
         .copyWith(blur: 20, glassColor: const Color(0xC8F8F8F8));
 
+/// Opacity of content cards sitting on a glass sheet: low enough that the
+/// glass shows, high enough that the text on them stays readable.
+double tintaSheetCardAlpha(bool dark) => dark ? 0.55 : 0.6;
+
 /// The sliding lens of tab bars. 0 aberration counts as "unset" in the
 /// package's indicator merge and brings back its 0.15 rainbow rim.
 LiquidGlassSettings tintaIndicatorSettings() =>

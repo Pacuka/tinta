@@ -26,13 +26,19 @@ class RoundedBottomSheet extends StatelessWidget {
     // Üveg: frosted glass, flat bottom edge. A caller's own colour (a fully
     // coloured sheet) still wins.
     if (backgroundColor == null && isGlassTheme(context)) {
+      final theme = Theme.of(context);
+      final dark = theme.brightness == Brightness.dark;
       return AdaptiveGlass(
         shape: LiquidVerticalRoundedSuperellipse(
             topRadius: borderRadius, bottomRadius: 0),
-        settings:
-            tintaSheetSettings(Theme.of(context).brightness == Brightness.dark),
+        settings: tintaSheetSettings(dark),
         quality: tintaGlassQuality,
-        child: content,
+        // Cards on the sheet are see-through too, so the glass isn't hidden
+        // behind solid tiles ("túl matt", 2026-11-16).
+        child: Theme(
+          data: theme.copyWith(colorScheme: _seeThrough(theme.colorScheme, dark)),
+          child: content,
+        ),
       );
     }
     return Container(
@@ -44,6 +50,20 @@ class RoundedBottomSheet extends StatelessWidget {
         ),
       ),
       child: content,
+    );
+  }
+
+  /// The card colours, made translucent for the glass sheet.
+  static ColorScheme _seeThrough(ColorScheme c, bool dark) {
+    final a = tintaSheetCardAlpha(dark);
+    Color t(Color x) => x.withValues(alpha: a);
+    return c.copyWith(
+      surface: t(c.surface),
+      surfaceContainerLowest: t(c.surfaceContainerLowest),
+      surfaceContainerLow: t(c.surfaceContainerLow),
+      surfaceContainer: t(c.surfaceContainer),
+      surfaceContainerHigh: t(c.surfaceContainerHigh),
+      surfaceContainerHighest: t(c.surfaceContainerHighest),
     );
   }
 
