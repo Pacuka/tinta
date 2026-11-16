@@ -404,6 +404,11 @@ class _MessagePopupState extends State<MessagePopup> {
                         ),
                         padding: const EdgeInsets.all(14.0),
                         child: SelectableLinkify(
+                          // flutter_linkify passes a null builder through and that hides
+                          // the Copy menu; give SelectableText its usual one back.
+                          contextMenuBuilder: (context, state) =>
+                              AdaptiveTextSelectionToolbar.editableText(
+                                  editableTextState: state),
                           text: message.content.escapeHtml(),
                           options: const LinkifyOptions(removeWww: true),
                           onOpen: (link) {

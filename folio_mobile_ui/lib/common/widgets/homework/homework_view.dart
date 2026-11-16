@@ -111,6 +111,11 @@ class HomeworkView extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
                 child: SelectableLinkify(
+                  // flutter_linkify passes a null builder through and that hides
+                  // the Copy menu; give SelectableText its usual one back.
+                  contextMenuBuilder: (context, state) =>
+                      AdaptiveTextSelectionToolbar.editableText(
+                          editableTextState: state),
                   text: homework.content.escapeHtml(),
                   options: const LinkifyOptions(removeWww: true),
                   onOpen: (link) {

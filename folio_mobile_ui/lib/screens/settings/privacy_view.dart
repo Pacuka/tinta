@@ -27,6 +27,11 @@ class PrivacyView extends StatelessWidget {
                 child: Text("privacy".i18n),
               ),
               SelectableLinkify(
+                // flutter_linkify passes a null builder through and that hides
+                // the Copy menu; give SelectableText its usual one back.
+                contextMenuBuilder: (context, state) =>
+                    AdaptiveTextSelectionToolbar.editableText(
+                        editableTextState: state),
                 text: """
   • A Tinta (továbbiakban: „alkalmazás”) egy nem hivatalos, nyílt forráskódú mobilos kliensalkalmazás, segítségével a KRÉTA rendszeréből letöltheted és felhasználóbarát módon megjelenítheted az adataidat. Tanulmányi adataid csak közvetlenül az alkalmazás és a KRÉTA szerverei között közlekednek, titkosított kapcsolaton keresztül.
 

@@ -41,6 +41,11 @@ class NewsView extends StatelessWidget {
                       ),
                     ),
                     SelectableLinkify(
+                      // flutter_linkify passes a null builder through and that hides
+                      // the Copy menu; give SelectableText its usual one back.
+                      contextMenuBuilder: (context, state) =>
+                          AdaptiveTextSelectionToolbar.editableText(
+                              editableTextState: state),
                       text: news.content.escapeHtml(),
                       options:
                           const LinkifyOptions(removeWww: true),
