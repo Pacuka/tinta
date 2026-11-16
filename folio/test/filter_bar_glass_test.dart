@@ -125,4 +125,25 @@ void main() {
     expect(find.byType(TabBar), findsOneWidget);
     expect(find.byType(GlassSegmentedControl), findsNothing);
   });
+
+  testWidgets('a count badge arriving later makes the bar measure again',
+      (tester) async {
+    // Regression (2026-11-16): the package measured segments once, the
+    // late "1" badge widened Számonkérés, later pills drifted and the bar
+    // couldn't scroll to the last filter.
+    await tester.pumpWidget(_app(AccentColor.uveg, const _Host(items: _tabs)));
+    final before =
+        tester.widget<GlassSegmentedControl>(find.byType(GlassSegmentedControl)).key;
+    await tester.pumpWidget(_app(
+        AccentColor.uveg,
+        const _Host(items: [
+          Tab(text: 'Összes'),
+          Tab(text: 'Jegyek'),
+          Tab(child: Row(children: [Text('Számonkérés'), Text('1')])),
+          Tab(text: 'Üzenetek'),
+        ])));
+    final after =
+        tester.widget<GlassSegmentedControl>(find.byType(GlassSegmentedControl)).key;
+    expect(after, isNot(before));
+  });
 }

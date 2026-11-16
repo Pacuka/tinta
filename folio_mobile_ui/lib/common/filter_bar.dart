@@ -190,6 +190,15 @@ class _FilterBarState extends State<FilterBar> {
         builder: (context, _) {
           final selected = controller.animation!.value.round();
           final bar = GlassSegmentedControl.scrollable(
+            // The package measures each segment once. A count badge that
+            // arrives after the data loads (Számonkérés → "Számonkérés 1")
+            // widened that segment, so every later pill drifted off its
+            // label and the bar couldn't scroll to the last one
+            // ("Hiányzások", 2026-11-16). A new key on any label/count
+            // change makes it measure again.
+            key: ValueKey(widget.items
+                .map((i) => (_glassParts(i) ?? ('', null)).toString())
+                .join('|')),
             segments: [
               for (final (i, item) in widget.items.indexed)
                 _glassSegment(
