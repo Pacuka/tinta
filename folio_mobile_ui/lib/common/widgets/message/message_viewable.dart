@@ -19,6 +19,7 @@ import 'package:folio_mobile_ui/common/round_border_icon.dart';
 import 'package:folio/ui/widgets/message/message_tile.dart';
 import 'package:folio_mobile_ui/common/widgets/message/attachment_tile.dart';
 import 'message_view_tile.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 class MessageViewable extends StatelessWidget {
   const MessageViewable(this.message, {super.key});
@@ -107,9 +108,14 @@ class _MessagePopupState extends State<MessagePopup> {
   }
 
   Future<void> _deleteForever() async {
-    final sure = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final sure = await showTintaConfirm(
+      context,
+      title: "delete_forever_q".i18n,
+      message: "delete_forever_body".i18n,
+      confirmLabel: "delete_forever".i18n,
+      cancelLabel: "cancel".i18n,
+      destructive: true,
+      fallback: (context) => AlertDialog(
         title: Text("delete_forever_q".i18n),
         content: Text("delete_forever_body".i18n),
         actions: [
@@ -122,7 +128,7 @@ class _MessagePopupState extends State<MessagePopup> {
         ],
       ),
     );
-    if (sure != true || !mounted || !widget.outsideContext.mounted) return;
+    if (!sure || !mounted || !widget.outsideContext.mounted) return;
     final provider =
         Provider.of<MessageProvider>(widget.outsideContext, listen: false);
     final messenger = ScaffoldMessenger.of(widget.outsideContext);

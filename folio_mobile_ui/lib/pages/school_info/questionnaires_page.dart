@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'school_info.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 /// Header shared by the two questionnaire screens.
 Widget _header(BuildContext context, String title) {
@@ -160,10 +161,13 @@ class _QuestionnaireFillPageState extends State<QuestionnaireFillPage> {
   final Map<int, String> _answers = {};
   bool _sending = false;
 
-  Future<bool> _confirm(String title, String yes) async =>
-      await showDialog<bool>(
-        context: context,
-        builder: (c) => AlertDialog(
+  Future<bool> _confirm(String title, String yes) => showTintaConfirm(
+        context,
+        title: title,
+        message: title == "confirm_send".i18n ? "sending_note".i18n : null,
+        confirmLabel: yes,
+        cancelLabel: "cancel".i18n,
+        fallback: (c) => AlertDialog(
           title: Text(title),
           content: title == "confirm_send".i18n
               ? Text("sending_note".i18n)
@@ -176,8 +180,7 @@ class _QuestionnaireFillPageState extends State<QuestionnaireFillPage> {
                 onPressed: () => Navigator.pop(c, true), child: Text(yes)),
           ],
         ),
-      ) ??
-      false;
+      );
 
   Future<void> _send() async {
     if (!await _confirm("confirm_send".i18n, "send".i18n)) return;

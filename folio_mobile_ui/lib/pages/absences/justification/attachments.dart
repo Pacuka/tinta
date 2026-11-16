@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'justification.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 /// A picked file on its way to KRÉTA's temporary storage.
 class PendingAttachment {
@@ -196,9 +197,13 @@ class AttachmentSection extends StatelessWidget {
   }
 
   Future<void> _confirmRemove(BuildContext context, PendingAttachment a) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final ok = await showTintaConfirm(
+      context,
+      message: "delete_attachment_q".i18n,
+      confirmLabel: "delete".i18n,
+      cancelLabel: "cancel".i18n,
+      destructive: true,
+      fallback: (context) => AlertDialog(
         content: Text("delete_attachment_q".i18n),
         actions: [
           TextButton(
@@ -210,6 +215,6 @@ class AttachmentSection extends StatelessWidget {
         ],
       ),
     );
-    if (ok == true) controller.remove(a);
+    if (ok) controller.remove(a);
   }
 }

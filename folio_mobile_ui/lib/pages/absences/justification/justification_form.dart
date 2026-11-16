@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'attachments.dart';
 import 'justification.i18n.dart';
 import 'justifications_page.dart' show formatRange;
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 /// New absence justification. Pops `true` once KRÉTA accepted it.
 class JustificationForm extends StatefulWidget {
@@ -63,9 +64,12 @@ class _JustificationFormState extends State<JustificationForm> {
       _others.items.isNotEmpty;
 
   Future<bool> _confirmLeave() async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final ok = await showTintaConfirm(
+      context,
+      message: "leave_q".i18n,
+      confirmLabel: "leave".i18n,
+      cancelLabel: "stay".i18n,
+      fallback: (context) => AlertDialog(
         content: Text("leave_q".i18n),
         actions: [
           TextButton(
@@ -77,7 +81,7 @@ class _JustificationFormState extends State<JustificationForm> {
         ],
       ),
     );
-    return ok == true;
+    return ok;
   }
 
   Future<void> _pick(bool isStart) async {
@@ -110,20 +114,25 @@ class _JustificationFormState extends State<JustificationForm> {
       ..._mandatory.uploaded.map((f) => "📎 ${f.name}"),
       ..._others.uploaded.map((f) => "📎 ${f.name}"),
     ];
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final body = [
+      "confirm_body".i18n,
+      "",
+      _type!.name,
+      formatRange(_start, _end),
+      if (reason.isNotEmpty) "„$reason”",
+      ...files,
+      "",
+      "no_edit_after".i18n,
+    ].join("\n");
+    final ok = await showTintaConfirm(
+      context,
+      title: "confirm_title".i18n,
+      message: body,
+      confirmLabel: "confirm_send".i18n,
+      cancelLabel: "cancel".i18n,
+      fallback: (context) => AlertDialog(
         title: Text("confirm_title".i18n),
-        content: Text([
-          "confirm_body".i18n,
-          "",
-          _type!.name,
-          formatRange(_start, _end),
-          if (reason.isNotEmpty) "„$reason”",
-          ...files,
-          "",
-          "no_edit_after".i18n,
-        ].join("\n")),
+        content: Text(body),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -134,7 +143,7 @@ class _JustificationFormState extends State<JustificationForm> {
         ],
       ),
     );
-    if (ok != true || !mounted) {
+    if (!ok || !mounted) {
       if (mounted) setState(() => _sending = false);
       return;
     }

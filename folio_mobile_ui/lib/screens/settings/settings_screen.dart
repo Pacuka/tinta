@@ -60,6 +60,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'settings_screen.i18n.dart';
 // ignore: unused_import
 import 'submenu/submenu_screen.i18n.dart' hide SettingsLocalization;
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 class _SettingsSection {
   final String category;
@@ -2296,9 +2297,13 @@ Container(
                 padding: const EdgeInsets.only(left: 14.0, right: 6.0),
                 onPressed: () async {
                   if (!settings.goodStudent) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => WillPopScope(
+                    if (await showTintaConfirm(
+                      context,
+                      title: "attention".i18n,
+                      message: "goodstudent_disclaimer".i18n,
+                      confirmLabel: "understand".i18n,
+                      barrierDismissible: false,
+                      fallback: (context) => WillPopScope(
                         onWillPop: () async => false,
                         child: AlertDialog(
                           shape: RoundedRectangleBorder(
@@ -2308,19 +2313,18 @@ Container(
                           actions: [
                             ActionButton(
                               label: "understand".i18n,
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                settings.update(goodStudent: true);
-                                Provider.of<GradeProvider>(context,
-                                        listen: false)
-                                    .convertBySettings();
-                                setState(() {});
-                              },
+                              onTap: () => Navigator.of(context).pop(true),
                             ),
                           ],
                         ),
                       ),
-                    );
+                    )) {
+                      if (!mounted) return;
+                      settings.update(goodStudent: true);
+                      Provider.of<GradeProvider>(context, listen: false)
+                          .convertBySettings();
+                      setState(() {});
+                    }
                   } else {
                     settings.update(goodStudent: false);
                     Provider.of<GradeProvider>(context, listen: false)
@@ -2340,9 +2344,13 @@ Container(
                 trailing: Switch(
                   onChanged: (v) async {
                     if (v) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => WillPopScope(
+                      if (await showTintaConfirm(
+                        context,
+                        title: "attention".i18n,
+                        message: "goodstudent_disclaimer".i18n,
+                        confirmLabel: "understand".i18n,
+                        barrierDismissible: false,
+                        fallback: (context) => WillPopScope(
                           onWillPop: () async => false,
                           child: AlertDialog(
                             shape: RoundedRectangleBorder(
@@ -2352,19 +2360,18 @@ Container(
                             actions: [
                               ActionButton(
                                 label: "understand".i18n,
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                  settings.update(goodStudent: true);
-                                  Provider.of<GradeProvider>(context,
-                                          listen: false)
-                                      .convertBySettings();
-                                  setState(() {});
-                                },
+                                onTap: () => Navigator.of(context).pop(true),
                               ),
                             ],
                           ),
                         ),
-                      );
+                      )) {
+                        if (!mounted) return;
+                        settings.update(goodStudent: true);
+                        Provider.of<GradeProvider>(context, listen: false)
+                            .convertBySettings();
+                        setState(() {});
+                      }
                     } else {
                       settings.update(goodStudent: false);
                       Provider.of<GradeProvider>(context, listen: false)

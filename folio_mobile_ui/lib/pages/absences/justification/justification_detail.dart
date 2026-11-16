@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'attachments.dart';
 import 'justification.i18n.dart';
 import 'justifications_page.dart' show formatRange;
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 /// One justification: state, documents, decisions, and the "hiánypótlás"
 /// (missing document) reply when the school asks for it.
@@ -205,15 +206,20 @@ class _RectificationPageState extends State<_RectificationPage> {
   Future<void> _send() async {
     if (_sending) return;
     setState(() => _sending = true);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final body = [
+      "rectification_confirm".i18n,
+      "",
+      ..._files.uploaded.map((f) => "📎 ${f.name}"),
+    ].join("\n");
+    final ok = await showTintaConfirm(
+      context,
+      title: "confirm_title".i18n,
+      message: body,
+      confirmLabel: "confirm_send".i18n,
+      cancelLabel: "cancel".i18n,
+      fallback: (context) => AlertDialog(
         title: Text("confirm_title".i18n),
-        content: Text([
-          "rectification_confirm".i18n,
-          "",
-          ..._files.uploaded.map((f) => "📎 ${f.name}"),
-        ].join("\n")),
+        content: Text(body),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -224,7 +230,7 @@ class _RectificationPageState extends State<_RectificationPage> {
         ],
       ),
     );
-    if (ok != true || !mounted) {
+    if (!ok || !mounted) {
       if (mounted) setState(() => _sending = false);
       return;
     }

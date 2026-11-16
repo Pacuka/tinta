@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'consulting.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 String _hm(DateTime d) => DateFormat("HH:mm").format(d);
 
@@ -109,9 +110,13 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
   ConsultingHour get hour => widget.hour;
 
   Future<bool> _confirm(String title, String body) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final ok = await showTintaConfirm(
+      context,
+      title: title,
+      message: body,
+      confirmLabel: "yes".i18n,
+      cancelLabel: "no".i18n,
+      fallback: (context) => AlertDialog(
         title: Text(title),
         content: Text(body),
         actions: [
@@ -127,7 +132,7 @@ class _ConsultingSheetState extends State<ConsultingSheet> {
         ],
       ),
     );
-    return ok == true;
+    return ok;
   }
 
   String _slotText(ConsultingSlot s) =>

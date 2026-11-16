@@ -39,6 +39,7 @@ import 'package:folio_mobile_ui/common/profile_image/profile_image.dart';
 import 'package:folio_mobile_ui/common/splitted_panel/splitted_panel.dart';
 import 'package:folio_mobile_ui/screens/settings/accounts/account_tile.dart';
 import 'profile_screen.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -286,39 +287,40 @@ class ProfileScreenState extends State<ProfileScreen>
     final String? result = await refresh();
 
     if (result != 'success') {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
+      final ok = await showTintaConfirm(
+        context,
+        title: 'oopsie'.i18n,
+        message: 'session_expired'.i18n,
+        confirmLabel: "Ok",
+        fallback: (dialogContext) => AlertDialog(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0)),
           title: Text('oopsie'.i18n),
           content: Text('session_expired'.i18n),
           actions: [
             TextButton(
-              onPressed: () async {
-                String? userId = user.id;
-                if (userId == null) return;
-                user.removeUser(userId);
-                await Provider.of<DatabaseProvider>(context, listen: false)
-                    .store
-                    .removeUser(userId);
-                if (user.getUsers().isNotEmpty) {
-                  user.setUser(user.getUsers().first.id);
-                  restore()
-                      .then((_) => user.setUser(user.getUsers().first.id));
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed("login_back");
-                } else {
-                  Navigator.of(context).pop();
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil("login", (_) => false);
-                }
-              },
+              onPressed: () => Navigator.of(dialogContext).pop(true),
               child: const Text("Ok"),
             ),
           ],
         ),
       );
+      if (!ok || !mounted) return;
+      // The dialog is already closed here, so only the next screen is pushed.
+      String? userId = user.id;
+      if (userId == null) return;
+      user.removeUser(userId);
+      await Provider.of<DatabaseProvider>(context, listen: false)
+          .store
+          .removeUser(userId);
+      if (!mounted) return;
+      if (user.getUsers().isNotEmpty) {
+        user.setUser(user.getUsers().first.id);
+        restore().then((_) => user.setUser(user.getUsers().first.id));
+        Navigator.of(context).pushNamed("login_back");
+      } else {
+        Navigator.of(context).pushNamedAndRemoveUntil("login", (_) => false);
+      }
       return;
     }
 

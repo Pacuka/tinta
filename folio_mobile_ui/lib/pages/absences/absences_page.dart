@@ -28,6 +28,7 @@ import 'absences_page.i18n.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:folio/models/user.dart' show Role;
 import 'justification/justifications_page.dart';
+import 'package:folio_mobile_ui/common/tinta_confirm.dart';
 
 enum AbsenceFilter { absences, delays, misses }
 
@@ -334,9 +335,12 @@ Container(
                           ),
                         IconButton(
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
+                            showTintaConfirm(
+                              context,
+                              title: "attention".i18n,
+                              message: "attention_body".i18n,
+                              confirmLabel: "Ok",
+                              fallback: (context) => AlertDialog(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12.0)),
                                 title: Text("attention".i18n),
