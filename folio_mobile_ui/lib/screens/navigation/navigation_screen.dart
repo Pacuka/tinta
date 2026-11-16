@@ -299,15 +299,32 @@ class NavigationScreenState extends State<NavigationScreen>
         body: Stack(
           alignment: Alignment.bottomCenter,
           children: [
-            Navigator(
-              key: _navigatorState,
-              observers: [CNTabBarRouteObserver()],
-              initialRoute: selected.name,
-              onGenerateRoute: (settings) => navigationRouteHandler(settings),
-            ),
-            // Üveg: halvány színes fények az egész app fölött
+            // Üveg: színes fények a fő oldalak MÖGÖTT, az oldalak háttere
+            // átlátszó, így a menüsáv és a szűrők üvegének van mit megtörnie.
             if (isGlassTheme(context))
-              const Positioned.fill(child: GlassBackdrop()),
+              Positioned.fill(
+                child: GlassBackdrop(
+                    background: Theme.of(context).scaffoldBackgroundColor),
+              ),
+            Builder(builder: (context) {
+              final navigator = Navigator(
+                key: _navigatorState,
+                observers: [CNTabBarRouteObserver()],
+                initialRoute: selected.name,
+                onGenerateRoute: (settings) =>
+                    navigationRouteHandler(settings),
+              );
+              if (!isGlassTheme(context)) return navigator;
+              final theme = Theme.of(context);
+              return GlassPageBackground(
+                color: theme.scaffoldBackgroundColor,
+                child: Theme(
+                  data: theme.copyWith(
+                      scaffoldBackgroundColor: Colors.transparent),
+                  child: navigator,
+                ),
+              );
+            }),
             // A lista elhalványul a lebegő menüsor mögött (üvegnél a
             // menüsor maga mossa el, ami mögötte van)
             if (!isGlassTheme(context))

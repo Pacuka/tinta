@@ -41,6 +41,8 @@ import 'package:provider/provider.dart';
 import 'home_page.i18n.dart';
 import 'package:folio/ui/filter/widgets.dart';
 import 'package:folio/ui/filter/sort.dart';
+import 'package:folio_mobile_ui/common/glass_backdrop.dart';
+import 'package:folio/theme/glass.dart';
 // import 'package:dropdown_button2/dropdown_button2.dart';
 
 class HomePage extends StatefulWidget {
@@ -430,7 +432,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 : 184.0)))),
 
                             // Live Card
-                            flexibleSpace: FlexibleSpaceBar(
+                            flexibleSpace: Stack(fit: StackFit.expand, children: [
+                              // Üveg: frosted header, the list scrolls
+                              // under it blurred (page bg is transparent)
+                              if (isGlassTheme(context))
+                                const GlassHeaderFill(),
+                              FlexibleSpaceBar(
                               background: Container(
                                 color: Theme.of(context).scaffoldBackgroundColor,
                                 child: Padding(
@@ -451,6 +458,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                               ),
                             ),
+                            ]),
                             shadowColor: Colors.black,
                             // Filter Bar
                             bottom: _withInkStroke(
