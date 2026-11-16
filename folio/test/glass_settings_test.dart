@@ -10,12 +10,16 @@ void main() {
     expect(tintaBarSettings(false).blur, 6);
   });
 
-  test('light sheets are frosted harder than bars, dark ones are not', () {
+  test('light sheets frosted harder than bars, dark sheets clearer', () {
     expect(tintaSheetSettings(false).blur,
         greaterThan(tintaBarSettings(false).blur));
     expect(tintaSheetSettings(false).glassColor.a,
         greaterThan(tintaBarSettings(false).glassColor.a));
-    expect(tintaSheetSettings(true), tintaBarSettings(true));
+    // dark: the barrier dims what's behind, so the sheet is clearer and
+    // catches light on its rim ("túl matt", 2026-11-16)
+    expect(tintaSheetSettings(true).blur,
+        lessThan(tintaBarSettings(true).blur));
+    expect(tintaSheetSettings(true).lightIntensity, greaterThan(0));
   });
 
   test('indicator lens has no rainbow rim (0 would mean "unset")', () {

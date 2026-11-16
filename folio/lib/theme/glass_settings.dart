@@ -14,7 +14,11 @@ LiquidGlassSettings tintaBarSettings(bool dark) =>
 /// stay a colour wash, never readable words (Redmi, "Több" sheet). Dark
 /// keeps the bar material: the modal barrier already hides what's behind.
 LiquidGlassSettings tintaSheetSettings(bool dark) => dark
-    ? tintaBarSettings(true)
+    // Dark: the barrier already dims what's behind, so the sheet can be
+    // much clearer than the bars and catch light on its rim like real glass
+    // (blur 6 looked "túl matt", 2026-11-16).
+    ? LiquidGlassSettings.ios27Dark
+        .copyWith(blur: 2, frostOpacity: 0.7, lightIntensity: 0.6)
     : tintaBarSettings(false)
         .copyWith(blur: 20, glassColor: const Color(0xC8F8F8F8));
 
