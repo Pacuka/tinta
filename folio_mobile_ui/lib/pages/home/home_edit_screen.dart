@@ -6,6 +6,7 @@ import 'package:folio/theme/colors/colors.dart';
 import 'package:provider/provider.dart';
 
 import 'home_widgets.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_switch.dart';
 
 class HomeEditScreen extends StatefulWidget {
   const HomeEditScreen({super.key});
@@ -216,7 +217,7 @@ class _EditTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Switch(
+            TintaSwitch(
               value: item.enabled,
               onChanged: onToggleEnabled,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

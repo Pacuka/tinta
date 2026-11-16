@@ -10,6 +10,7 @@ import 'package:folio_mobile_ui/pages/grades/calculator/grade_calculator_provide
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'grade_calculator.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_switch.dart';
 
 class GradeCalculator extends StatefulWidget {
   const GradeCalculator(this.subject, {super.key});
@@ -118,7 +119,7 @@ class GradeCalculatorState extends State<GradeCalculator> {
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: Slider(
+                child: TintaSlider(
                   value: newWeight.toDouble(),
                   min: 0,
                   max: 400,

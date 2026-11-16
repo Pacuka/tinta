@@ -36,6 +36,7 @@ import 'package:flutter_material_color_picker/flutter_material_color_picker.dart
 import 'package:folio/models/icon_pack.dart';
 import 'package:folio/utils/format.dart';
 import 'package:folio_mobile_ui/screens/settings/theme_screen.dart';
+import 'package:folio_mobile_ui/common/tinta_switch.dart';
 
 class SettingsHelper {
   static const Map<String, String> langMap = {
@@ -522,7 +523,7 @@ class _RoundingSettingState extends State<RoundingSetting> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Slider(
+            child: TintaSlider(
               value: rounding,
               min: 0.1,
               max: 0.9,

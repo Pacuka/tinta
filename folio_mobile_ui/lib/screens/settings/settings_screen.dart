@@ -61,6 +61,7 @@ import 'settings_screen.i18n.dart';
 // ignore: unused_import
 import 'submenu/submenu_screen.i18n.dart' hide SettingsLocalization;
 import 'package:folio_mobile_ui/common/tinta_confirm.dart';
+import 'package:folio_mobile_ui/common/tinta_switch.dart';
 
 class _SettingsSection {
   final String category;
@@ -613,7 +614,7 @@ class SettingsScreenState extends State<SettingsScreen>
               trackHeight: 4.0,
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 14.0),
             ),
-            child: Slider(
+            child: TintaSlider(
               value: value,
               min: min,
               max: max,
@@ -1098,7 +1099,7 @@ Container(
                       .withValues(alpha: settings.bellDelayEnabled ? .95 : .25),
                 ),
                 trailingDivider: true,
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) {
                     _haptic();
                     settings.update(bellDelayEnabled: v);
@@ -1127,7 +1128,7 @@ Container(
                     color: AppColors.of(context)
                         .text
                         .withValues(alpha: settings.showBreaks ? .95 : .25)),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) {
                     _haptic();
                     settings.update(showBreaks: v);
@@ -1181,7 +1182,7 @@ Container(
                       size: 22.0,
                       color: AppColors.of(context).text.withValues(
                           alpha: settings.liveActivityEnabled ? .95 : .25)),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       if (v && !settings.liveActivityConsentAccepted) {
                         LiveActivityConsentDialog.show(context)
@@ -1257,7 +1258,7 @@ Container(
                   color: AppColors.of(context).text.withValues(
                       alpha: settings.notificationsEnabled ? .95 : .25),
                 ),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) {
                     _haptic();
                     settings.update(notificationsEnabled: v);
@@ -1299,7 +1300,7 @@ Container(
                         alpha:
                             settings.notificationsGradesEnabled ? .95 : .25),
                   ),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       _haptic();
                       settings.update(notificationsGradesEnabled: v);
@@ -1337,7 +1338,7 @@ Container(
                         alpha:
                             settings.notificationsAbsencesEnabled ? .95 : .25),
                   ),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       _haptic();
                       settings.update(notificationsAbsencesEnabled: v);
@@ -1375,7 +1376,7 @@ Container(
                         alpha:
                             settings.notificationsMessagesEnabled ? .95 : .25),
                   ),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       _haptic();
                       settings.update(notificationsMessagesEnabled: v);
@@ -1413,7 +1414,7 @@ Container(
                         alpha:
                             settings.notificationsLessonsEnabled ? .95 : .25),
                   ),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       _haptic();
                       settings.update(notificationsLessonsEnabled: v);
@@ -1478,7 +1479,7 @@ Container(
                     color: AppColors.of(context).text.withValues(
                         alpha: settings.androidLiveActivityEnabled ? .95 : .25),
                   ),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       _haptic();
                       settings.update(androidLiveActivityEnabled: v);
@@ -1592,7 +1593,7 @@ Container(
                       size: 22.0,
                       color: AppColors.of(context).text.withValues(
                           alpha: settings.liveCountdownEnabled ? .95 : .25)),
-                  trailing: Switch(
+                  trailing: TintaSwitch(
                     onChanged: (v) {
                       _haptic();
                       settings.update(liveCountdownEnabled: v);
@@ -1630,7 +1631,7 @@ Container(
                             alpha: settings.liveCountdownBeforeLesson
                                 ? .95
                                 : .25)),
-                    trailing: Switch(
+                    trailing: TintaSwitch(
                       onChanged: (v) {
                         _haptic();
                         settings.update(liveCountdownBeforeLesson: v);
@@ -1687,7 +1688,7 @@ Container(
                             alpha: settings.liveCountdownDuringLesson
                                 ? .95
                                 : .25)),
-                    trailing: Switch(
+                    trailing: TintaSwitch(
                       onChanged: (v) {
                         _haptic();
                         settings.update(liveCountdownDuringLesson: v);
@@ -1721,7 +1722,7 @@ Container(
                         color: AppColors.of(context).text.withValues(
                             alpha:
                                 settings.liveCountdownDuringBreak ? .95 : .25)),
-                    trailing: Switch(
+                    trailing: TintaSwitch(
                       onChanged: (v) {
                         _haptic();
                         settings.update(liveCountdownDuringBreak: v);
@@ -2047,7 +2048,7 @@ Container(
                     color: AppColors.of(context)
                         .text
                         .withValues(alpha: settings.shadowEffect ? .95 : .25)),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) {
                     _haptic();
                     settings.update(shadowEffect: v);
@@ -2218,7 +2219,7 @@ Container(
                     color: AppColors.of(context)
                         .text
                         .withValues(alpha: settings.graphClassAvg ? .95 : .25)),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) {
                     _haptic();
                     settings.update(graphClassAvg: v);
@@ -2281,7 +2282,7 @@ Container(
                     size: 22.0,
                     color: AppColors.of(context).text.withValues(
                         alpha: settings.gradeOpeningFun ? .95 : .25)),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) async {
                     _haptic();
                     settings.update(gradeOpeningFun: v);
@@ -2341,7 +2342,7 @@ Container(
                     color: AppColors.of(context)
                         .text
                         .withValues(alpha: settings.goodStudent ? .95 : .25)),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) async {
                     if (v) {
                       if (await showTintaConfirm(
@@ -2441,7 +2442,7 @@ Container(
                     size: 22.0,
                     color: AppColors.of(context).text.withValues(
                         alpha: settings.presentationMode ? .95 : .25)),
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) async {
                     _haptic();
                     settings.update(presentationMode: v);
@@ -2610,7 +2611,7 @@ Container(
                       .withValues(alpha: syncEnabled ? .95 : .25),
                 ),
                 trailingDivider: true,
-                trailing: Switch(
+                trailing: TintaSwitch(
                   onChanged: (v) {
                     _haptic();
                     wear.setSyncEnabled(v);
