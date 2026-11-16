@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -60,9 +61,10 @@ class GradePopup extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsProvider>(context, listen: false);
 
-    final subjectName = grade.subject.isRenamed && settings.renamedSubjectsEnabled
-        ? grade.subject.renamedTo ?? grade.subject.name.capital()
-        : grade.subject.name.capital();
+    final subjectName =
+        grade.subject.isRenamed && settings.renamedSubjectsEnabled
+            ? grade.subject.renamedTo ?? grade.subject.name.capital()
+            : grade.subject.name.capital();
 
     final teacherName = settings.presentationMode
         ? "Tanár"
@@ -80,7 +82,7 @@ class GradePopup extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: popupBackground(context),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(12.0),
         ),
@@ -90,15 +92,19 @@ class GradePopup extends StatelessWidget {
           // Background SVG + gradient
           Stack(
             children: [
-              SvgPicture.asset(
-                SubjectBooklet.resolveVariant(
-                    context: context, subject: grade.subject),
-                // ignore: deprecated_member_use
-                color: ColorsUtils()
-                    .fade(context, Theme.of(context).colorScheme.secondary,
-                        darkenAmount: 0.1, lightenAmount: 0.1)
-                    .withValues(alpha: 0.33),
-                width: MediaQuery.of(context).size.width,
+              popupArtFade(
+                context,
+                stops: const [0.0, 0.3, 0.6, 0.95],
+                child: SvgPicture.asset(
+                  SubjectBooklet.resolveVariant(
+                      context: context, subject: grade.subject),
+                  // ignore: deprecated_member_use
+                  color: ColorsUtils()
+                      .fade(context, Theme.of(context).colorScheme.secondary,
+                          darkenAmount: 0.1, lightenAmount: 0.1)
+                      .withValues(alpha: 0.33),
+                  width: MediaQuery.of(context).size.width,
+                ),
               ),
               Container(
                 decoration: BoxDecoration(
@@ -107,14 +113,10 @@ class GradePopup extends StatelessWidget {
                   ),
                   gradient: LinearGradient(
                     colors: [
-                      Theme.of(context).scaffoldBackgroundColor,
-                      Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withValues(alpha: 0.1),
-                      Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withValues(alpha: 0.1),
-                      Theme.of(context).scaffoldBackgroundColor,
+                      popupBackground(context),
+                      popupBackground(context).withValues(alpha: 0.1),
+                      popupBackground(context).withValues(alpha: 0.1),
+                      popupBackground(context),
                     ],
                     stops: const [0.0, 0.3, 0.6, 0.95],
                     begin: Alignment.topCenter,
@@ -352,8 +354,7 @@ class GradePopup extends StatelessWidget {
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.vertical(
                           top: const Radius.circular(6.0),
-                          bottom:
-                              Radius.circular(hasWriteDate ? 6.0 : 12.0),
+                          bottom: Radius.circular(hasWriteDate ? 6.0 : 12.0),
                         ),
                       ),
                       padding: const EdgeInsets.all(14.0),

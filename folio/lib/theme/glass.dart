@@ -27,3 +27,38 @@ double glassRadius(BuildContext context, double normal) =>
 bool followsSystemColors(AccentColor c, {required bool hasSystemPalette}) =>
     c == AccentColor.adaptive ||
     (c == AccentColor.uveg && hasSystemPalette);
+
+/// Detail popups (grade, homework, lesson…) paint their own sheet colour.
+/// In Üveg it is transparent so the glass sheet beneath shows through.
+Color popupBackground(BuildContext context) => isGlassTheme(context)
+    ? Colors.transparent
+    : Theme.of(context).scaffoldBackgroundColor;
+
+/// The cover art on detail popups fades out under an overlay of the sheet
+/// colour. With a transparent sheet (Üveg) that overlay does nothing, so the
+/// art is masked with the same profile instead: hidden → 90% → 90% → hidden,
+/// measured on the art itself so it always fades out before its own bottom
+/// edge (the art is often shorter than the overlay). Other themes get [child]
+/// unchanged.
+Widget popupArtFade(
+  BuildContext context, {
+  required List<double> stops,
+  required Widget child,
+}) {
+  if (!isGlassTheme(context)) return child;
+  return ShaderMask(
+    blendMode: BlendMode.dstIn,
+    shaderCallback: (bounds) => LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Colors.black.withValues(alpha: 0.0),
+        Colors.black.withValues(alpha: 0.9),
+        Colors.black.withValues(alpha: 0.9),
+        Colors.black.withValues(alpha: 0.0),
+      ],
+      stops: stops,
+    ).createShader(bounds),
+    child: child,
+  );
+}

@@ -18,6 +18,7 @@ import 'package:folio_mobile_ui/common/widgets/absence/absence_tile.dart';
 import 'package:folio_mobile_ui/common/widgets/absence_group/absence_group_container.dart';
 import 'package:folio_mobile_ui/pages/timetable/timetable_page.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
 
 import 'absence_view.i18n.dart';
 
@@ -87,7 +88,7 @@ class AbsencePopup extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: popupBackground(context),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(12.0),
         ),
@@ -97,15 +98,19 @@ class AbsencePopup extends StatelessWidget {
           // Background SVG + gradient
           Stack(
             children: [
-              SvgPicture.asset(
-                SubjectBooklet.resolveVariant(
-                    context: context, subject: absence.subject),
-                // ignore: deprecated_member_use
-                color: ColorsUtils()
-                    .fade(context, Theme.of(context).colorScheme.secondary,
-                        darkenAmount: 0.1, lightenAmount: 0.1)
-                    .withValues(alpha: 0.33),
-                width: MediaQuery.of(context).size.width,
+              popupArtFade(
+                context,
+                stops: const [0.0, 0.3, 0.6, 0.95],
+                child: SvgPicture.asset(
+                  SubjectBooklet.resolveVariant(
+                      context: context, subject: absence.subject),
+                  // ignore: deprecated_member_use
+                  color: ColorsUtils()
+                      .fade(context, Theme.of(context).colorScheme.secondary,
+                          darkenAmount: 0.1, lightenAmount: 0.1)
+                      .withValues(alpha: 0.33),
+                  width: MediaQuery.of(context).size.width,
+                ),
               ),
               Container(
                 decoration: BoxDecoration(
@@ -114,14 +119,10 @@ class AbsencePopup extends StatelessWidget {
                   ),
                   gradient: LinearGradient(
                     colors: [
-                      Theme.of(context).scaffoldBackgroundColor,
-                      Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withValues(alpha: 0.1),
-                      Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withValues(alpha: 0.1),
-                      Theme.of(context).scaffoldBackgroundColor,
+                      popupBackground(context),
+                      popupBackground(context).withValues(alpha: 0.1),
+                      popupBackground(context).withValues(alpha: 0.1),
+                      popupBackground(context),
                     ],
                     stops: const [0.0, 0.3, 0.6, 0.95],
                     begin: Alignment.topCenter,
@@ -413,8 +414,7 @@ class AbsencePopup extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
-                      ReverseSearch.getLessonByAbsence(
-                              absence, outsideContext)
+                      ReverseSearch.getLessonByAbsence(absence, outsideContext)
                           .then((lesson) {
                         if (lesson != null) {
                           TimetablePage.jump(outsideContext, lesson: lesson);
@@ -422,10 +422,8 @@ class AbsencePopup extends StatelessWidget {
                           ScaffoldMessenger.of(outsideContext)
                               .showSnackBar(CustomSnackBar(
                             content: Text("Cannot find lesson".i18n,
-                                style:
-                                    const TextStyle(color: Colors.white)),
-                            backgroundColor:
-                                AppColors.of(outsideContext).red,
+                                style: const TextStyle(color: Colors.white)),
+                            backgroundColor: AppColors.of(outsideContext).red,
                             context: outsideContext,
                           ));
                         }
@@ -464,8 +462,7 @@ class AbsencePopup extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(
-                      height: MediaQuery.of(context).padding.bottom + 8.0),
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 8.0),
                 ],
               ),
             ),

@@ -14,6 +14,7 @@ import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.da
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
 import 'package:folio_mobile_ui/common/widgets/exam/exam_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
 import 'package:provider/provider.dart';
 import 'exam_view.i18n.dart';
 
@@ -76,7 +77,7 @@ class ExamPopup extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: popupBackground(context),
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(12.0),
           ),
@@ -85,15 +86,19 @@ class ExamPopup extends StatelessWidget {
           children: [
             Stack(
               children: [
-                SvgPicture.asset(
-                  SubjectBooklet.resolveVariant(
-                      context: context, subject: exam.subject),
-                  // ignore: deprecated_member_use
-                  color: ColorsUtils()
-                      .fade(context, Theme.of(context).colorScheme.secondary,
-                          darkenAmount: 0.1, lightenAmount: 0.1)
-                      .withValues(alpha: 0.33),
-                  width: MediaQuery.of(context).size.width,
+                popupArtFade(
+                  context,
+                  stops: const [0.1, 0.5, 0.7, 1.0],
+                  child: SvgPicture.asset(
+                    SubjectBooklet.resolveVariant(
+                        context: context, subject: exam.subject),
+                    // ignore: deprecated_member_use
+                    color: ColorsUtils()
+                        .fade(context, Theme.of(context).colorScheme.secondary,
+                            darkenAmount: 0.1, lightenAmount: 0.1)
+                        .withValues(alpha: 0.33),
+                    width: MediaQuery.of(context).size.width,
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -102,14 +107,10 @@ class ExamPopup extends StatelessWidget {
                     ),
                     gradient: LinearGradient(
                       colors: [
-                        Theme.of(context).scaffoldBackgroundColor,
-                        Theme.of(context)
-                            .scaffoldBackgroundColor
-                            .withValues(alpha: 0.1),
-                        Theme.of(context)
-                            .scaffoldBackgroundColor
-                            .withValues(alpha: 0.1),
-                        Theme.of(context).scaffoldBackgroundColor,
+                        popupBackground(context),
+                        popupBackground(context).withValues(alpha: 0.1),
+                        popupBackground(context).withValues(alpha: 0.1),
+                        popupBackground(context),
                       ],
                       stops: const [0.1, 0.5, 0.7, 1.0],
                       begin: Alignment.topCenter,

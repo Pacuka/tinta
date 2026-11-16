@@ -15,6 +15,7 @@ import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.da
 import 'package:folio_mobile_ui/common/round_border_icon.dart';
 import 'package:folio/ui/widgets/lesson/lesson_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
 import 'lesson_view.i18n.dart';
 
 class LessonViewable extends StatefulWidget {
@@ -133,7 +134,7 @@ class TimetableLessonPopup extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: popupBackground(context),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(12.0),
         ),
@@ -142,16 +143,20 @@ class TimetableLessonPopup extends StatelessWidget {
         children: [
           Stack(
             children: [
-              SvgPicture.asset(
-                // "assets/svg/mesh_bg.svg",
-                SubjectBooklet.resolveVariant(
-                    context: context, subject: lesson.subject),
-                // ignore: deprecated_member_use
-                color: ColorsUtils()
-                    .fade(context, Theme.of(context).colorScheme.secondary,
-                        darkenAmount: 0.1, lightenAmount: 0.1)
-                    .withValues(alpha: 0.33),
-                width: MediaQuery.of(context).size.width,
+              popupArtFade(
+                context,
+                stops: const [0.0, 0.3, 0.6, 0.95],
+                child: SvgPicture.asset(
+                  // "assets/svg/mesh_bg.svg",
+                  SubjectBooklet.resolveVariant(
+                      context: context, subject: lesson.subject),
+                  // ignore: deprecated_member_use
+                  color: ColorsUtils()
+                      .fade(context, Theme.of(context).colorScheme.secondary,
+                          darkenAmount: 0.1, lightenAmount: 0.1)
+                      .withValues(alpha: 0.33),
+                  width: MediaQuery.of(context).size.width,
+                ),
               ),
               Container(
                 decoration: BoxDecoration(
@@ -160,14 +165,10 @@ class TimetableLessonPopup extends StatelessWidget {
                   ),
                   gradient: LinearGradient(
                     colors: [
-                      Theme.of(context).scaffoldBackgroundColor,
-                      Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withValues(alpha: 0.1),
-                      Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withValues(alpha: 0.1),
-                      Theme.of(context).scaffoldBackgroundColor,
+                      popupBackground(context),
+                      popupBackground(context).withValues(alpha: 0.1),
+                      popupBackground(context).withValues(alpha: 0.1),
+                      popupBackground(context),
                     ],
                     stops: const [0.0, 0.3, 0.6, 0.95],
                     begin: Alignment.topCenter,

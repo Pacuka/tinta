@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_svg/svg.dart';
@@ -79,7 +80,7 @@ class HomeworkPopup extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: popupBackground(context),
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(12.0),
           ),
@@ -90,15 +91,20 @@ class HomeworkPopup extends StatelessWidget {
               // Background SVG + gradient
               Stack(
                 children: [
-                  SvgPicture.asset(
-                    SubjectBooklet.resolveVariant(
-                        context: context, subject: homework.subject),
-                    // ignore: deprecated_member_use
-                    color: ColorsUtils()
-                        .fade(context, Theme.of(context).colorScheme.secondary,
-                            darkenAmount: 0.1, lightenAmount: 0.1)
-                        .withValues(alpha: 0.33),
-                    width: MediaQuery.of(context).size.width,
+                  popupArtFade(
+                    context,
+                    stops: const [0.0, 0.3, 0.6, 0.95],
+                    child: SvgPicture.asset(
+                      SubjectBooklet.resolveVariant(
+                          context: context, subject: homework.subject),
+                      // ignore: deprecated_member_use
+                      color: ColorsUtils()
+                          .fade(
+                              context, Theme.of(context).colorScheme.secondary,
+                              darkenAmount: 0.1, lightenAmount: 0.1)
+                          .withValues(alpha: 0.33),
+                      width: MediaQuery.of(context).size.width,
+                    ),
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -107,14 +113,10 @@ class HomeworkPopup extends StatelessWidget {
                       ),
                       gradient: LinearGradient(
                         colors: [
-                          Theme.of(context).scaffoldBackgroundColor,
-                          Theme.of(context)
-                              .scaffoldBackgroundColor
-                              .withValues(alpha: 0.1),
-                          Theme.of(context)
-                              .scaffoldBackgroundColor
-                              .withValues(alpha: 0.1),
-                          Theme.of(context).scaffoldBackgroundColor,
+                          popupBackground(context),
+                          popupBackground(context).withValues(alpha: 0.1),
+                          popupBackground(context).withValues(alpha: 0.1),
+                          popupBackground(context),
                         ],
                         stops: const [0.0, 0.3, 0.6, 0.95],
                         begin: Alignment.topCenter,
