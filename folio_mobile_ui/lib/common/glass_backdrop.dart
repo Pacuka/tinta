@@ -98,11 +98,12 @@ class GlassPageBackground extends InheritedWidget {
 
 /// Fill for a pinned header in Üveg: paints exactly the backdrop behind it,
 /// so the header is invisible at rest, and fades out over its last
-/// [fade] px so content scrolling under it dissolves instead of being cut
-/// by a hard line (iOS "scroll edge" look). [screenTop] = where the header
+/// [fade] px. Keep it short: the filter bar sits at the bottom of the
+/// header, and an 18 px fade let a scrolled date show through the glass
+/// filters (2026-11-16). [screenTop] = where the header
 /// starts on screen.
 class GlassHeaderFill extends StatelessWidget {
-  const GlassHeaderFill({super.key, this.screenTop = 0, this.fade = 18});
+  const GlassHeaderFill({super.key, this.screenTop = 0, this.fade = 4});
 
   final double screenTop;
   final double fade;
