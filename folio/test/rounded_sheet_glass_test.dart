@@ -28,7 +28,7 @@ Widget _app(AccentColor c, Widget child, {EdgeInsets? viewInsets}) =>
 const _body = SizedBox(height: 80, child: Text('Tartalom'));
 
 void main() {
-  testWidgets('Üveg: a see-through panel, NOT live glass (120 Hz perf)',
+  testWidgets('Üveg: a solid lit panel, NOT live glass (120 Hz perf)',
       (tester) async {
     // Live glass on a sheet this big cost ~7 ms/frame on the Redmi and the
     // open animation stuttered (2026-11-16).
@@ -42,8 +42,8 @@ void main() {
             matching: find.byType(DecoratedBox))
         .first);
     final color = (panel.decoration as BoxDecoration).color!;
-    expect(color.a, lessThan(1.0));
-    expect(color.a, greaterThan(0.8));
+    // solid: without blur any see-through ghosted the text behind
+    expect(color.a, 1.0);
   });
 
   testWidgets('Kobalt keeps the solid scaffold-coloured sheet',
