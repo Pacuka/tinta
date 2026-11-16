@@ -23,7 +23,8 @@ void main() {
       bg = popupBackground(context);
       return popupArtFade(context, stops: _stops, child: _art);
     }));
-    expect(bg, Colors.transparent);
+    expect(bg.a, 0); // see-through …
+    expect(bg.r, isNot(0)); // … but page-coloured, not black (grey band)
     expect(find.byType(ShaderMask), findsOneWidget);
     expect(find.byKey(const Key('art')), findsOneWidget);
   });

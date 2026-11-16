@@ -30,8 +30,12 @@ bool followsSystemColors(AccentColor c, {required bool hasSystemPalette}) =>
 
 /// Detail popups (grade, homework, lesson…) paint their own sheet colour.
 /// In Üveg it is transparent so the glass sheet beneath shows through.
+///
+/// The page colour at 0 alpha, NOT [Colors.transparent]: the popups fade
+/// with `.withValues(alpha: 0.1)`, and transparent *black* at 10% laid a
+/// grey band over light-mode sheets (2026-11-16).
 Color popupBackground(BuildContext context) => isGlassTheme(context)
-    ? Colors.transparent
+    ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0)
     : Theme.of(context).scaffoldBackgroundColor;
 
 /// The cover art on detail popups fades out under an overlay of the sheet
