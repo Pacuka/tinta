@@ -1,6 +1,8 @@
+import 'dart:ui' show ImageFilter;
 import 'package:folio/theme/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
+import 'package:folio/helpers/hyper_os.dart';
 import 'package:folio/theme/glass_settings.dart';
 
 class RoundedBottomSheet extends StatelessWidget {
@@ -11,6 +13,7 @@ class RoundedBottomSheet extends StatelessWidget {
     this.shrink = true,
     this.showHandle = true,
     this.backgroundColor,
+    this.frostedSheets,
   });
 
   final Widget? child;
@@ -18,6 +21,9 @@ class RoundedBottomSheet extends StatelessWidget {
   final bool shrink;
   final bool showHandle;
   final Color? backgroundColor;
+
+  /// Test hook; null = HyperOS decides.
+  final bool? frostedSheets;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +40,31 @@ class RoundedBottomSheet extends StatelessWidget {
       final theme = Theme.of(context);
       final dark = theme.brightness == Brightness.dark;
       final radius = BorderRadius.vertical(top: Radius.circular(borderRadius));
+      // HyperOS: its own dialog/sheet material (miuix GlassMaterials
+      // .dialogGlass: 60 dp blur + neutral grey), smooth at 120 Hz there.
+      if (frostedSheets ?? HyperOS.isHyperOS) {
+        return ClipRRect(
+          borderRadius: radius,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                color: dark ? const Color(0x9E1E1E20) : const Color(0xB8F5F5F5),
+                border: Border.all(
+                  width: 0.8,
+                  color: Colors.white.withValues(alpha: dark ? 0.14 : 0.8),
+                ),
+              ),
+              child: Theme(
+                data: theme.copyWith(
+                    colorScheme: _seeThrough(theme.colorScheme, dark)),
+                child: content,
+              ),
+            ),
+          ),
+        );
+      }
       return DecoratedBox(
         // the panel
         decoration: BoxDecoration(

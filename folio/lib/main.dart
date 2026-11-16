@@ -31,6 +31,7 @@ import 'package:folio/models/config.dart';
 import 'package:folio/helpers/update_notifier.dart';
 import 'package:folio/helpers/update_helper.dart';
 import 'package:folio/helpers/reduce_transparency.dart';
+import 'package:folio/helpers/hyper_os.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/app.dart';
@@ -98,6 +99,7 @@ void main() async {
 
     await LiquidGlassWidgets.initialize();
     await ReduceTransparency.init();
+    await HyperOS.init();
     runApp(LiquidGlassWidgets.wrap(
       brightnessResolver: Theme.maybeBrightnessOf,
       child: App(

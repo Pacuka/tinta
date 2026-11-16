@@ -88,4 +88,21 @@ void main() {
     expect(tester.getRect(find.byType(TextField)).bottom,
         lessThanOrEqualTo(screen.height - 300));
   });
+
+  testWidgets('Üveg on HyperOS: frosted sheet (60 dp blur), else solid',
+      (tester) async {
+    await tester.pumpWidget(_app(AccentColor.uveg,
+        const RoundedBottomSheet(frostedSheets: true, child: _body)));
+    expect(find.byType(BackdropFilter), findsOneWidget);
+    expect(find.text('Tartalom'), findsOneWidget);
+    await tester.pumpWidget(_app(AccentColor.uveg,
+        const RoundedBottomSheet(frostedSheets: false, child: _body)));
+    expect(find.byType(BackdropFilter), findsNothing);
+  });
+
+  testWidgets('Kobalt never blurs, even on HyperOS', (tester) async {
+    await tester.pumpWidget(_app(AccentColor.kobalt,
+        const RoundedBottomSheet(frostedSheets: true, child: _body)));
+    expect(find.byType(BackdropFilter), findsNothing);
+  });
 }

@@ -18,6 +18,7 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
     private val LIVE_ACTIVITY_CHANNEL = "app.zan1456.folio/android_live_activity"
     private val WEAR_CHANNEL = "app.zan1456.folio/wear_sync"
     private val WIDGET_CHANNEL = "app.zan1456.folio/home_widget"
+    private val SYSTEM_UI_CHANNEL = "app.zan1456.folio/system_ui"
     private val TAG = "FolioPhone.MainActivity"
 
     private var wearSync: WearSyncManager? = null
@@ -87,6 +88,27 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                     }
                     else -> result.notImplemented()
                 }
+            }
+
+        // Üveg theme: HyperOS gets its own frosted sheet material. Read the
+        // property with getprop (public, no hidden-API reflection) off the UI
+        // thread; null when the property is missing (not HyperOS).
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SYSTEM_UI_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                if (call.method != "hyperOsVersion") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                Thread {
+                    val v = try {
+                        val p = Runtime.getRuntime()
+                            .exec(arrayOf("getprop", "ro.mi.os.version.name"))
+                        p.inputStream.bufferedReader().use { it.readText() }.trim()
+                    } catch (e: Exception) {
+                        ""
+                    }
+                    runOnUiThread { result.success(v.ifEmpty { null }) }
+                }.start()
             }
 
         widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WIDGET_CHANNEL)
