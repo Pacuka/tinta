@@ -28,12 +28,22 @@ Widget _app(AccentColor c, Widget child, {EdgeInsets? viewInsets}) =>
 const _body = SizedBox(height: 80, child: Text('Tartalom'));
 
 void main() {
-  testWidgets('Üveg: the sheet sits on glass, child still shown',
+  testWidgets('Üveg: a see-through panel, NOT live glass (120 Hz perf)',
       (tester) async {
+    // Live glass on a sheet this big cost ~7 ms/frame on the Redmi and the
+    // open animation stuttered (2026-11-16).
     await tester.pumpWidget(
         _app(AccentColor.uveg, const RoundedBottomSheet(child: _body)));
-    expect(find.byType(AdaptiveGlass), findsOneWidget);
+    expect(find.byType(AdaptiveGlass), findsNothing);
     expect(find.text('Tartalom'), findsOneWidget);
+    final panel = tester.widget<DecoratedBox>(find
+        .descendant(
+            of: find.byType(RoundedBottomSheet),
+            matching: find.byType(DecoratedBox))
+        .first);
+    final color = (panel.decoration as BoxDecoration).color!;
+    expect(color.a, lessThan(1.0));
+    expect(color.a, greaterThan(0.8));
   });
 
   testWidgets('Kobalt keeps the solid scaffold-coloured sheet',

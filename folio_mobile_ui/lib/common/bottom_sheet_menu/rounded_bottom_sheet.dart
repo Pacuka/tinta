@@ -2,7 +2,6 @@ import 'package:folio/theme/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
 import 'package:folio/theme/glass_settings.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 class RoundedBottomSheet extends StatelessWidget {
   const RoundedBottomSheet({
@@ -23,21 +22,50 @@ class RoundedBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final content = _content(context);
-    // Üveg: frosted glass, flat bottom edge. A caller's own colour (a fully
-    // coloured sheet) still wins.
+    // Üveg: a see-through tinted panel with a lit rim, NOT live glass. A
+    // live-glass sheet re-samples everything behind it every frame; at this
+    // size that cost ~7 ms/frame on the Redmi and the 120 Hz open animation
+    // stuttered (15.9 ms raster vs 8.3 ms budget, measured 2026-11-16; blur
+    // and specular made no difference, the frosted "minimal" tier was worse
+    // at 26.8 ms). iOS 26 does the same: a sheet turns opaque as it grows.
+    // Refraction stays on the small controls (navbar, filters, switches).
+    // A caller's own colour (a fully coloured sheet) still wins.
     if (backgroundColor == null && isGlassTheme(context)) {
       final theme = Theme.of(context);
       final dark = theme.brightness == Brightness.dark;
-      return AdaptiveGlass(
-        shape: LiquidVerticalRoundedSuperellipse(
-            topRadius: borderRadius, bottomRadius: 0),
-        settings: tintaSheetSettings(dark),
-        quality: tintaGlassQuality,
-        // Cards on the sheet are see-through too, so the glass isn't hidden
-        // behind solid tiles ("túl matt", 2026-11-16).
-        child: Theme(
-          data: theme.copyWith(colorScheme: _seeThrough(theme.colorScheme, dark)),
-          child: content,
+      final radius = BorderRadius.vertical(top: Radius.circular(borderRadius));
+      return DecoratedBox(
+        // the panel
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          color: theme.scaffoldBackgroundColor
+              .withValues(alpha: tintaSheetPanelAlpha(dark)),
+        ),
+        child: DecoratedBox(
+          // a soft wash of the theme colour from the top + the lit rim
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                theme.colorScheme.secondary
+                    .withValues(alpha: dark ? 0.10 : 0.06),
+                theme.colorScheme.secondary.withValues(alpha: 0),
+              ],
+              stops: const [0.0, 0.5],
+            ),
+            border: Border.all(
+              width: 0.8,
+              color: Colors.white.withValues(alpha: dark ? 0.14 : 0.8),
+            ),
+          ),
+          child: Theme(
+            // cards on the sheet stay see-through ("túl matt", 2026-11-16)
+            data: theme.copyWith(
+                colorScheme: _seeThrough(theme.colorScheme, dark)),
+            child: content,
+          ),
         ),
       );
     }
