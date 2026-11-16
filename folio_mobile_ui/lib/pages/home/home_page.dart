@@ -436,7 +436,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               // Üveg: frosted header, the list scrolls
                               // under it blurred (page bg is transparent)
                               if (isGlassTheme(context))
-                                const GlassHeaderFill(),
+                                const GlassHeaderFill(screenTop: 12.0),
                               FlexibleSpaceBar(
                               background: Container(
                                 color: Theme.of(context).scaffoldBackgroundColor,

@@ -1,14 +1,13 @@
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 
-/// Üveg theme: the "wallpaper" behind the main pages. The theme background
-/// with a few large, soft glows of the theme colours (which follow the
-/// phone's wallpaper/system palette where available), so the glass navbar,
-/// filters and sheets have colour to refract. Over a flat near-black
-/// background glass reads as a grey pill (liquidglassdesign.com, 2026-11).
-/// Painted BEHIND the content; plain gradients, no blur filter, never
-/// animates, doesn't scroll.
+/// Üveg theme: the "wallpaper" behind the main pages. The page colour with
+/// one quiet wash of the theme colour (which follows the phone's wallpaper
+/// palette where available) fading out from the top, like iOS Weather or
+/// Music. Gives the glass bars something to refract; over a flat near-black
+/// page glass reads as a grey pill (liquidglassdesign.com). No blobs: the
+/// three-glow "aurora" looked like generic AI art (user, 2026-11-16).
+/// Painted BEHIND the content, in screen coordinates, so a header can paint
+/// the exact same pixels ([GlassHeaderFill]). Never animates or scrolls.
 class GlassBackdrop extends StatelessWidget {
   const GlassBackdrop({super.key, required this.background});
 
@@ -16,40 +15,66 @@ class GlassBackdrop extends StatelessWidget {
   final Color background;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final dark = theme.brightness == Brightness.dark;
-    final cs = theme.colorScheme;
-    final a = dark ? 0.30 : 0.22;
-
-    Widget glow(Alignment center, double radius, Color c, double alpha) =>
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: center,
-              radius: radius,
-              colors: [c.withValues(alpha: alpha), c.withValues(alpha: 0)],
+  Widget build(BuildContext context) => IgnorePointer(
+        child: RepaintBoundary(
+          child: CustomPaint(
+            painter: _WashPainter(
+              background: background,
+              wash: _washColor(context),
+              screenHeight: MediaQuery.sizeOf(context).height,
+              top: 0,
             ),
-          ),
-          child: const SizedBox.expand(),
-        );
-
-    return IgnorePointer(
-      child: RepaintBoundary(
-        child: ColoredBox(
-          color: background,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              glow(const Alignment(-0.9, -0.9), 1.0, cs.secondary, a),
-              glow(const Alignment(1.0, 0.1), 0.9, cs.tertiary, a * 0.8),
-              glow(const Alignment(-0.6, 1.0), 1.0, cs.primary, a),
-            ],
+            child: const SizedBox.expand(),
           ),
         ),
-      ),
+      );
+}
+
+Color _washColor(BuildContext context) {
+  final theme = Theme.of(context);
+  final dark = theme.brightness == Brightness.dark;
+  return theme.colorScheme.secondary.withValues(alpha: dark ? 0.20 : 0.14);
+}
+
+/// Page colour + the top wash, laid out against the whole screen. [top] is
+/// where this box starts on screen, so a header paints the same pixels as
+/// the backdrop behind it.
+class _WashPainter extends CustomPainter {
+  _WashPainter({
+    required this.background,
+    required this.wash,
+    required this.screenHeight,
+    required this.top,
+  });
+
+  final Color background;
+  final Color wash;
+  final double screenHeight;
+  final double top;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    canvas.drawRect(rect, Paint()..color = background);
+    final screen = Rect.fromLTWH(0, -top, size.width, screenHeight);
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [wash, wash.withValues(alpha: 0)],
+          stops: const [0.0, 0.55],
+        ).createShader(screen),
     );
   }
+
+  @override
+  bool shouldRepaint(_WashPainter old) =>
+      old.background != background ||
+      old.wash != wash ||
+      old.screenHeight != screenHeight ||
+      old.top != top;
 }
 
 /// Üveg: the main pages run with a transparent scaffoldBackgroundColor so
@@ -71,20 +96,40 @@ class GlassPageBackground extends InheritedWidget {
   bool updateShouldNotify(GlassPageBackground old) => old.color != color;
 }
 
-/// Frosted fill for a pinned header in Üveg: content scrolling under it is
-/// blurred into a colour wash instead of overlapping the header's text
-/// (like the iOS navigation bar).
+/// Fill for a pinned header in Üveg: paints exactly the backdrop behind it,
+/// so the header is invisible at rest, and fades out over its last
+/// [fade] px so content scrolling under it dissolves instead of being cut
+/// by a hard line (iOS "scroll edge" look). [screenTop] = where the header
+/// starts on screen.
 class GlassHeaderFill extends StatelessWidget {
-  const GlassHeaderFill({super.key});
+  const GlassHeaderFill({super.key, this.screenTop = 0, this.fade = 18});
+
+  final double screenTop;
+  final double fade;
 
   @override
-  Widget build(BuildContext context) => ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-          child: ColoredBox(
-            color: GlassPageBackground.of(context).withValues(alpha: 0.72),
-            child: const SizedBox.expand(),
-          ),
-        ),
+  Widget build(BuildContext context) => IgnorePointer(
+        child: LayoutBuilder(builder: (context, c) {
+          final h = c.maxHeight;
+          final solid = h <= fade ? 0.0 : (h - fade) / h;
+          return ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (r) => LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: const [Colors.black, Colors.black, Colors.transparent],
+              stops: [0.0, solid, 1.0],
+            ).createShader(r),
+            child: CustomPaint(
+              painter: _WashPainter(
+                background: GlassPageBackground.of(context),
+                wash: _washColor(context),
+                screenHeight: MediaQuery.sizeOf(context).height,
+                top: screenTop,
+              ),
+              child: const SizedBox.expand(),
+            ),
+          );
+        }),
       );
 }
