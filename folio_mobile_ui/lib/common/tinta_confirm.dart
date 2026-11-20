@@ -1,12 +1,10 @@
 import 'package:cupertino_native_better/cupertino_native_better.dart';
-import 'package:flutter/cupertino.dart' show showCupertinoDialog;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/accent.dart';
-import 'package:folio/theme/glass_settings.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 
 /// Called from callbacks, so no listening; a tree without settings (some
 /// widget tests) counts as "not glass".
@@ -22,7 +20,7 @@ bool _glass(BuildContext context) {
 /// A short yes/no (or single "OK") question.
 ///
 /// * Üveg + iPhone: Apple's own alert ([CNAlert]).
-/// * Üveg + Android: the package's glass dialog.
+/// * Üveg + Android: [TintaAlertDialog] on frozen glass.
 /// * Every other theme: [fallback], the call site's original dialog, shown
 ///   with [showDialog] exactly as before. It must pop `true` for the
 ///   confirming button and `false` (or nothing) otherwise.
@@ -67,52 +65,31 @@ Future<bool> showTintaConfirm(
     return r?.value == true;
   }
 
-  final dark = Theme.of(context).brightness == Brightness.dark;
-  final nav = Navigator.of(context, rootNavigator: true);
-  // GlassDialog.show puts the dialog in a route with no Material above it,
-  // so text fell back to the debug style (yellow underline, monospace) on the
-  // Redmi. Same route type and barrier as the package, plus a transparent
-  // Material for the app's text style.
-  final r = await showCupertinoDialog<bool>(
+  // Android: the app's own glass alert, on the same frozen glass as every
+  // other sheet and dialog (2026-11-20).
+  final r = await showDialog<bool>(
     context: context,
     barrierDismissible: barrierDismissible,
-    // = the package's iOS 27 alert barrier (src/, not exported).
-    barrierColor: dark ? const Color(0x77000000) : const Color(0x35000000),
-    builder: (_) => Material(
-      type: MaterialType.transparency,
-      child: _dialog(context, title, message, confirmLabel, cancelLabel,
-          destructive, dark, nav),
+    builder: (dialogContext) => TintaAlertDialog(
+      title: title == null ? null : Text(title),
+      content: message == null ? null : Text(message),
+      actions: [
+        if (cancelLabel != null)
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(cancelLabel),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          style: destructive
+              ? TextButton.styleFrom(
+                  foregroundColor: Theme.of(dialogContext).colorScheme.error)
+              : null,
+          child: Text(confirmLabel,
+              style: const TextStyle(fontWeight: FontWeight.w700)),
+        ),
+      ],
     ),
   );
   return r == true;
 }
-
-Widget _dialog(
-  BuildContext context,
-  String? title,
-  String? message,
-  String confirmLabel,
-  String? cancelLabel,
-  bool destructive,
-  bool dark,
-  NavigatorState nav,
-) =>
-    GlassDialog(
-      title: title,
-      message: message,
-      settings: tintaSheetSettings(dark),
-      quality: tintaGlassQuality,
-      actions: [
-        if (cancelLabel != null)
-          GlassDialogAction(
-            label: cancelLabel,
-            onPressed: () => nav.pop(false),
-          ),
-        GlassDialogAction(
-          label: confirmLabel,
-          isDestructive: destructive,
-          isPrimary: !destructive,
-          onPressed: () => nav.pop(true),
-        ),
-      ],
-    );

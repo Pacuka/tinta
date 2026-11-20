@@ -5,7 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/accent.dart';
 import 'package:folio_mobile_ui/common/tinta_confirm.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:folio_mobile_ui/common/frozen_glass.dart';
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:provider/provider.dart';
 
 bool? result;
@@ -79,16 +80,12 @@ void main() {
     expect(find.byType(AlertDialog), findsOneWidget);
   });
 
-  testWidgets('Üveg + Android: glass dialog, confirm → true', (tester) async {
+  testWidgets('Üveg + Android: frozen-glass alert, confirm → true',
+      (tester) async {
     await _open(tester, _app(AccentColor.uveg));
     expect(find.byType(AlertDialog), findsNothing);
-    expect(find.byType(GlassDialog), findsOneWidget);
-    // a Material inside the dialog route gives the app's text style
-    // (without it: yellow underline + monospace on the phone)
-    expect(
-        find.ancestor(
-            of: find.byType(GlassDialog), matching: find.byType(Material)),
-        findsWidgets);
+    expect(find.byType(TintaAlertDialog), findsOneWidget);
+    expect(find.byType(FrozenGlass), findsOneWidget);
     await tester.tap(find.text('Törlés'));
     await tester.pumpAndSettle();
     expect(result, true);

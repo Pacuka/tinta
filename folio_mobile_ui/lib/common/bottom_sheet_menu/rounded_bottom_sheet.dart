@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
 import 'package:folio/helpers/hyper_os.dart';
 import 'package:folio_mobile_ui/common/glass_backdrop.dart';
+import 'package:folio_mobile_ui/common/frozen_glass.dart';
 import 'package:folio/theme/glass_settings.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
@@ -120,8 +121,25 @@ class TintaSheetSurface extends StatelessWidget {
                 RoundedBottomSheet.seeThrough(theme.colorScheme, dark)),
         child: child,
       );
-      if (frostedSheets ?? HyperOS.isHyperOS) {
-        // miuix GlassMaterials.dialogGlass: 60 dp blur + neutral grey
+      final hyperOS = frostedSheets ?? HyperOS.isHyperOS;
+      // A sheet in a popup route: frozen glass (photo of the page, blurred
+      // once; smooth at 120 Hz). HyperOS: its own neutral grey material
+      // (miuix GlassMaterials.dialogGlass).
+      if (FrozenBackdrop.canFreeze(context)) {
+        return FrozenGlass(
+          borderRadius: radius,
+          tint: hyperOS
+              ? (dark ? const Color(0x9E1E1E20) : const Color(0xB8F5F5F5))
+              : tintaFrozenTint(theme.scaffoldBackgroundColor, dark),
+          blurSigma: hyperOS ? 30 : tintaFrozenBlur(dark),
+          saturation: hyperOS ? 1.0 : 1.25,
+          highlight: hyperOS ? 0.0 : (dark ? 0.08 : 0.25),
+          rim: Colors.white.withValues(alpha: dark ? 0.14 : 0.8),
+          child: inner,
+        );
+      }
+      // A persistent sheet over a page that can still scroll: live glass.
+      if (hyperOS) {
         return ClipRRect(
           borderRadius: radius,
           child: BackdropFilter(

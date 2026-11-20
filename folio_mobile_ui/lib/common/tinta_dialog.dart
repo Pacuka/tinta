@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:folio/theme/glass.dart';
 import 'package:folio/theme/glass_settings.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
+import 'package:folio_mobile_ui/common/frozen_glass.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 /// The corner radius of a dialog [shape], or [fallback].
@@ -26,16 +27,27 @@ class TintaDialogGlass extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
+    final inner = Theme(
+      data: theme.copyWith(
+          colorScheme: RoundedBottomSheet.seeThrough(theme.colorScheme, dark)),
+      child: child,
+    );
+    // in a dialog route: the same frozen glass as the sheets
+    if (FrozenBackdrop.canFreeze(context)) {
+      return FrozenGlass(
+        borderRadius: BorderRadius.circular(radius),
+        tint: tintaFrozenTint(theme.scaffoldBackgroundColor, dark),
+        blurSigma: tintaFrozenBlur(dark),
+        highlight: dark ? 0.08 : 0.25,
+        rim: Colors.white.withValues(alpha: dark ? 0.14 : 0.8),
+        child: inner,
+      );
+    }
     return AdaptiveGlass(
       shape: LiquidRoundedSuperellipse(borderRadius: radius),
       settings: tintaSheetSettings(dark),
       quality: tintaGlassQuality,
-      child: Theme(
-        data: theme.copyWith(
-            colorScheme:
-                RoundedBottomSheet.seeThrough(theme.colorScheme, dark)),
-        child: child,
-      ),
+      child: inner,
     );
   }
 }

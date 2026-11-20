@@ -4,6 +4,7 @@ import 'package:folio/models/settings.dart';
 import 'package:folio/theme/colors/accent.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:folio_mobile_ui/common/frozen_glass.dart';
 import 'package:provider/provider.dart';
 
 SettingsProvider _settings(AccentColor c) =>
@@ -33,6 +34,30 @@ void main() {
     await tester.pumpWidget(_app(AccentColor.uveg,
         const RoundedBottomSheet(frostedSheets: false, child: _body)));
     expect(find.byType(AdaptiveGlass), findsOneWidget);
+    expect(find.text('Tartalom'), findsOneWidget);
+  });
+
+  testWidgets('Üveg: an opened sheet is frozen glass (photo, not live)',
+      (tester) async {
+    await tester.pumpWidget(ChangeNotifierProvider<SettingsProvider>.value(
+      value: _settings(AccentColor.uveg),
+      child: MaterialApp(
+        builder: (context, child) => FrozenBackdrop.wrapApp(child!),
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () =>
+                  showRoundedModalBottomSheet(context, child: _body),
+              child: const Text('Nyit'),
+            ),
+          ),
+        ),
+      ),
+    ));
+    await tester.tap(find.text('Nyit'));
+    await tester.pumpAndSettle();
+    expect(find.byType(FrozenGlass), findsOneWidget);
+    expect(find.byType(AdaptiveGlass), findsNothing);
     expect(find.text('Tartalom'), findsOneWidget);
   });
 

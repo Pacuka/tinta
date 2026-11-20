@@ -39,6 +39,7 @@ import 'package:folio_kreta_api/providers/share_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/frozen_glass.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_color_utilities/palettes/core_palette.dart';
@@ -188,7 +189,8 @@ class _AppState extends State<App> {
               SchoolCalendarProvider(context: context)..restore(),
         ),
         ChangeNotifierProvider<ProgramEventProvider>(
-          create: (context) => ProgramEventProvider(context: context)..restore(),
+          create: (context) =>
+              ProgramEventProvider(context: context)..restore(),
         ),
         ChangeNotifierProvider<SchoolInfoProvider>(
           create: (context) => SchoolInfoProvider(context: context)..restore(),
@@ -291,6 +293,9 @@ class _AppState extends State<App> {
                     );
                   }
 
+                  // every Üveg sheet/dialog photographs this once on open
+                  app = FrozenBackdrop.wrapApp(app);
+
                   return I18n(
                     initialLocale: Locale(
                         settings.language, settings.language.toUpperCase()),
@@ -299,7 +304,8 @@ class _AppState extends State<App> {
                       // the package read the system flags itself.
                       child: ValueListenableBuilder<bool>(
                         valueListenable: ReduceTransparency.enabled,
-                        builder: (context, reduce, _) => GlassAccessibilityScope(
+                        builder: (context, reduce, _) =>
+                            GlassAccessibilityScope(
                           reduceTransparency: reduce ? true : null,
                           child: app,
                         ),

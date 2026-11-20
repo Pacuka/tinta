@@ -22,6 +22,16 @@ LiquidGlassSettings tintaSheetSettings(bool dark) => dark
     : tintaBarSettings(false)
         .copyWith(blur: 20, glassColor: const Color(0xC8F8F8F8));
 
+/// Frozen glass (sheets, dialogs): the glass colour over the blurred photo
+/// of the page. Dark: the page colour, fairly clear (the barrier already
+/// dims what's behind); light: the frosted white of the light sheet, so
+/// text behind stays a colour wash.
+Color tintaFrozenTint(Color page, bool dark) =>
+    dark ? page.withValues(alpha: 0.62) : const Color(0xC8F8F8F8);
+
+/// Frozen glass blur, logical pixels.
+double tintaFrozenBlur(bool dark) => dark ? 14 : 20;
+
 /// Opacity of content cards sitting on a glass sheet: low enough that the
 /// glass shows, high enough that the text on them stays readable.
 double tintaSheetCardAlpha(bool dark) => dark ? 0.55 : 0.6;
