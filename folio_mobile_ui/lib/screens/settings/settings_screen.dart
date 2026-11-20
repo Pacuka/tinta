@@ -53,6 +53,7 @@ import 'package:folio_mobile_ui/screens/settings/privacy_view.dart';
 import 'package:folio_mobile_ui/screens/settings/settings_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:folio_mobile_ui/common/tinta_dialog.dart';
+import 'package:folio_mobile_ui/common/tinta_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:flutter/services.dart';
@@ -539,8 +540,7 @@ class SettingsScreenState extends State<SettingsScreen>
     return Container(
       margin: const EdgeInsets.only(left: 10.0),
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.06),
+        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(4.0),
       ),
       child: child,
@@ -700,207 +700,214 @@ class SettingsScreenState extends State<SettingsScreen>
         children: [
           // ── Header (Messages-style) ───────────────────────────
           Column(
-  mainAxisSize: MainAxisSize.min,
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(28.0)),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button + title row
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 0.0),
-                    child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(28.0)),
+                  ),
+                  child: SafeArea(
+                    bottom: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).maybePop(),
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer
-                                  .withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 18.0,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
+                        // Back button + title row
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 0.0),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () => Navigator.of(context).maybePop(),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer
+                                        .withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    size: 18.0,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12.0),
+                              Expanded(
+                                child: Text(
+                                  "settings".i18n,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                    fontSize: 28.0,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              if (isSearching)
+                                GestureDetector(
+                                  onTap: () {
+                                    _searchController.clear();
+                                    setState(() => _searchQuery = '');
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.close_rounded,
+                                      size: 18.0,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 12.0),
-                        Expanded(
-                          child: Text(
-                            "settings".i18n,
+
+                        // Search bar
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 14.0),
+                          child: TextField(
+                            controller: _searchController,
                             style: TextStyle(
                               color: Theme.of(context)
                                   .colorScheme
                                   .onPrimaryContainer,
-                              fontSize: 28.0,
-                              fontWeight: FontWeight.w800,
                             ),
-                          ),
-                        ),
-                        if (isSearching)
-                          GestureDetector(
-                            onTap: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
+                            decoration: InputDecoration(
+                              hintText: "search".i18n,
+                              hintStyle: TextStyle(
                                 color: Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12.0),
+                                    .withValues(alpha: 0.5),
+                                fontWeight: FontWeight.w400,
                               ),
-                              child: Icon(
-                                Icons.close_rounded,
-                                size: 18.0,
+                              prefixIcon: Icon(
+                                Icons.search_rounded,
+                                size: 20.0,
                                 color: Theme.of(context)
                                     .colorScheme
-                                    .onPrimaryContainer,
+                                    .onPrimaryContainer
+                                    .withValues(alpha: 0.5),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 11.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer
+                                  .withValues(alpha: 0.12),
+                            ),
+                          ),
+                        ),
+
+                        // ── Category chips (inside header, messages-style) ──
+                        if (!isSearching)
+                          ValueListenableBuilder<String?>(
+                            valueListenable: _activeNavCategoryNotifier,
+                            builder: (context, activeCategory, _) =>
+                                SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              controller: _chipScrollController,
+                              padding: const EdgeInsets.fromLTRB(
+                                  12.0, 8.0, 12.0, 14.0),
+                              child: Row(
+                                children: navCategories.map((c) {
+                                  final catKey = c['key'] as String;
+                                  final isActive = activeCategory == catKey;
+                                  return Padding(
+                                    key: _chipKeys[catKey],
+                                    padding: const EdgeInsets.only(right: 4.0),
+                                    child: GestureDetector(
+                                      onTap: () => _scrollToSection(catKey),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 180),
+                                        curve: Curves.easeOutCubic,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 14.0, vertical: 8.0),
+                                        decoration: BoxDecoration(
+                                          color: isActive
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary
+                                                  .withValues(alpha: 0.15)
+                                              : Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(14.0),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              c['icon'] as IconData,
+                                              size: 15.0,
+                                              color: isActive
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary
+                                                  : Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimaryContainer
+                                                      .withValues(alpha: 0.65),
+                                            ),
+                                            const SizedBox(width: 6.0),
+                                            Text(
+                                              c['label'] as String,
+                                              style: TextStyle(
+                                                fontSize: 13.5,
+                                                fontWeight: isActive
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
+                                                color: isActive
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onPrimaryContainer
+                                                        .withValues(
+                                                            alpha: 0.65),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ),
                       ],
                     ),
                   ),
-
-                  // Search bar
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 14.0),
-                    child: TextField(
-                      controller: _searchController,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "search".i18n,
-                        hintStyle: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer
-                              .withValues(alpha: 0.5),
-                          fontWeight: FontWeight.w400,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          size: 20.0,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer
-                              .withValues(alpha: 0.5),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 11.0),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.0),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context)
-                            .colorScheme
-                            .onPrimaryContainer
-                            .withValues(alpha: 0.12),
-                      ),
-                    ),
-                  ),
-
-                  // ── Category chips (inside header, messages-style) ──
-                  if (!isSearching)
-                    ValueListenableBuilder<String?>(
-                      valueListenable: _activeNavCategoryNotifier,
-                      builder: (context, activeCategory, _) =>
-                          SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        controller: _chipScrollController,
-                        padding:
-                            const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),
-                        child: Row(
-                          children: navCategories.map((c) {
-                            final catKey = c['key'] as String;
-                            final isActive = activeCategory == catKey;
-                            return Padding(
-                              key: _chipKeys[catKey],
-                              padding: const EdgeInsets.only(right: 4.0),
-                              child: GestureDetector(
-                                onTap: () => _scrollToSection(catKey),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 180),
-                                  curve: Curves.easeOutCubic,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14.0, vertical: 8.0),
-                                  decoration: BoxDecoration(
-                                    color: isActive
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .secondary
-                                            .withValues(alpha: 0.15)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(14.0),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        c['icon'] as IconData,
-                                        size: 15.0,
-                                        color: isActive
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .secondary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .onPrimaryContainer
-                                                .withValues(alpha: 0.65),
-                                      ),
-                                      const SizedBox(width: 6.0),
-                                      Text(
-                                        c['label'] as String,
-                                        style: TextStyle(
-                                          fontSize: 13.5,
-                                          fontWeight: isActive
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
-                                          color: isActive
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimaryContainer
-                                                  .withValues(alpha: 0.65),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-  const InkStroke(style: InkStyle.still),
-]),
+                ),
+                const InkStroke(style: InkStyle.still),
+              ]),
 
           // ── Scrollable content ────────────────────────────────
           Expanded(
@@ -922,8 +929,7 @@ Container(
                         // Update banner (always at top)
                         if (!isSearching && updateProvider.available)
                           UpdateViewable(updateProvider.update!)
-                        else if (!isSearching &&
-                            updateProvider.preview != null)
+                        else if (!isSearching && updateProvider.preview != null)
                           PreviewBanner(
                             updateProvider.preview!,
                             onTap: () => UpdateDialog.show(
@@ -1084,63 +1090,64 @@ Container(
               padding: const EdgeInsets.only(left: 14.0, right: 6.0),
               onPressed: () {
                 SettingsHelper.bellDelay(context);
-                  setState(() {});
+                setState(() {});
+              },
+              title: Text("bell_delay".i18n,
+                  style: TextStyle(
+                      color: AppColors.of(context).text.withValues(
+                          alpha: settings.bellDelayEnabled ? .95 : .25))),
+              leading: Icon(
+                settings.bellDelayEnabled
+                    ? Icons.notifications_outlined
+                    : Icons.notifications_off_rounded,
+                size: 22.0,
+                color: AppColors.of(context)
+                    .text
+                    .withValues(alpha: settings.bellDelayEnabled ? .95 : .25),
+              ),
+              trailingDivider: true,
+              trailing: TintaSwitch(
+                onChanged: (v) {
+                  _haptic();
+                  settings.update(bellDelayEnabled: v);
                 },
-                title: Text("bell_delay".i18n,
-                    style: TextStyle(
-                        color: AppColors.of(context).text.withValues(
-                            alpha: settings.bellDelayEnabled ? .95 : .25))),
-                leading: Icon(
-                  settings.bellDelayEnabled
-                      ? Icons.notifications_outlined
-                      : Icons.notifications_off_rounded,
+                value: settings.bellDelayEnabled,
+                activeColor: Theme.of(context).colorScheme.secondary,
+              ),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
+            ),
+            PanelButton(
+              padding: const EdgeInsets.only(left: 14.0, right: 6.0),
+              onPressed: () {
+                settings.update(showBreaks: !settings.showBreaks);
+                setState(() {});
+              },
+              title: Text("show_breaks".i18n,
+                  style: TextStyle(
+                      color: AppColors.of(context)
+                          .text
+                          .withValues(alpha: settings.showBreaks ? .95 : .25))),
+              leading: Icon(
+                  settings.showBreaks
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
                   size: 22.0,
                   color: AppColors.of(context)
                       .text
-                      .withValues(alpha: settings.bellDelayEnabled ? .95 : .25),
-                ),
-                trailingDivider: true,
-                trailing: TintaSwitch(
-                  onChanged: (v) {
-                    _haptic();
-                    settings.update(bellDelayEnabled: v);
-                  },
-                  value: settings.bellDelayEnabled,
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                ),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
-              ),
-              PanelButton(
-                padding: const EdgeInsets.only(left: 14.0, right: 6.0),
-                onPressed: () {
-                  settings.update(showBreaks: !settings.showBreaks);
-                  setState(() {});
+                      .withValues(alpha: settings.showBreaks ? .95 : .25)),
+              trailing: TintaSwitch(
+                onChanged: (v) {
+                  _haptic();
+                  settings.update(showBreaks: v);
                 },
-                title: Text("show_breaks".i18n,
-                    style: TextStyle(
-                        color: AppColors.of(context).text.withValues(
-                            alpha: settings.showBreaks ? .95 : .25))),
-                leading: Icon(
-                    settings.showBreaks
-                        ? Icons.visibility_rounded
-                        : Icons.visibility_off_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context)
-                        .text
-                        .withValues(alpha: settings.showBreaks ? .95 : .25)),
-                trailing: TintaSwitch(
-                  onChanged: (v) {
-                    _haptic();
-                    settings.update(showBreaks: v);
-                  },
-                  value: settings.showBreaks,
-                  activeColor: Theme.of(context).colorScheme.secondary,
-                ),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
+                value: settings.showBreaks,
+                activeColor: Theme.of(context).colorScheme.secondary,
               ),
-            ],
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
+            ),
+          ],
         ),
       ),
 
@@ -1152,7 +1159,8 @@ Container(
           widget: Padding(
             padding: EdgeInsets.zero,
             child: SplittedPanel(
-              padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+              padding:
+                  const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
               cardPadding: const EdgeInsets.all(4.0),
               isSeparated: true,
               children: [
@@ -1228,7 +1236,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -1248,8 +1257,7 @@ Container(
                   'push_notifications'.i18n,
                   style: TextStyle(
                       color: AppColors.of(context).text.withValues(
-                          alpha:
-                              settings.notificationsEnabled ? .95 : .25)),
+                          alpha: settings.notificationsEnabled ? .95 : .25)),
                 ),
                 leading: Icon(
                   settings.notificationsEnabled
@@ -1298,8 +1306,7 @@ Container(
                     Icons.bookmark_rounded,
                     size: 22.0,
                     color: AppColors.of(context).text.withValues(
-                        alpha:
-                            settings.notificationsGradesEnabled ? .95 : .25),
+                        alpha: settings.notificationsGradesEnabled ? .95 : .25),
                   ),
                   trailing: TintaSwitch(
                     onChanged: (v) {
@@ -1311,8 +1318,7 @@ Container(
                     activeColor: Theme.of(context).colorScheme.secondary,
                   ),
                   borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(4.0),
-                      bottom: Radius.circular(4.0)),
+                      top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
                 )),
                 // Absences
                 _subSetting(PanelButton(
@@ -1349,8 +1355,7 @@ Container(
                     activeColor: Theme.of(context).colorScheme.secondary,
                   ),
                   borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(4.0),
-                      bottom: Radius.circular(4.0)),
+                      top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
                 )),
                 // Messages
                 _subSetting(PanelButton(
@@ -1387,8 +1392,7 @@ Container(
                     activeColor: Theme.of(context).colorScheme.secondary,
                   ),
                   borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(4.0),
-                      bottom: Radius.circular(4.0)),
+                      top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
                 )),
                 // Lessons
                 _subSetting(PanelButton(
@@ -1425,8 +1429,7 @@ Container(
                     activeColor: Theme.of(context).colorScheme.secondary,
                   ),
                   borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(4.0),
-                      bottom: Radius.circular(12.0)),
+                      top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
                 )),
               ],
             ],
@@ -1451,7 +1454,8 @@ Container(
           widget: Padding(
             padding: EdgeInsets.zero,
             child: SplittedPanel(
-              padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+              padding:
+                  const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
               cardPadding: const EdgeInsets.all(4.0),
               isSeparated: false,
               children: [
@@ -1510,42 +1514,37 @@ Container(
                             color: AppColors.of(context)
                                 .text
                                 .withValues(alpha: .95))),
-                    trailing: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: settings.androidLiveNotificationType,
-                        isDense: true,
-                        borderRadius: BorderRadius.circular(12.0),
-                        dropdownColor: Theme.of(context).colorScheme.surface,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.of(context).text,
-                        ),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'native',
-                            child: Text('live_type_auto'.i18n),
-                          ),
-                          DropdownMenuItem(
-                            value: 'wavy',
-                            child: Text('live_type_wavy'.i18n),
-                          ),
-                          DropdownMenuItem(
-                            value: 'android16',
-                            child: Text('live_type_android16'.i18n),
-                          ),
-                          const DropdownMenuItem(
-                            value: 'hyper_os',
-                            child: Text('HyperOS'),
-                          ),
-                        ],
-                        onChanged: (v) {
-                          if (v == null) return;
-                          _haptic();
-                          settings.update(androidLiveNotificationType: v);
-                          setState(() {});
-                        },
+                    trailing: TintaDropdown<String>(
+                      value: settings.androidLiveNotificationType,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.of(context).text,
                       ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'native',
+                          child: Text('live_type_auto'.i18n),
+                        ),
+                        DropdownMenuItem(
+                          value: 'wavy',
+                          child: Text('live_type_wavy'.i18n),
+                        ),
+                        DropdownMenuItem(
+                          value: 'android16',
+                          child: Text('live_type_android16'.i18n),
+                        ),
+                        const DropdownMenuItem(
+                          value: 'hyper_os',
+                          child: Text('HyperOS'),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        if (v == null) return;
+                        _haptic();
+                        settings.update(androidLiveNotificationType: v);
+                        setState(() {});
+                      },
                     ),
                     borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(4.0),
@@ -1572,7 +1571,8 @@ Container(
           widget: Padding(
             padding: EdgeInsets.zero,
             child: SplittedPanel(
-              padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+              padding:
+                  const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
               cardPadding: const EdgeInsets.all(4.0),
               isSeparated: false,
               children: [
@@ -1749,7 +1749,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -1761,32 +1762,26 @@ Container(
                     style: TextStyle(
                         color:
                             AppColors.of(context).text.withValues(alpha: .95))),
-                trailing: DropdownButtonHideUnderline(
-                  child: DropdownButton<Pages>(
-                    value: settings.startPage,
-                    isDense: true,
-                    borderRadius: BorderRadius.circular(12.0),
-                    dropdownColor: Theme.of(context).colorScheme.surface,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.of(context).text,
-                    ),
-                    items: const [Pages.home, Pages.grades, Pages.timetable]
-                        .map((p) => DropdownMenuItem<Pages>(
-                              value: p,
-                              child: Text(
-                                  SettingsHelper.localizedPageTitles()[p]!
-                                      .capital()),
-                            ))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v == null) return;
-                      _haptic();
-                      settings.update(startPage: v);
-                      setState(() {});
-                    },
+                trailing: TintaDropdown<Pages>(
+                  value: settings.startPage,
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.of(context).text,
                   ),
+                  items: const [Pages.home, Pages.grades, Pages.timetable]
+                      .map((p) => DropdownMenuItem<Pages>(
+                            value: p,
+                            child: Text(SettingsHelper.localizedPageTitles()[p]!
+                                .capital()),
+                          ))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v == null) return;
+                    _haptic();
+                    settings.update(startPage: v);
+                    setState(() {});
+                  },
                 ),
                 borderRadius: const BorderRadius.all(Radius.circular(12.0)),
               ),
@@ -1802,7 +1797,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -1814,35 +1810,30 @@ Container(
                     style: TextStyle(
                         color:
                             AppColors.of(context).text.withValues(alpha: .95))),
-                trailing: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: settings.language,
-                    isDense: true,
-                    borderRadius: BorderRadius.circular(12.0),
-                    dropdownColor: Theme.of(context).colorScheme.surface,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.of(context).text,
-                    ),
-                    items: SettingsHelper.langMap.entries
-                        .map((e) => DropdownMenuItem<String>(
-                              value: e.key,
-                              child: Text(e.value.trim()),
-                            ))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v == null) return;
-                      _haptic();
-                      Provider.of<SettingsProvider>(context, listen: false)
-                          .update(language: v);
-                      I18n.of(context).locale = Locale(v, v.toUpperCase());
-                      if (Platform.isAndroid || Platform.isIOS) {
-                        setupQuickActions();
-                      }
-                      setState(() {});
-                    },
+                trailing: TintaDropdown<String>(
+                  value: settings.language,
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.of(context).text,
                   ),
+                  items: SettingsHelper.langMap.entries
+                      .map((e) => DropdownMenuItem<String>(
+                            value: e.key,
+                            child: Text(e.value.trim()),
+                          ))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v == null) return;
+                    _haptic();
+                    Provider.of<SettingsProvider>(context, listen: false)
+                        .update(language: v);
+                    I18n.of(context).locale = Locale(v, v.toUpperCase());
+                    if (Platform.isAndroid || Platform.isIOS) {
+                      setupQuickActions();
+                    }
+                    setState(() {});
+                  },
                 ),
                 borderRadius: const BorderRadius.all(Radius.circular(12.0)),
               ),
@@ -1858,7 +1849,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -1870,47 +1862,42 @@ Container(
                     style: TextStyle(
                         color:
                             AppColors.of(context).text.withValues(alpha: .95))),
-                trailing: DropdownButtonHideUnderline(
-                  child: DropdownButton<VibrationStrength>(
-                    value: settings.vibrate,
-                    isDense: true,
-                    borderRadius: BorderRadius.circular(12.0),
-                    dropdownColor: Theme.of(context).colorScheme.surface,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.of(context).text,
-                    ),
-                    items: [
-                      VibrationStrength.off,
-                      VibrationStrength.light,
-                      VibrationStrength.medium,
-                      VibrationStrength.strong,
-                    ]
-                        .map((v) => DropdownMenuItem<VibrationStrength>(
-                              value: v,
-                              child: Text(SettingsHelper
-                                      .localizedVibrationTitles()[v] ??
-                                  ''),
-                            ))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v == null) return;
-                      settings.update(vibrate: v);
-                      // play haptic with the newly selected strength
-                      switch (v) {
-                        case VibrationStrength.off:
-                          break;
-                        case VibrationStrength.light:
-                          HapticFeedback.selectionClick();
-                        case VibrationStrength.medium:
-                          HapticFeedback.lightImpact();
-                        case VibrationStrength.strong:
-                          HapticFeedback.mediumImpact();
-                      }
-                      setState(() {});
-                    },
+                trailing: TintaDropdown<VibrationStrength>(
+                  value: settings.vibrate,
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.of(context).text,
                   ),
+                  items: [
+                    VibrationStrength.off,
+                    VibrationStrength.light,
+                    VibrationStrength.medium,
+                    VibrationStrength.strong,
+                  ]
+                      .map((v) => DropdownMenuItem<VibrationStrength>(
+                            value: v,
+                            child: Text(
+                                SettingsHelper.localizedVibrationTitles()[v] ??
+                                    ''),
+                          ))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v == null) return;
+                    settings.update(vibrate: v);
+                    // play haptic with the newly selected strength
+                    switch (v) {
+                      case VibrationStrength.off:
+                        break;
+                      case VibrationStrength.light:
+                        HapticFeedback.selectionClick();
+                      case VibrationStrength.medium:
+                        HapticFeedback.lightImpact();
+                      case VibrationStrength.strong:
+                        HapticFeedback.mediumImpact();
+                    }
+                    setState(() {});
+                  },
                 ),
                 borderRadius: const BorderRadius.all(Radius.circular(12.0)),
               ),
@@ -1928,7 +1915,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -1940,40 +1928,35 @@ Container(
                     style: TextStyle(
                         color:
                             AppColors.of(context).text.withValues(alpha: .95))),
-                trailing: DropdownButtonHideUnderline(
-                  child: DropdownButton<ThemeMode>(
-                    value: settings.theme,
-                    isDense: true,
-                    borderRadius: BorderRadius.circular(12.0),
-                    dropdownColor: Theme.of(context).colorScheme.surface,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.of(context).text,
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: ThemeMode.light,
-                        child: Text('light'.i18n),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.dark,
-                        child: Text('dark'.i18n),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.system,
-                        child: Text('system'.i18n),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v == null) return;
-                      _haptic();
-                      settings.update(theme: v);
-                      Provider.of<ThemeModeObserver>(context, listen: false)
-                          .changeTheme(v);
-                      setState(() {});
-                    },
+                trailing: TintaDropdown<ThemeMode>(
+                  value: settings.theme,
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.of(context).text,
                   ),
+                  items: [
+                    DropdownMenuItem(
+                      value: ThemeMode.light,
+                      child: Text('light'.i18n),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.dark,
+                      child: Text('dark'.i18n),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.system,
+                      child: Text('system'.i18n),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v == null) return;
+                    _haptic();
+                    settings.update(theme: v);
+                    Provider.of<ThemeModeObserver>(context, listen: false)
+                        .changeTheme(v);
+                    setState(() {});
+                  },
                 ),
                 borderRadius: const BorderRadius.all(Radius.circular(12.0)),
               ),
@@ -2029,7 +2012,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -2081,7 +2065,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -2108,7 +2093,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -2134,7 +2120,8 @@ Container(
           widget: Padding(
             padding: EdgeInsets.zero,
             child: SplittedPanel(
-              padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+              padding:
+                  const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
               cardPadding: const EdgeInsets.all(4.0),
               isSeparated: true,
               children: [
@@ -2185,7 +2172,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -2252,7 +2240,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: false,
             children: [
@@ -2424,7 +2413,8 @@ Container(
         widget: Padding(
           padding: EdgeInsets.zero,
           child: SplittedPanel(
-            padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
+            padding:
+                const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
             cardPadding: const EdgeInsets.all(4.0),
             isSeparated: true,
             children: [
@@ -2480,51 +2470,50 @@ Container(
           padding: const EdgeInsets.only(bottom: 14.0, left: 24.0, right: 24.0),
           cardPadding: const EdgeInsets.all(4.0),
           children: [
-              PanelButton(
-                leading: Icon(Icons.lock_outline_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(alpha: 0.95)),
-                title: Text("privacy".i18n),
-                onPressed: () => _openPrivacy(context),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
-              ),
-              PanelButton(
-                leading: Icon(Icons.language_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(alpha: 0.95)),
-                title: Text("website".i18n),
-                onPressed: () => launchUrl(
-                    Uri.parse("https://tinta.pacuka.hu"),
-                    mode: LaunchMode.externalApplication),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
-              ),
-              PanelButton(
-                leading: Icon(Icons.code_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(alpha: 0.95)),
-                title: const Text("GitHub"),
-                onPressed: () => launchUrl(
-                    Uri.parse("https://github.com/Pacuka/tinta"),
-                    mode: LaunchMode.externalApplication),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
-              ),
-              PanelButton(
-                leading: Icon(Icons.emoji_events_rounded,
-                    size: 22.0,
-                    color: AppColors.of(context).text.withValues(alpha: 0.95)),
-                title: Text("licenses".i18n),
-                onPressed: () => showLicensePage(
-                    context: context,
-                    applicationName: "Tinta",
-                    applicationLegalese: "packagetext".i18n),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
-              ),
-            ],
-          ),
+            PanelButton(
+              leading: Icon(Icons.lock_outline_rounded,
+                  size: 22.0,
+                  color: AppColors.of(context).text.withValues(alpha: 0.95)),
+              title: Text("privacy".i18n),
+              onPressed: () => _openPrivacy(context),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12.0), bottom: Radius.circular(4.0)),
+            ),
+            PanelButton(
+              leading: Icon(Icons.language_rounded,
+                  size: 22.0,
+                  color: AppColors.of(context).text.withValues(alpha: 0.95)),
+              title: Text("website".i18n),
+              onPressed: () => launchUrl(Uri.parse("https://tinta.pacuka.hu"),
+                  mode: LaunchMode.externalApplication),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
+            ),
+            PanelButton(
+              leading: Icon(Icons.code_rounded,
+                  size: 22.0,
+                  color: AppColors.of(context).text.withValues(alpha: 0.95)),
+              title: const Text("GitHub"),
+              onPressed: () => launchUrl(
+                  Uri.parse("https://github.com/Pacuka/tinta"),
+                  mode: LaunchMode.externalApplication),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4.0), bottom: Radius.circular(4.0)),
+            ),
+            PanelButton(
+              leading: Icon(Icons.emoji_events_rounded,
+                  size: 22.0,
+                  color: AppColors.of(context).text.withValues(alpha: 0.95)),
+              title: Text("licenses".i18n),
+              onPressed: () => showLicensePage(
+                  context: context,
+                  applicationName: "Tinta",
+                  applicationLegalese: "packagetext".i18n),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4.0), bottom: Radius.circular(12.0)),
+            ),
+          ],
+        ),
       ),
     ];
   }
@@ -2575,7 +2564,8 @@ Container(
               if (pendingCode != null)
                 PanelButton(
                   padding: const EdgeInsets.only(left: 14.0, right: 14.0),
-                  onPressed: () => _showPairingDialog(context, wear, pendingCode),
+                  onPressed: () =>
+                      _showPairingDialog(context, wear, pendingCode),
                   title: const Text(
                     'WearOS app találva — Csatlakoztatás',
                     style: TextStyle(fontWeight: FontWeight.w700),
@@ -3057,8 +3047,7 @@ class _PairingDialogState extends State<_PairingDialog> {
   @override
   Widget build(BuildContext context) {
     return TintaAlertDialog(
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       icon: const Icon(Icons.watch_rounded, size: 36.0, color: Colors.green),
       title: const Text(
         'WearOS app találva',
@@ -3089,8 +3078,8 @@ class _PairingDialogState extends State<_PairingDialog> {
               hintText: '------',
               counterText: '',
               errorText: _isError ? 'Helytelen kód' : null,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
             ),
           ),
         ],
@@ -3105,8 +3094,8 @@ class _PairingDialogState extends State<_PairingDialog> {
         ),
         FilledButton(
           onPressed: () async {
-            final ok = await widget.wear
-                .confirmPairing(_codeController.text.trim());
+            final ok =
+                await widget.wear.confirmPairing(_codeController.text.trim());
             if (ok) {
               if (mounted) Navigator.pop(context);
             } else {
