@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_crop_plus/image_crop_plus.dart';
@@ -161,7 +162,7 @@ class _ImageNoteEditorState extends State<ImageNoteEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return TintaAlertDialog(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(14.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),

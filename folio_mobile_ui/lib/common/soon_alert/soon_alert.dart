@@ -1,5 +1,6 @@
 import 'package:folio_mobile_ui/common/action_button.dart';
 import 'package:folio_mobile_ui/common/soon_alert/soon_alert.i18n.dart';
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:flutter/material.dart';
 
 class SoonAlert extends StatelessWidget {
@@ -10,7 +11,7 @@ class SoonAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return TintaAlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       title: Text('soon'.i18n),
       content: Text('soon_body'.i18n),

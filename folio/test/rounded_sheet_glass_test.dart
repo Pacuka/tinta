@@ -28,22 +28,24 @@ Widget _app(AccentColor c, Widget child, {EdgeInsets? viewInsets}) =>
 const _body = SizedBox(height: 80, child: Text('Tartalom'));
 
 void main() {
-  testWidgets('Üveg: a solid lit panel, NOT live glass (120 Hz perf)',
+  testWidgets('Üveg: live glass sheet (every menu glass, 2026-11-17)',
       (tester) async {
-    // Live glass on a sheet this big cost ~7 ms/frame on the Redmi and the
-    // open animation stuttered (2026-11-16).
-    await tester.pumpWidget(
-        _app(AccentColor.uveg, const RoundedBottomSheet(child: _body)));
-    expect(find.byType(AdaptiveGlass), findsNothing);
+    await tester.pumpWidget(_app(AccentColor.uveg,
+        const RoundedBottomSheet(frostedSheets: false, child: _body)));
+    expect(find.byType(AdaptiveGlass), findsOneWidget);
     expect(find.text('Tartalom'), findsOneWidget);
-    final panel = tester.widget<DecoratedBox>(find
-        .descendant(
-            of: find.byType(RoundedBottomSheet),
-            matching: find.byType(DecoratedBox))
-        .first);
-    final color = (panel.decoration as BoxDecoration).color!;
-    // solid: without blur any see-through ghosted the text behind
-    expect(color.a, 1.0);
+  });
+
+  testWidgets('tintaSheetBody: glass in Üveg, untouched in Kobalt',
+      (tester) async {
+    Widget sheet() => Builder(
+        builder: (context) => tintaSheetBody(context,
+            handle: true, child: const Text('Lista')));
+    await tester.pumpWidget(_app(AccentColor.uveg, sheet()));
+    expect(find.byType(TintaSheetSurface), findsOneWidget);
+    await tester.pumpWidget(_app(AccentColor.kobalt, sheet()));
+    expect(find.byType(TintaSheetSurface), findsNothing);
+    expect(find.text('Lista'), findsOneWidget);
   });
 
   testWidgets('Kobalt keeps the solid scaffold-coloured sheet',

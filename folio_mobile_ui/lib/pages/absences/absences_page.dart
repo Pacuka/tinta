@@ -20,6 +20,7 @@ import 'package:folio_mobile_ui/common/widgets/miss_tile.dart';
 import 'package:folio_mobile_ui/pages/absences/absence_subject_modal.dart';
 import 'package:folio/ui/filter/sort.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio/models/settings.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
@@ -109,11 +110,14 @@ class AbsencesPageState extends State<AbsencesPage>
     );
   }
 
-  void _showJustificationBreakdown(BuildContext context, List<Absence> excused) {
+  void _showJustificationBreakdown(
+      BuildContext context, List<Absence> excused) {
     final Map<String, int> typeCounts = {};
     for (final absence in excused) {
       final name = absence.justification?.name;
-      final key = (name != null && name.isNotEmpty) ? name : "justification_unknown".i18n;
+      final key = (name != null && name.isNotEmpty)
+          ? name
+          : "justification_unknown".i18n;
       typeCounts[key] = (typeCounts[key] ?? 0) + 1;
     }
 
@@ -121,61 +125,66 @@ class AbsencesPageState extends State<AbsencesPage>
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: tintaSheetRouteColor(context),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.fromLTRB(
-            20.0, 20.0, 20.0, MediaQuery.of(context).padding.bottom + 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "justification_breakdown_title".i18n,
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface,
-                ),
+        return tintaSheetBody(context,
+            borderRadius: 20,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0,
+                  MediaQuery.of(context).padding.bottom + 20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "justification_breakdown_title".i18n,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  ...typeCounts.entries.map((e) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                e.key,
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 4.0),
+                              decoration: BoxDecoration(
+                                color: AppColors.of(context)
+                                    .green
+                                    .withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: Text(
+                                "${e.value}",
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.of(context).green,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
               ),
-              const SizedBox(height: 12.0),
-              ...typeCounts.entries.map((e) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        e.key,
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 4.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.of(context).green.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Text(
-                        "${e.value}",
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.of(context).green,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-            ],
-          ),
-        );
+            ));
       },
     );
   }
@@ -235,188 +244,196 @@ class AbsencesPageState extends State<AbsencesPage>
         children: [
           // ─── Accent Header ────────────────────────────────────────────
           Column(
-  mainAxisSize: MainAxisSize.min,
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(28.0)),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 8.0, 0.0),
-                    child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(28.0)),
+                  ),
+                  child: SafeArea(
+                    bottom: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (Navigator.of(context).canPop()) ...[
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).maybePop(),
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer
-                                  .withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 18.0,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12.0),
-                        ],
-                        Expanded(
-                          child: Text(
-                            "Absences".i18n,
-                            style: TextStyle(
-                              fontSize: 28.0,
-                              fontWeight: FontWeight.w800,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                        if (user.user?.role == Role.parent)
-                          GestureDetector(
-                            onTap: () {
-                              performHapticFeedback(
-                                  Provider.of<SettingsProvider>(context,
-                                          listen: false)
-                                      .vibrate);
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (_) => const JustificationsPage()));
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14.0, vertical: 10.0),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(14.0),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.check_rounded,
-                                    size: 16.0,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                  ),
-                                  const SizedBox(width: 6.0),
-                                  Text(
-                                    "justify".i18n,
-                                    style: TextStyle(
-                                      fontSize: 13.0,
-                                      fontWeight: FontWeight.w600,
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(20.0, 12.0, 8.0, 0.0),
+                          child: Row(
+                            children: [
+                              if (Navigator.of(context).canPop()) ...[
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).maybePop(),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      size: 18.0,
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onPrimaryContainer,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        IconButton(
-                          onPressed: () {
-                            showTintaConfirm(
-                              context,
-                              title: "attention".i18n,
-                              message: "attention_body".i18n,
-                              confirmLabel: "Ok",
-                              fallback: (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0)),
-                                title: Text("attention".i18n),
-                                content: Text("attention_body".i18n),
-                                actions: [
-                                  ActionButton(
-                                    label: "Ok",
-                                    onTap: () => Navigator.of(context).pop(),
+                                ),
+                                const SizedBox(width: 12.0),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  "Absences".i18n,
+                                  style: TextStyle(
+                                    fontSize: 28.0,
+                                    fontWeight: FontWeight.w800,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
                                   ),
-                                ],
+                                ),
                               ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.info_outline_rounded,
-                            color: Theme.of(context)
+                              if (user.user?.role == Role.parent)
+                                GestureDetector(
+                                  onTap: () {
+                                    performHapticFeedback(
+                                        Provider.of<SettingsProvider>(context,
+                                                listen: false)
+                                            .vibrate);
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(
+                                            builder: (_) =>
+                                                const JustificationsPage()));
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14.0, vertical: 10.0),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(14.0),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.check_rounded,
+                                          size: 16.0,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer,
+                                        ),
+                                        const SizedBox(width: 6.0),
+                                        Text(
+                                          "justify".i18n,
+                                          style: TextStyle(
+                                            fontSize: 13.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimaryContainer,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              IconButton(
+                                onPressed: () {
+                                  showTintaConfirm(
+                                    context,
+                                    title: "attention".i18n,
+                                    message: "attention_body".i18n,
+                                    confirmLabel: "Ok",
+                                    fallback: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.0)),
+                                      title: Text("attention".i18n),
+                                      content: Text("attention_body".i18n),
+                                      actions: [
+                                        ActionButton(
+                                          label: "Ok",
+                                          onTap: () =>
+                                              Navigator.of(context).pop(),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                icon: Icon(
+                                  Icons.info_outline_rounded,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Tab bar
+                        AnimatedBuilder(
+                          animation: _tabController,
+                          builder: (context, _) => TabBar(
+                            controller: _tabController,
+                            dividerColor: Colors.transparent,
+                            labelColor: Theme.of(context).colorScheme.secondary,
+                            unselectedLabelColor: Theme.of(context)
                                 .colorScheme
-                                .onPrimaryContainer,
+                                .onPrimaryContainer
+                                .withValues(alpha: 0.65),
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13.5,
+                            ),
+                            unselectedLabelStyle: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13.5,
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            indicatorPadding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 6.0),
+                            indicator: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .secondary
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(14.0),
+                            ),
+                            overlayColor: WidgetStateProperty.all(
+                                const Color(0x00000000)),
+                            splashFactory: NoSplash.splashFactory,
+                            onTap: (_) => performHapticFeedback(
+                                Provider.of<SettingsProvider>(context,
+                                        listen: false)
+                                    .vibrate),
+                            padding: const EdgeInsets.fromLTRB(
+                                12.0, 8.0, 12.0, 14.0),
+                            // Labels shrink instead of clipping with a large font.
+                            tabs: [
+                              for (final t in ["Absences", "Delays", "Misses"])
+                                Tab(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(t.i18n, maxLines: 1),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  // Tab bar
-                  AnimatedBuilder(
-                    animation: _tabController,
-                    builder: (context, _) => TabBar(
-                      controller: _tabController,
-                      dividerColor: Colors.transparent,
-                      labelColor: Theme.of(context).colorScheme.secondary,
-                      unselectedLabelColor: Theme.of(context)
-                          .colorScheme
-                          .onPrimaryContainer
-                          .withValues(alpha: 0.65),
-                      labelStyle: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13.5,
-                      ),
-                      unselectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13.5,
-                      ),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorPadding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 6.0),
-                      indicator: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .secondary
-                            .withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(14.0),
-                      ),
-                      overlayColor:
-                          WidgetStateProperty.all(const Color(0x00000000)),
-                      splashFactory: NoSplash.splashFactory,
-                      onTap: (_) => performHapticFeedback(
-                          Provider.of<SettingsProvider>(context, listen: false).vibrate),
-                      padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),
-                      // Labels shrink instead of clipping with a large font.
-                      tabs: [
-                        for (final t in ["Absences", "Delays", "Misses"])
-                          Tab(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(t.i18n, maxLines: 1),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-  const InkStroke(style: InkStyle.blot, motionKey: "absences"),
-]),
+                ),
+                const InkStroke(style: InkStyle.blot, motionKey: "absences"),
+              ]),
           // ─── Content ─────────────────────────────────────────────────
           Expanded(
             child: TabBarView(
@@ -647,42 +664,42 @@ class _StatCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
-        decoration: BoxDecoration(
-          color: value > 0 ? color.withValues(alpha: 0.14) : cardColor,
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "$value$suffix",
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.w800,
-                color: value > 0 ? color : onCardColor,
-                height: 1.1,
-              ),
-            ),
-            const SizedBox(height: 2.0),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                label,
-                maxLines: 1,
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: value > 0 ? color.withValues(alpha: 0.14) : cardColor,
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "$value$suffix",
                 style: TextStyle(
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                  color: value > 0
-                      ? color.withValues(alpha: 0.8)
-                      : onCardColor.withValues(alpha: 0.6),
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w800,
+                  color: value > 0 ? color : onCardColor,
+                  height: 1.1,
                 ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 2.0),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                    color: value > 0
+                        ? color.withValues(alpha: 0.8)
+                        : onCardColor.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:folio/theme/colors/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 
 class BottomCard extends StatelessWidget {
   const BottomCard({super.key, this.child});
@@ -8,13 +9,7 @@ class BottomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(28.0),
-        ),
-      ),
+    return TintaSheetSurface(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

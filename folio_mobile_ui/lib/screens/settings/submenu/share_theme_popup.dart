@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:folio/models/settings.dart';
@@ -17,7 +18,7 @@ class ShareThemeDialog extends StatefulWidget {
   static void show(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => TintaAlertDialog(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         title: Text("attention".i18n),
@@ -57,7 +58,7 @@ class ShareThemeDialogState extends State<ShareThemeDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return TintaAlertDialog(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(14.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),

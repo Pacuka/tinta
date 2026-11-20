@@ -52,6 +52,7 @@ import 'package:folio_mobile_ui/screens/settings/navbar_order_screen.dart';
 import 'package:folio_mobile_ui/screens/settings/privacy_view.dart';
 import 'package:folio_mobile_ui/screens/settings/settings_helper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:flutter/services.dart';
@@ -240,7 +241,7 @@ class SettingsScreenState extends State<SettingsScreen>
 
     showDialog(
       context: context,
-      builder: (ctx) => Dialog(
+      builder: (ctx) => TintaDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(20.0))),
         insetPadding:
@@ -358,7 +359,7 @@ class SettingsScreenState extends State<SettingsScreen>
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setS) => AlertDialog(
+        builder: (ctx, setS) => TintaAlertDialog(
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(18.0))),
           contentPadding: const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 0.0),
@@ -3055,7 +3056,7 @@ class _PairingDialogState extends State<_PairingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return TintaAlertDialog(
       shape:
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       icon: const Icon(Icons.watch_rounded, size: 36.0, color: Colors.green),

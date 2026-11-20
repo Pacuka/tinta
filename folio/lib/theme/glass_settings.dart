@@ -26,11 +26,6 @@ LiquidGlassSettings tintaSheetSettings(bool dark) => dark
 /// glass shows, high enough that the text on them stays readable.
 double tintaSheetCardAlpha(bool dark) => dark ? 0.55 : 0.6;
 
-/// Opacity of the Üveg sheet panel. Without blur any see-through let the
-/// text behind ghost through (0.86 and even 0.97 on the Redmi, 2026-11-16),
-/// so the panel is solid, like an expanded iOS 26 sheet.
-double tintaSheetPanelAlpha(bool dark) => 1.0;
-
 /// The sliding lens of tab bars. 0 aberration counts as "unset" in the
 /// package's indicator merge and brings back its 0.15 rainbow rim.
 LiquidGlassSettings tintaIndicatorSettings() =>

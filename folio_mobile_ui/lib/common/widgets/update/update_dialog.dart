@@ -11,6 +11,7 @@ import 'package:folio/api/client.dart';
 import 'package:folio/flavor.dart';
 import 'package:folio/models/release.dart';
 import 'package:folio/theme/colors/colors.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 
 class UpdateDialog extends StatefulWidget {
   const UpdateDialog({super.key, required this.release});
@@ -116,258 +117,253 @@ class _UpdateDialogState extends State<UpdateDialog> {
     final tt = Theme.of(context).textTheme;
     final hasApk = _apkAsset != null;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
-      ),
-      padding: EdgeInsets.fromLTRB(
-          20.0, 16.0, 20.0, MediaQuery.of(context).padding.bottom + 20.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Handle
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 20.0),
-              decoration: BoxDecoration(
-                color: AppColors.of(context).text.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(2.0),
+    return TintaSheetSurface(
+      borderRadius: 24.0,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+            20.0, 16.0, 20.0, MediaQuery.of(context).padding.bottom + 20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20.0),
+                decoration: BoxDecoration(
+                  color: AppColors.of(context).text.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(2.0),
+                ),
               ),
             ),
-          ),
 
-          // Header row
-          Row(
-            children: [
+            // Header row
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer,
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                  child: Icon(Icons.system_update_rounded,
+                      size: 22.0, color: cs.onPrimaryContainer),
+                ),
+                const SizedBox(width: 14.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.release.prerelease
+                            ? 'Előzetes, nem tesztelt verzió'
+                            : 'Új verzió elérhető',
+                        style: tt.titleMedium!.copyWith(
+                            fontWeight: FontWeight.w700, color: cs.onSurface),
+                      ),
+                      Text(
+                        widget.release.tag,
+                        style: tt.bodySmall!.copyWith(
+                            color: cs.primary, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16.0),
+
+            if (widget.release.prerelease) ...[
               Container(
-                padding: const EdgeInsets.all(10.0),
+                width: double.infinity,
+                padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
-                  color: cs.primaryContainer,
+                  color: cs.errorContainer,
                   borderRadius: BorderRadius.circular(14.0),
                 ),
-                child: Icon(Icons.system_update_rounded,
-                    size: 22.0, color: cs.onPrimaryContainer),
-              ),
-              const SizedBox(width: 14.0),
-              Expanded(
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.release.prerelease
-                          ? 'Előzetes, nem tesztelt verzió'
-                          : 'Új verzió elérhető',
-                      style: tt.titleMedium!.copyWith(
-                          fontWeight: FontWeight.w700, color: cs.onSurface),
-                    ),
-                    Text(
-                      widget.release.tag,
-                      style: tt.bodySmall!.copyWith(
-                          color: cs.primary, fontWeight: FontWeight.w600),
+                    Icon(Icons.warning_amber_rounded,
+                        color: cs.onErrorContainer),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(previewWarning,
+                          style: tt.bodySmall!.copyWith(
+                              color: cs.onErrorContainer,
+                              fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 12.0),
             ],
-          ),
 
-          const SizedBox(height: 16.0),
-
-          if (widget.release.prerelease) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: cs.errorContainer,
-                borderRadius: BorderRadius.circular(14.0),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.warning_amber_rounded,
-                      color: cs.onErrorContainer),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(previewWarning,
-                        style: tt.bodySmall!.copyWith(
-                            color: cs.onErrorContainer,
-                            fontWeight: FontWeight.w600)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12.0),
-          ],
-
-          // Release notes
-          if (widget.release.body.trim().isNotEmpty) ...[
-            Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(maxHeight: 200.0),
-              padding: const EdgeInsets.all(14.0),
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: SingleChildScrollView(
-                child: MarkdownBody(
-                  data: widget.release.body.trim(),
-                  styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                      .copyWith(
-                    p: tt.bodySmall!
-                        .copyWith(color: cs.onSurface.withValues(alpha: 0.8)),
-                    h1: tt.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface),
-                    h2: tt.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface),
-                    h3: tt.bodySmall!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: cs.onSurface),
-                    code: tt.bodySmall!.copyWith(
-                        fontFamily: 'monospace',
-                        color: cs.primary),
-                    codeblockDecoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8.0),
+            // Release notes
+            if (widget.release.body.trim().isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxHeight: 200.0),
+                padding: const EdgeInsets.all(14.0),
+                decoration: BoxDecoration(
+                  color: cs.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: SingleChildScrollView(
+                  child: MarkdownBody(
+                    data: widget.release.body.trim(),
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                        .copyWith(
+                      p: tt.bodySmall!
+                          .copyWith(color: cs.onSurface.withValues(alpha: 0.8)),
+                      h1: tt.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.w700, color: cs.onSurface),
+                      h2: tt.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.w600, color: cs.onSurface),
+                      h3: tt.bodySmall!.copyWith(
+                          fontWeight: FontWeight.w600, color: cs.onSurface),
+                      code: tt.bodySmall!
+                          .copyWith(fontFamily: 'monospace', color: cs.primary),
+                      codeblockDecoration: BoxDecoration(
+                        color: cs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 14.0),
-          ],
+              const SizedBox(height: 14.0),
+            ],
 
-          // Error message
-          if (_state == _DownloadState.error && _errorMessage != null) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: cs.errorContainer,
-                borderRadius: BorderRadius.circular(12.0),
+            // Error message
+            if (_state == _DownloadState.error && _errorMessage != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: cs.errorContainer,
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Text(
+                  _errorMessage!,
+                  style: tt.bodySmall!.copyWith(color: cs.onErrorContainer),
+                ),
               ),
-              child: Text(
-                _errorMessage!,
-                style:
-                    tt.bodySmall!.copyWith(color: cs.onErrorContainer),
-              ),
-            ),
-            const SizedBox(height: 12.0),
-          ],
+              const SizedBox(height: 12.0),
+            ],
 
-          // Progress bar
-          if (_state == _DownloadState.downloading) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: LinearProgressIndicator(
-                value: _progress > 0 ? _progress : null,
-                minHeight: 8.0,
-                backgroundColor: cs.surfaceContainerHigh,
-                color: cs.primary,
+            // Progress bar
+            if (_state == _DownloadState.downloading) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: LinearProgressIndicator(
+                  value: _progress > 0 ? _progress : null,
+                  minHeight: 8.0,
+                  backgroundColor: cs.surfaceContainerHigh,
+                  color: cs.primary,
+                ),
               ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              _progress > 0
-                  ? 'Letöltés: ${(_progress * 100).toStringAsFixed(0)}%'
-                  : 'Letöltés...',
-              style: tt.bodySmall!
-                  .copyWith(color: cs.onSurface.withValues(alpha: 0.6)),
-            ),
-            const SizedBox(height: 14.0),
-          ],
+              const SizedBox(height: 8.0),
+              Text(
+                _progress > 0
+                    ? 'Letöltés: ${(_progress * 100).toStringAsFixed(0)}%'
+                    : 'Letöltés...',
+                style: tt.bodySmall!
+                    .copyWith(color: cs.onSurface.withValues(alpha: 0.6)),
+              ),
+              const SizedBox(height: 14.0),
+            ],
 
-          if (_state == _DownloadState.installing) ...[
+            if (_state == _DownloadState.installing) ...[
+              Row(
+                children: [
+                  SizedBox(
+                    width: 16.0,
+                    height: 16.0,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2.0, color: cs.primary),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Text('Telepítő megnyitása...',
+                      style: tt.bodySmall!.copyWith(
+                          color: cs.onSurface.withValues(alpha: 0.6))),
+                ],
+              ),
+              const SizedBox(height: 14.0),
+            ],
+
+            // Action buttons
             Row(
               children: [
-                SizedBox(
-                  width: 16.0,
-                  height: 16.0,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2.0, color: cs.primary),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _state == _DownloadState.downloading
+                        ? null
+                        : () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.0)),
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      side:
+                          BorderSide(color: cs.outline.withValues(alpha: 0.4)),
+                    ),
+                    child: const Text('Később',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
                 ),
                 const SizedBox(width: 10.0),
-                Text('Telepítő megnyitása...',
-                    style: tt.bodySmall!
-                        .copyWith(color: cs.onSurface.withValues(alpha: 0.6))),
+                Expanded(
+                  flex: 2,
+                  child: kIsPlayStore
+                      ? FilledButton.icon(
+                          onPressed: () => launchUrl(
+                            Uri.parse(
+                                'https://play.google.com/store/apps/details?id=hu.pacuka.tinta'),
+                          ),
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14.0)),
+                            padding: const EdgeInsets.symmetric(vertical: 14.0),
+                          ),
+                          icon:
+                              const Icon(Icons.open_in_new_rounded, size: 18.0),
+                          label: const Text('Play Store',
+                              style: TextStyle(fontWeight: FontWeight.w600)),
+                        )
+                      : FilledButton.icon(
+                          onPressed: (!hasApk ||
+                                  _state == _DownloadState.downloading ||
+                                  _state == _DownloadState.installing)
+                              ? null
+                              : _downloadAndInstall,
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14.0)),
+                            padding: const EdgeInsets.symmetric(vertical: 14.0),
+                          ),
+                          icon: Icon(
+                            _state == _DownloadState.error
+                                ? Icons.refresh_rounded
+                                : Icons.download_rounded,
+                            size: 18.0,
+                          ),
+                          label: Text(
+                            !hasApk
+                                ? 'Nincs APK'
+                                : _state == _DownloadState.error
+                                    ? 'Újra'
+                                    : 'Letöltés és telepítés',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                ),
               ],
             ),
-            const SizedBox(height: 14.0),
           ],
-
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _state == _DownloadState.downloading
-                      ? null
-                      : () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.0)),
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    side: BorderSide(
-                        color: cs.outline.withValues(alpha: 0.4)),
-                  ),
-                  child: const Text('Később',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
-                ),
-              ),
-              const SizedBox(width: 10.0),
-              Expanded(
-                flex: 2,
-                child: kIsPlayStore
-                    ? FilledButton.icon(
-                        onPressed: () => launchUrl(
-                          Uri.parse(
-                              'https://play.google.com/store/apps/details?id=hu.pacuka.tinta'),
-                        ),
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14.0)),
-                          padding: const EdgeInsets.symmetric(vertical: 14.0),
-                        ),
-                        icon: const Icon(Icons.open_in_new_rounded, size: 18.0),
-                        label: const Text('Play Store',
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                      )
-                    : FilledButton.icon(
-                        onPressed: (!hasApk ||
-                                _state == _DownloadState.downloading ||
-                                _state == _DownloadState.installing)
-                            ? null
-                            : _downloadAndInstall,
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14.0)),
-                          padding: const EdgeInsets.symmetric(vertical: 14.0),
-                        ),
-                        icon: Icon(
-                          _state == _DownloadState.error
-                              ? Icons.refresh_rounded
-                              : Icons.download_rounded,
-                          size: 18.0,
-                        ),
-                        label: Text(
-                          !hasApk
-                              ? 'Nincs APK'
-                              : _state == _DownloadState.error
-                                  ? 'Újra'
-                                  : 'Letöltés és telepítés',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

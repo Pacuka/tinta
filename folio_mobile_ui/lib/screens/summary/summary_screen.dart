@@ -1,5 +1,6 @@
 import 'package:folio/theme/colors/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'summary_screen.i18n.dart';
 
 import 'pages/allsum_page.dart';
@@ -56,11 +57,7 @@ class SummaryScreenState extends State<SummaryScreen> {
 
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.92,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28.0)),
-        ),
+      child: TintaSheetSurface(
         child: Column(
           children: [
             // Handle

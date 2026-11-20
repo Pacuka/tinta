@@ -45,8 +45,7 @@ class GradesPage extends StatefulWidget {
   State<GradesPage> createState() => _GradesPageState();
 }
 
-class _GradesPageState extends State<GradesPage>
-    with TickerProviderStateMixin {
+class _GradesPageState extends State<GradesPage> with TickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
 
@@ -127,8 +126,8 @@ class _GradesPageState extends State<GradesPage>
         showHandle: false,
         // Keep the content above the floating navbar.
         child: Padding(
-          padding: EdgeInsets.only(
-              bottom: 96.0 + MediaQuery.of(ctx).padding.bottom),
+          padding:
+              EdgeInsets.only(bottom: 96.0 + MediaQuery.of(ctx).padding.bottom),
           child: GradeCalculator(subject),
         ),
       ),
@@ -149,37 +148,41 @@ class _GradesPageState extends State<GradesPage>
     performHapticFeedback(settings.vibrate);
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: tintaSheetRouteColor(context) ??
+          Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _periods.asMap().entries.map((entry) {
-              final isSelected = _periodDays == entry.value;
-              return ListTile(
-                title: Text(
-                  _periodKeys[entry.key].i18n,
-                  style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                ),
-                trailing: isSelected
-                    ? Icon(Icons.check_rounded,
-                        color: Theme.of(ctx).colorScheme.secondary)
-                    : null,
-                onTap: () {
-                  setState(() => _periodDays = entry.value);
-                  Navigator.pop(ctx);
-                },
-              );
-            }).toList(),
-          ),
-        ),
-      ),
+      builder: (ctx) => tintaSheetBody(ctx,
+          borderRadius: 20,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _periods.asMap().entries.map((entry) {
+                  final isSelected = _periodDays == entry.value;
+                  return ListTile(
+                    title: Text(
+                      _periodKeys[entry.key].i18n,
+                      style: TextStyle(
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? Icon(Icons.check_rounded,
+                            color: Theme.of(ctx).colorScheme.secondary)
+                        : null,
+                    onTap: () {
+                      setState(() => _periodDays = entry.value);
+                      Navigator.pop(ctx);
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          )),
     );
   }
 
@@ -194,90 +197,94 @@ class _GradesPageState extends State<GradesPage>
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: tintaSheetRouteColor(context) ??
+          Theme.of(context).scaffoldBackgroundColor,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'grades_cnt'.i18n.fill([total.toString()]),
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              if (grades.length >= 2) ...[
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GradeGraph(grades, classAvg: classAvg),
-                ),
-              ],
-              const SizedBox(height: 16),
-              ...counts.reversed.toList().asMap().entries.map((e) {
-                final value = 5 - e.key;
-                final count = e.value;
-                final color = gradeColor(context: ctx, value: value.toDouble());
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            value.toString(),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: color,
+      builder: (ctx) => tintaSheetBody(ctx,
+          borderRadius: 24,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'grades_cnt'.i18n.fill([total.toString()]),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
+                  if (grades.length >= 2) ...[
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GradeGraph(grades, classAvg: classAvg),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  ...counts.reversed.toList().asMap().entries.map((e) {
+                    final value = 5 - e.key;
+                    final count = e.value;
+                    final color =
+                        gradeColor(context: ctx, value: value.toDouble());
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                value.toString(),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: color,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: LinearProgressIndicator(
-                            value: maxCount > 0 ? count / maxCount : 0,
-                            backgroundColor: Theme.of(ctx)
-                                .colorScheme
-                                .surfaceContainerHighest,
-                            valueColor: AlwaysStoppedAnimation(
-                                color.withValues(alpha: 0.75)),
-                            minHeight: 10,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: LinearProgressIndicator(
+                                value: maxCount > 0 ? count / maxCount : 0,
+                                backgroundColor: Theme.of(ctx)
+                                    .colorScheme
+                                    .surfaceContainerHighest,
+                                valueColor: AlwaysStoppedAnimation(
+                                    color.withValues(alpha: 0.75)),
+                                minHeight: 10,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                            width: 24,
+                            child: Text(
+                              count.toString(),
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      SizedBox(
-                        width: 24,
-                        child: Text(
-                          count.toString(),
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          )),
     );
   }
 
@@ -350,116 +357,118 @@ class _GradesPageState extends State<GradesPage>
       body: Column(
         children: [
           Column(
-  mainAxisSize: MainAxisSize.min,
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(28.0)),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 0.0),
-                    child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(28.0)),
+                  ),
+                  child: SafeArea(
+                    bottom: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (Navigator.of(context).canPop()) ...[
-                          GestureDetector(
-                            onTap: () => Navigator.of(context).maybePop(),
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                color: colorScheme.onPrimaryContainer
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12.0),
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 0.0),
+                          child: Row(
+                            children: [
+                              if (Navigator.of(context).canPop()) ...[
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).maybePop(),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.onPrimaryContainer
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      size: 18.0,
+                                      color: colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12.0),
+                              ],
+                              Text(
+                                'page_title_grades'.i18n,
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  color: colorScheme.onPrimaryContainer,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 18.0,
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12.0),
-                        ],
-                        Text(
-                          'page_title_grades'.i18n,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: colorScheme.onPrimaryContainer,
+                              const Spacer(),
+                              if (_sheetController == null &&
+                                  _tabController.index == 1 &&
+                                  !isCalcMode)
+                                GestureDetector(
+                                  onTap: () => _openCalculator(context),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.onPrimaryContainer
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.calculate_outlined,
+                                      size: 18.0,
+                                      color: colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        const Spacer(),
-                        if (_sheetController == null &&
-                            _tabController.index == 1 &&
-                            !isCalcMode)
-                          GestureDetector(
-                            onTap: () => _openCalculator(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                color: colorScheme.onPrimaryContainer
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              child: Icon(
-                                Icons.calculate_outlined,
-                                size: 18.0,
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
+                        TabBar(
+                          controller: _tabController,
+                          dividerColor: Colors.transparent,
+                          labelColor: colorScheme.secondary,
+                          unselectedLabelColor: colorScheme.onPrimaryContainer
+                              .withValues(alpha: 0.65),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13.5,
                           ),
+                          unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13.5,
+                          ),
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicatorPadding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 6.0),
+                          isScrollable: false,
+                          indicator: BoxDecoration(
+                            color: colorScheme.secondary.withValues(
+                                alpha: isGlassTheme(context) ? 0.24 : 0.15),
+                            borderRadius: BorderRadius.circular(14.0),
+                            border: isGlassTheme(context)
+                                ? Border.all(
+                                    color: Colors.white.withValues(alpha: 0.12))
+                                : null,
+                          ),
+                          overlayColor:
+                              WidgetStateProperty.all(const Color(0x00000000)),
+                          splashFactory: NoSplash.splashFactory,
+                          padding:
+                              const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),
+                          tabs: [
+                            Tab(text: 'subjects_tab'.i18n),
+                            Tab(text: 'grades_tab'.i18n),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                  TabBar(
-                    controller: _tabController,
-                    dividerColor: Colors.transparent,
-                    labelColor: colorScheme.secondary,
-                    unselectedLabelColor:
-                        colorScheme.onPrimaryContainer.withValues(alpha: 0.65),
-                    labelStyle: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13.5,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13.5,
-                    ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicatorPadding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 6.0),
-                    isScrollable: false,
-                    indicator: BoxDecoration(
-                      color: colorScheme.secondary.withValues(
-                          alpha: isGlassTheme(context) ? 0.24 : 0.15),
-                      borderRadius: BorderRadius.circular(14.0),
-                      border: isGlassTheme(context)
-                          ? Border.all(
-                              color: Colors.white.withValues(alpha: 0.12))
-                          : null,
-                    ),
-                    overlayColor:
-                        WidgetStateProperty.all(const Color(0x00000000)),
-                    splashFactory: NoSplash.splashFactory,
-                    padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 14.0),
-                    tabs: [
-                      Tab(text: 'subjects_tab'.i18n),
-                      Tab(text: 'grades_tab'.i18n),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-  const InkStroke(style: InkStyle.still),
-]),
+                ),
+                const InkStroke(style: InkStyle.still),
+              ]),
           Expanded(
             child: TabBarView(
               controller: _tabController,

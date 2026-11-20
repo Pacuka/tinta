@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'settings_screen.i18n.dart';
@@ -15,9 +17,9 @@ class PrivacyView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 32.0),
-      child: Material(
-        borderRadius: BorderRadius.circular(12.0),
-        child: Padding(
+      child: _surface(
+        context,
+        Padding(
           padding: const EdgeInsets.all(12.0),
           child: ListView(
             physics: const BouncingScrollPhysics(),
@@ -69,4 +71,12 @@ class PrivacyView extends StatelessWidget {
       ),
     );
   }
+
+  /// Üveg: the shared dialog glass; other themes: the old solid card.
+  static Widget _surface(BuildContext context, Widget child) =>
+      isGlassTheme(context)
+          ? TintaDialogGlass(
+              radius: 12.0,
+              child: Material(type: MaterialType.transparency, child: child))
+          : Material(borderRadius: BorderRadius.circular(12.0), child: child);
 }

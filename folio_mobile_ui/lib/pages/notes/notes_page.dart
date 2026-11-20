@@ -40,6 +40,7 @@ import 'package:folio_mobile_ui/common/empty.dart';
 import 'package:folio_mobile_ui/common/panel/panel.dart';
 import 'package:folio_mobile_ui/common/soon_alert/soon_alert.dart';
 import 'package:folio_mobile_ui/common/widgets/tick_tile.dart';
+import 'package:folio_mobile_ui/common/tinta_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:folio_mobile_ui/common/ink_stroke.dart';
 import 'package:folio_mobile_ui/common/haptic.dart';
@@ -594,7 +595,7 @@ Container(
   void showTaskCreation(context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => TintaAlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(14.0))),
         contentPadding: const EdgeInsets.only(top: 10.0),

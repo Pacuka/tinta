@@ -28,8 +28,8 @@ class SendMessageSheet extends StatefulWidget {
         useRootNavigator: true,
         isScrollControlled: true,
         builder: (ctx) => Padding(
-          padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: RoundedBottomSheet(
             showHandle: false,
             child: SendMessageSheet(recipients),
@@ -75,72 +75,69 @@ class SendMessageSheetState extends State<SendMessageSheet> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (ctx) => Container(
+      builder: (ctx) => ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.6,
         ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(20.0)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(top: 12.0, bottom: 8.0),
-              decoration: BoxDecoration(
-                color: AppColors.of(context).text.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(2.0),
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "select_recipient".i18n,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.of(context).text,
+        child: TintaSheetSurface(
+            borderRadius: 20.0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.of(context).text.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(2.0),
                   ),
                 ),
-              ),
-            ),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _available.length,
-                itemBuilder: (_, i) {
-                  final r = _available[i];
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 2.0),
-                    title: Text(
-                      r.name ?? (r.id ?? 'Nincs név').toString(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 8.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "select_recipient".i18n,
                       style: TextStyle(
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.of(context).text,
                       ),
                     ),
-                    onTap: () {
-                      setState(() {
-                        selectedRecipients.add(r);
-                        _available.remove(r);
-                      });
-                      Navigator.of(ctx).pop();
+                  ),
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _available.length,
+                    itemBuilder: (_, i) {
+                      final r = _available[i];
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 2.0),
+                        title: Text(
+                          r.name ?? (r.id ?? 'Nincs név').toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.of(context).text,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            selectedRecipients.add(r);
+                            _available.remove(r);
+                          });
+                          Navigator.of(ctx).pop();
+                        },
+                      );
                     },
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 12.0),
-          ],
-        ),
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 12.0),
+              ],
+            )),
       ),
     );
   }
@@ -216,11 +213,9 @@ class SendMessageSheetState extends State<SendMessageSheet> {
                         height: 4,
                         decoration: BoxDecoration(
                           color: ColorsUtils()
-                              .fade(
-                                  context,
+                              .fade(context,
                                   Theme.of(context).colorScheme.secondary,
-                                  darkenAmount: 0.1,
-                                  lightenAmount: 0.1)
+                                  darkenAmount: 0.1, lightenAmount: 0.1)
                               .withValues(alpha: 0.33),
                           borderRadius: BorderRadius.circular(2.0),
                         ),
@@ -429,95 +424,96 @@ class SendMessageSheetState extends State<SendMessageSheet> {
                       ListenableBuilder(
                         listenable: _attachments,
                         builder: (context, _) => SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: _sending || _attachments.uploading
-                              ? null
-                              : () async {
-                            if (_messageController.text.replaceAll(' ', '') ==
-                                '') return;
-                            if (selectedRecipients.isEmpty) return;
-                            if (_attachments.hasFailed) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  CustomSnackBar(
-                                      content: Text('attach_failed'.i18n),
-                                      context: context));
-                              return;
-                            }
-                            setState(() => _sending = true);
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: _sending || _attachments.uploading
+                                ? null
+                                : () async {
+                                    if (_messageController.text
+                                            .replaceAll(' ', '') ==
+                                        '') return;
+                                    if (selectedRecipients.isEmpty) return;
+                                    if (_attachments.hasFailed) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(CustomSnackBar(
+                                              content:
+                                                  Text('attach_failed'.i18n),
+                                              context: context));
+                                      return;
+                                    }
+                                    setState(() => _sending = true);
 
-                            final subjectText =
-                                _subjectController.text.replaceAll(' ', '') !=
-                                        ''
-                                    ? _subjectController.text
-                                    : 'Nincs tárgy';
+                                    final subjectText = _subjectController.text
+                                                .replaceAll(' ', '') !=
+                                            ''
+                                        ? _subjectController.text
+                                        : 'Nincs tárgy';
 
-                            // No network / timeout can throw instead of
-                            // returning; treat it as a failed send so the
-                            // draft stays and the user gets told.
-                            String? res;
-                            try {
-                              res = await messageProvider.sendMessage(
-                                recipients: selectedRecipients,
-                                subject: subjectText,
-                                messageText: _messageController.text,
-                                attachments: _attachments.uploaded,
-                              );
-                            } catch (_) {
-                              res = 'send_failed';
-                            }
-                            if (!mounted) return;
-                            setState(() => _sending = false);
+                                    // No network / timeout can throw instead of
+                                    // returning; treat it as a failed send so the
+                                    // draft stays and the user gets told.
+                                    String? res;
+                                    try {
+                                      res = await messageProvider.sendMessage(
+                                        recipients: selectedRecipients,
+                                        subject: subjectText,
+                                        messageText: _messageController.text,
+                                        attachments: _attachments.uploaded,
+                                      );
+                                    } catch (_) {
+                                      res = 'send_failed';
+                                    }
+                                    if (!mounted) return;
+                                    setState(() => _sending = false);
 
-                            if (res == 'send_failed') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  CustomSnackBar(
-                                      content: Text('send_failed'.i18n),
-                                      context: context));
-                              return; // keep the sheet and the draft
-                            }
+                                    if (res == 'send_failed') {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(CustomSnackBar(
+                                              content: Text('send_failed'.i18n),
+                                              context: context));
+                                      return; // keep the sheet and the draft
+                                    }
 
-                            if (res == 'send_permission_error') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  CustomSnackBar(
-                                      content: Text('cant_send'.i18n),
-                                      context: context));
-                            }
-                            if (res == 'successfully_sent') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  CustomSnackBar(
-                                      content: Text('sent'.i18n),
-                                      context: context));
-                              // Show the new message in the Sent tab right away.
-                              messageProvider
-                                  .fetch(type: MessageType.sent)
-                                  .catchError((_) {});
-                            }
+                                    if (res == 'send_permission_error') {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(CustomSnackBar(
+                                              content: Text('cant_send'.i18n),
+                                              context: context));
+                                    }
+                                    if (res == 'successfully_sent') {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(CustomSnackBar(
+                                              content: Text('sent'.i18n),
+                                              context: context));
+                                      // Show the new message in the Sent tab right away.
+                                      messageProvider
+                                          .fetch(type: MessageType.sent)
+                                          .catchError((_) {});
+                                    }
 
-                            Navigator.of(context).pop();
-                          },
-                          icon: _sending
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2))
-                              : const Icon(Icons.send_rounded, size: 18.0),
-                          label: Text("send".i18n),
-                          style: FilledButton.styleFrom(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 14.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
+                                    Navigator.of(context).pop();
+                                  },
+                            icon: _sending
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2))
+                                : const Icon(Icons.send_rounded, size: 18.0),
+                            label: Text("send".i18n),
+                            style: FilledButton.styleFrom(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 14.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      ),
 
                       SizedBox(
-                          height:
-                              MediaQuery.of(context).padding.bottom + 8.0),
+                          height: MediaQuery.of(context).padding.bottom + 8.0),
                     ],
                   ),
                 ),
@@ -564,13 +560,12 @@ class _NeutralTextField extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: borderRadius,
       ),
-      padding:
-          const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
       child: Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: neutralColor,
-          ),
+                primary: neutralColor,
+              ),
           textSelectionTheme: TextSelectionThemeData(
             cursorColor: neutralColor,
             selectionColor: textColor.withValues(alpha: 0.15),

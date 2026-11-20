@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/theme/glass.dart';
+import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
 import 'package:folio_kreta_api/models/justification.dart';
 import 'package:folio_kreta_api/providers/case_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -79,26 +81,30 @@ class AttachmentController extends ChangeNotifier {
   static Future<(String, Uint8List)?> _pick(BuildContext context) async {
     final source = await showModalBottomSheet<String>(
       context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(
-            leading: const Icon(Icons.photo_camera_rounded),
-            title: Text("source_camera".i18n),
-            onTap: () => Navigator.pop(context, "camera"),
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_library_rounded),
-            title: Text("source_gallery".i18n),
-            onTap: () => Navigator.pop(context, "gallery"),
-          ),
-          ListTile(
-            leading: const Icon(Icons.description_rounded),
-            title: Text("source_file".i18n),
-            onTap: () => Navigator.pop(context, "file"),
-          ),
-        ]),
-      ),
+      backgroundColor: tintaSheetRouteColor(context),
+      showDragHandle: !isGlassThemeNow(context),
+      builder: (context) => tintaSheetBody(context,
+          borderRadius: 28,
+          handle: true,
+          child: SafeArea(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              ListTile(
+                leading: const Icon(Icons.photo_camera_rounded),
+                title: Text("source_camera".i18n),
+                onTap: () => Navigator.pop(context, "camera"),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded),
+                title: Text("source_gallery".i18n),
+                onTap: () => Navigator.pop(context, "gallery"),
+              ),
+              ListTile(
+                leading: const Icon(Icons.description_rounded),
+                title: Text("source_file".i18n),
+                onTap: () => Navigator.pop(context, "file"),
+              ),
+            ]),
+          )),
     );
     if (source == null) return null;
     if (source == "file") {
