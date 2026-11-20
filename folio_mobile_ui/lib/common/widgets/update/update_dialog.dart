@@ -9,6 +9,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:folio/api/client.dart';
 import 'package:folio/flavor.dart';
+import 'package:folio/helpers/update_helper.dart';
 import 'package:folio/models/release.dart';
 import 'package:folio/theme/colors/colors.dart';
 import 'package:folio_mobile_ui/common/bottom_sheet_menu/rounded_bottom_sheet.dart';
@@ -43,18 +44,9 @@ class _UpdateDialogState extends State<UpdateDialog> {
   double _progress = 0.0;
   String? _errorMessage;
 
-  ReleaseDownload? get _apkAsset {
-    try {
-      return widget.release.downloads.firstWhere(
-        (d) => d.url.toLowerCase().endsWith('.apk'),
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-
   Future<void> _downloadAndInstall() async {
-    final asset = _apkAsset;
+    final asset = await phoneApkFor(widget.release);
+    if (!mounted) return;
     if (asset == null) {
       setState(() {
         _state = _DownloadState.error;
@@ -118,7 +110,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final hasApk = _apkAsset != null;
+    final hasApk = pickApk(widget.release.downloads) != null;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

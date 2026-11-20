@@ -99,6 +99,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"
         tools:node="remove" />
 
+    <!-- ── Storage/media: added by plugins, but Tinta never needs them.
+         Files are picked with the system picker and downloads stay in the
+         app's own cache, so no flavor asks for storage access. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
+
     <!-- ── GitHub-only permissions (storage + self-install) live in:
              src/github/AndroidManifest.xml
          ── Play Store removes them again as a safety net in:
