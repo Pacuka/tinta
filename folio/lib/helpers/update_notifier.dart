@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:folio/api/providers/database_provider.dart';
 import 'package:folio/api/providers/status_provider.dart';
 import 'package:folio/api/providers/user_provider.dart';
+import 'package:folio/helpers/fake_kreta.dart';
 import 'package:folio/models/user.dart';
 import 'package:folio/models/config.dart';
 import 'package:folio/models/settings.dart';
@@ -21,6 +22,7 @@ import 'package:folio_kreta_api/providers/consulting_provider.dart';
 import 'package:folio_kreta_api/models/grade.dart';
 import 'package:folio_kreta_api/models/homework.dart';
 import 'package:folio_kreta_api/models/lesson.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -113,6 +115,7 @@ class UpdateNotifier {
   static Future<void> runHeadless() async {
     DartPluginRegistrant.ensureInitialized();
     await Config.initDeviceUserAgent();
+    await FakeKreta.load(); // test builds: stay on the fake server
     final database = DatabaseProvider();
     await database.init();
     final settings = await database.query.getSettings(database);
@@ -135,6 +138,9 @@ class UpdateNotifier {
     if (_running) return;
     _running = true;
     try {
+      // A headless run (app process dead) has no MaterialApp, so the
+      // Hungarian date names behind _day() are not loaded yet.
+      await initializeDateFormatting("hu");
       await _check(kreta, user, settings);
     } catch (e) {
       // ignore: avoid_print
