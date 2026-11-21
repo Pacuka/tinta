@@ -33,6 +33,7 @@ Androidon az app magától szól, ha új verzió érhető el.
 - Módosult házi jelzése és a korábbi verziók visszanézése
 - Üzenetek kukába rakása, visszaállítása és végleges törlése
 - Élő értesítés az éppen tartó óráról (Androidon)
+- Órarend-widget a kezdő- és a zárolási képernyőre (Androidon), az app témájának színeivel
 - Elmaradó óra és helyettesítés jól láthatóan jelölve (ki tartja az órát)
 - Értesítés új jegyről, üzenetről, házi feladatról és órarend-változásról –
   push-szerver nélkül, minden a telefonon fut, órák előtt is ránéz
