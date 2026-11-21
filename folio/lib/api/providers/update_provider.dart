@@ -35,7 +35,13 @@ class UpdateProvider extends ChangeNotifier {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final current = Version.fromString(packageInfo.version);
 
-    if (!Platform.isAndroid || kIsFdroid) return;
+    // Kamu test builds ("1.7.0-kamu") are a separate app; never offer them
+    // the real release.
+    if (!Platform.isAndroid ||
+        kIsFdroid ||
+        packageInfo.version.endsWith("-kamu")) {
+      return;
+    }
 
     _releases = await FilcAPI.getReleases() ?? [];
     _releases.sort((a, b) => -a.version.compareTo(b.version));
