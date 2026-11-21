@@ -58,7 +58,6 @@ Más szerverhez csak ezekben az esetekben fordul az app:
 - **GitHub:** új verzió keresése (személyes adat nélkül), illetve ha egy hibánál a
   „Hiba jelentése” gombot választod – ilyenkor egy előre kitöltött hibajegy nyílik
   meg, és beküldés előtt látod, mi kerül bele.
-- **Firka szerver:** csak ha témát osztasz meg vagy töltesz le.
 - **Google Fonts:** csak ha a beállításokban másik betűtípust választasz.
 
 A `tinta_push_firebase` mappában van egy Firebase-es push-kiegészítő, de ki van
