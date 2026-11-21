@@ -25,6 +25,11 @@
                 android:resource="@drawable/launch_background" />
             <meta-data android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
+            <!-- The widget's data URI (tinta-widget://open/...) only keeps its
+                 PendingIntents apart; Flutter must not read it as an initial
+                 route (cold start from the lock screen = unknown route, blank
+                 screen). The target travels in the tinta_widget_open extra. -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
