@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,7 @@ import android.widget.RemoteViews
 import app.zan1456.folio.MainActivity
 import app.zan1456.folio.R
 import org.json.JSONArray
+import org.json.JSONObject
 import java.util.Calendar
 import java.util.Locale
 
@@ -66,6 +68,7 @@ class TimetableWidget : AppWidgetProvider() {
     companion object {
         private const val PREFS = "tinta_widget"
         private const val KEY_LESSONS = "lessons"
+        private const val KEY_COLORS = "colors"
         private const val ACTION_TICK = "app.zan1456.folio.widget.TICK"
 
         /** Mit nyisson meg az app: "timetable" vagy "lesson:<kezdés ms>". */
@@ -78,6 +81,13 @@ class TimetableWidget : AppWidgetProvider() {
         fun save(context: Context, json: String) {
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
                 .putString(KEY_LESSONS, json).apply()
+            refresh(context)
+        }
+
+        /** A Tinta hívja témaváltáskor: a widget az app színeit veszi át. */
+        fun saveColors(context: Context, json: String) {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString(KEY_COLORS, json).apply()
             refresh(context)
         }
 
@@ -120,14 +130,72 @@ class TimetableWidget : AppWidgetProvider() {
             }
         }
 
+        /** Az app témájának színei; null = a res/values(-night) alapszínei (Kobalt). */
+        private class Palette(
+            val bg: Int, val card: Int, val text: Int,
+            val dim: Int, val accent: Int, val container: Int,
+        )
+
+        private fun loadPalette(context: Context): Palette? {
+            val raw = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString(KEY_COLORS, null) ?: return null
+            return try {
+                val o = JSONObject(raw)
+                Palette(
+                    o.getInt("bg"), o.getInt("card"), o.getInt("text"),
+                    o.getInt("dim"), o.getInt("accent"), o.getInt("container"),
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        /** Kártyák/chipek alakja megmarad, csak a színük cserélődik (Android 12+). */
+        private fun tintBackground(views: RemoteViews, id: Int, color: Int) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+            views.setColorStateList(id, "setBackgroundTintList", ColorStateList.valueOf(color))
+        }
+
+        private fun paintFrame(views: RemoteViews, p: Palette?, small: Boolean) {
+            if (p == null) return
+            tintBackground(views, R.id.widget_root, p.bg)
+            views.setInt(R.id.widget_logo, "setColorFilter", p.accent)
+            views.setTextColor(R.id.widget_timer, p.accent)
+            if (small) {
+                views.setTextColor(R.id.widget_subject, p.text)
+                views.setTextColor(R.id.widget_detail, p.accent)
+            } else {
+                views.setTextColor(R.id.widget_label, p.text)
+                views.setTextColor(R.id.widget_time, p.dim)
+                views.setTextColor(R.id.widget_empty, p.dim)
+            }
+        }
+
+        private fun paintRow(row: RemoteViews, p: Palette?, kind: Int) {
+            if (p == null) return
+            val now = kind == R.layout.widget_row_now
+            val past = kind == R.layout.widget_row_past
+            tintBackground(row, R.id.row_card, if (now) p.container else p.card)
+            tintBackground(row, R.id.row_room, p.container)
+            row.setTextColor(R.id.row_index, when { now -> p.accent; past -> p.dim; else -> p.text })
+            row.setTextColor(R.id.row_time, if (now) p.accent else p.dim)
+            row.setTextColor(R.id.row_subject, if (past) p.dim else p.text)
+            row.setTextColor(R.id.row_teacher, if (now) p.accent else p.dim)
+            row.setTextColor(R.id.row_room, p.accent)
+        }
+
         private fun build(context: Context, lessons: List<Lesson>, now: Long): RemoteViews {
+            val palette = loadPalette(context)
             val small = RemoteViews(context.packageName, R.layout.widget_timetable_small)
             fillSmall(context, small, lessons, now)
+            paintFrame(small, palette, small = true)
             val medium = RemoteViews(context.packageName, R.layout.widget_timetable_day)
-            fillList(context, medium, lessons, now, wholeDay = false)
+            fillList(context, medium, lessons, now, wholeDay = false, palette)
+            paintFrame(medium, palette, small = false)
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return medium
             val day = RemoteViews(context.packageName, R.layout.widget_timetable_day)
-            fillList(context, day, lessons, now, wholeDay = true)
+            fillList(context, day, lessons, now, wholeDay = true, palette)
+            paintFrame(day, palette, small = false)
             return RemoteViews(
                 mapOf(
                     SizeF(110f, 40f) to small,
@@ -189,7 +257,8 @@ class TimetableWidget : AppWidgetProvider() {
          * Nagy méret ([wholeDay]): a mai (vagy a következő tanítási) nap minden órája.
          */
         private fun fillList(
-            context: Context, views: RemoteViews, lessons: List<Lesson>, now: Long, wholeDay: Boolean
+            context: Context, views: RemoteViews, lessons: List<Lesson>, now: Long, wholeDay: Boolean,
+            palette: Palette?,
         ) {
             views.setOnClickPendingIntent(R.id.widget_root, openIntent(context, "timetable"))
             views.removeAllViews(R.id.widget_rows)
@@ -246,6 +315,7 @@ class TimetableWidget : AppWidgetProvider() {
                 row.setViewVisibility(R.id.row_teacher, if (teacher.isBlank()) View.GONE else View.VISIBLE)
                 row.setTextViewText(R.id.row_room, l.room)
                 row.setViewVisibility(R.id.row_room, if (l.room.isBlank()) View.GONE else View.VISIBLE)
+                paintRow(row, palette, layout)
                 views.addView(R.id.widget_rows, row)
             }
         }

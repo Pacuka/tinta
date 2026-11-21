@@ -1,6 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:folio/helpers/update_notifier.dart';
 
@@ -16,6 +18,39 @@ class HomeWidgetHelper {
     } catch (e) {
       debugPrint('HomeWidgetHelper save error: $e');
     }
+  }
+
+  static String? _lastColors;
+
+  /// The widget's colours from the app's current theme (palette, light or
+  /// dark, Üveg's wallpaper colours). Sent only when they change.
+  static Future<void> saveColors(ThemeData theme) async {
+    if (!Platform.isAndroid) return;
+    final json = jsonEncode(widgetColors(theme));
+    if (json == _lastColors) return;
+    _lastColors = json;
+    try {
+      await _channel.invokeMethod('colors', {'json': json});
+    } catch (e) {
+      _lastColors = null;
+      debugPrint('HomeWidgetHelper colors error: $e');
+    }
+  }
+
+  /// ARGB ints for TimetableWidget.kt (same roles as res/values/widget.xml).
+  @visibleForTesting
+  static Map<String, int> widgetColors(ThemeData theme) {
+    final s = theme.colorScheme;
+    final card = theme.cardColor;
+    Color solid(Color c) => Color.alphaBlend(c, card);
+    return {
+      'bg': solid(theme.scaffoldBackgroundColor).toARGB32(),
+      'card': card.withValues(alpha: 1).toARGB32(),
+      'text': solid(s.onSurface).toARGB32(),
+      'dim': solid(s.onSurfaceVariant).toARGB32(),
+      'accent': solid(s.primary).toARGB32(),
+      'container': solid(s.primaryContainer).toARGB32(),
+    };
   }
 
   /// Widget taps arrive like notification taps (same payloads), so the

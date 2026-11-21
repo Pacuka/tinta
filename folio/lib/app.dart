@@ -39,6 +39,7 @@ import 'package:folio_kreta_api/providers/share_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:folio/helpers/home_widget_helper.dart';
 import 'package:folio_mobile_ui/common/frozen_glass.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -259,6 +260,8 @@ class _AppState extends State<App> {
                   : systemPalette;
               return MaterialApp(
                 builder: (context, child) {
+                  // The home/lock screen widget follows the app's theme.
+                  HomeWidgetHelper.saveColors(Theme.of(context));
                   // Follow the system font size, but cap it so layouts hold.
                   final textScaler = MediaQuery.of(context)
                       .textScaler

@@ -118,6 +118,10 @@ class MainActivity : FlutterActivity(), MessageClient.OnMessageReceivedListener 
                         TimetableWidget.save(this, call.argument<String>("json") ?: "[]")
                         result.success(null)
                     }
+                    "colors" -> {
+                        TimetableWidget.saveColors(this, call.argument<String>("json") ?: "")
+                        result.success(null)
+                    }
                     "clear" -> {
                         TimetableWidget.clear(this)
                         result.success(null)
