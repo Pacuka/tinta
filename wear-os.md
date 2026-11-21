@@ -46,11 +46,11 @@ Ezt csak egyszer kell megcsinálni.
 
 Töltsd le a legfrissebb `tinta-wear-….apk` fájlt a [Releases](https://github.com/Pacuka/tinta/releases/latest) oldalról. Lépj abba a mappába, ahol a fájl van, és futtasd a saját fájlnévvel:
 
-    adb install tinta-wear-1.6.2.apk
+    adb install tinta-wear-1.7.0.apk
 
 Ha az `adb devices` több eszközt is mutat, add meg, melyikre menjen:
 
-    adb -s IP-CÍM:MÁSIK-PORT install tinta-wear-1.6.2.apk
+    adb -s IP-CÍM:MÁSIK-PORT install tinta-wear-1.7.0.apk
 
 Sikeres telepítés után a parancs ezt írja ki: `Success`.
 
