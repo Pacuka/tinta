@@ -14,8 +14,11 @@
 
 - **Android:** a legfrissebb APK a [Releases](https://github.com/Pacuka/tinta/releases/latest) oldalon
   (`arm64` a legtöbb mai telefonra, `armeabi` a régebbiekre).
+  F-Droidból vagy Droid-ify-ból is telepíthető: a saját tároló címe
+  `https://tinta.pacuka.hu/fdroid/repo` (egy koppintással felvehető a [weboldalról](https://tinta.pacuka.hu/#letoltes)).
 - **iPhone:** a `Tinta.ipa` ugyanott; telepítés AltStore-ral, lásd az
-  [iPhone-os útmutatót](ipa-sideloading.md).
+  [iPhone-os útmutatót](ipa-sideloading.md). AltStore-ban és SideStore-ban a Tinta forrásként is
+  felvehető (`https://tinta.pacuka.hu/altstore.json`), így az új verziókról is szól.
 - **Wear OS óra** (pl. Galaxy Watch4 vagy újabb): a `tinta-wear` fájl ugyanott; a telepítéshez
   számítógép kell, lásd a [Wear OS-útmutatót](wear-os.md). Az óra a telefonos Tintától kapja az
   adatokat, Androidos telefon kell hozzá.

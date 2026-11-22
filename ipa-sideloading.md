@@ -77,6 +77,15 @@ Most már van egy **AltStore** ikon a kezdőképernyőn.
 3. Keresd meg a **Letöltések** mappában a **`Tinta.ipa`**-t, és koppints rá.
 4. Ha kéri, add meg újra az Apple ID-det. Pár perc, és a Tinta ott lesz a kezdőképernyőn.
 
+**Kényelmesebb út: a Tinta forrása.** Ha egyszer felveszed, az AltStore-ban megtalálod a
+Tintát, és szól, ha új verzió jön. Ilyenkor az 1. lépés (az IPA letöltése) sem kell.
+
+1. A telefonon nyisd meg a https://tinta.pacuka.hu oldalt, és a Letöltés résznél, az
+   iPhone alatt koppints az **Ezzel a linkkel** feliratra. Az AltStore megnyílik, és
+   felajánlja a forrás hozzáadását.
+   (Kézzel: AltStore → **Sources** → **+** → `https://tinta.pacuka.hu/altstore.json`)
+2. A forrásban koppints a Tintára, aztán a **FREE** (telepítés) gombra.
+
 ## 4. Frissítés 7 naponta (fontos!)
 
 Az AltStore a **My Apps** fülön mutatja, hány nap van még hátra.
@@ -88,8 +97,9 @@ Az AltStore a **My Apps** fülön mutatja, hány nap van még hátra.
 
 Ha lejárt és nem indul a Tinta: semmi baj, csak csináld meg a Refresh All-t.
 
-**Új Tinta verzió:** töltsd le újra a `Tinta.ipa`-t (1. lépés), és telepítsd ugyanúgy
-(3. lépés) – a régi felülíródik, az adatok megmaradnak.
+**Új Tinta verzió:** ha felvetted a Tinta forrását, az AltStore az **Updates** fülön
+jelzi, és onnan egy koppintással frissítheted. Ha nem, töltsd le újra a `Tinta.ipa`-t
+(1. lépés), és telepítsd ugyanúgy (3. lépés). A régi felülíródik, az adatok megmaradnak.
 
 ---
 
@@ -114,7 +124,7 @@ kell, és mindegyiknél él a **7 napos** frissítés meg a **max. 3 app** szab�
 |---|---|---|
 | **AltStore** (fent leírva) | első telepítéshez + frissítéshez (wifin is megy) | a legismertebb, sok leírás van hozzá |
 | **Sideloadly** – https://sideloadly.io | igen (Windows/Mac) | a legegyszerűbb: csak behúzod a `Tinta.ipa`-t a programba, beírod az Apple ID-t, kész. Be lehet állítani, hogy magától frissítsen, ha a telefon ugyanazon a wifin van. Windowson ugyanúgy az Apple oldaláról letöltött iTunes + iCloud kell hozzá. |
-| **SideStore** – https://sidestore.io | csak **egyszer**, az elején | utána a 7 napos frissítés a telefonon megy, gép nélkül (egy kis „VPN” appot kell hozzá bekapcsolni). Haladóbbaknak, a beállítás kicsit macerásabb. |
+| **SideStore** – https://sidestore.io | csak **egyszer**, az elején | utána a 7 napos frissítés a telefonon megy, gép nélkül (egy kis „VPN” appot kell hozzá bekapcsolni). A Tinta forrása itt is felvehető: Sources → `https://tinta.pacuka.hu/altstore.json`. Haladóbbaknak, a beállítás kicsit macerásabb. |
 
 ## „Nem akarok 7 naponta frissíteni” – mik a lehetőségek?
 
