@@ -11,7 +11,7 @@
 > tulajdonosáé. Használata saját felelősségre történik.
 
 > A Tinta **nem azonos a Tinta Napló** nevű alkalmazással. Az egy később, 2026 novemberében
-> indult, független KRÉTA-kliens, más fejlesztőtől. A két app nem kapcsolódik egymáshoz, és nem
+> indult, független KRÉTA-kliens, [más fejlesztőtől](https://github.com/mlnlbrt10/tinta-naplo). A két app nem kapcsolódik egymáshoz, és nem
 > ugyanaz a kódjuk. A Tinta 2026 októbere óta érhető el.
 
 ## Letöltés
