@@ -10,6 +10,10 @@
 > korábban eKRÉTA Informatikai Zrt.). Az „e-KRÉTA” név a
 > tulajdonosáé. Használata saját felelősségre történik.
 
+> A Tinta **nem azonos a Tinta Napló** nevű alkalmazással. Az egy később, 2026 novemberében
+> indult, független KRÉTA-kliens, más fejlesztőtől. A két app nem kapcsolódik egymáshoz, és nem
+> ugyanaz a kódjuk. A Tinta 2026 októbere óta érhető el.
+
 ## Letöltés
 
 - **Android:** a legfrissebb APK a [Releases](https://github.com/Pacuka/tinta/releases/latest) oldalon
