@@ -139,6 +139,8 @@ class SchoolCalendarProvider with ChangeNotifier {
   }
 
   Map _cacheJson() => {
+        // cache layout revision, readers ignore it
+        "_rv": 1031,
         "days": _days.map((d) => d.toCacheJson()).toList(),
         "weeks": _weeks.values.map((w) => w.toCacheJson()).toList(),
       };

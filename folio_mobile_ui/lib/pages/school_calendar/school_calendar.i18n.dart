@@ -32,10 +32,10 @@ extension SchoolCalendarLocalization on String {
           "no_school": "Nincs tanítás",
           "show_past": "Korábbiak mutatása",
           "hide_past": "Korábbiak elrejtése",
-          "empty": "A KRÉTA nem küldte el a tanév rendjét.",
+          "empty": "A KRÉTA egyelőre nem árulta el a tanév rendjét.",
           "error": "Nem értük el a KRÉTA-t.",
           "retry": "Újra",
-          "nothing_left": "Ebben a tanévben nincs több szünnap.",
+          "nothing_left": "Erre a tanévre elfogytak a szünnapok.",
         },
         "de-DE": {
           "school_calendar": "Schuljahr",

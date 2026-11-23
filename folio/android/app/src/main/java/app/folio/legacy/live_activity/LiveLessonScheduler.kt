@@ -19,7 +19,9 @@ object LiveLessonScheduler {
     private const val PREFS = "live_lesson_schedule"
     private const val KEY_PLAN = "plan"
     private const val KEY_MODE = "mode"
-    private const val REDRAW_MS = 3 * 60 * 1000L
+    // Szándékosan nem kerek perc: így az újrarajzolás nem esik egybe a
+    // percváltással, amikor a rendszer úgyis frissíti az óra kijelzését.
+    private const val REDRAW_MS = (2 * 60 + 47) * 1000L
 
     fun schedule(context: Context, plan: String, mode: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()

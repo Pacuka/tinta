@@ -11,7 +11,7 @@ Map _entry(DateTime d, String type,
       "ElteroOrarendSzerintiTanitasiNap":
           follows == null ? null : {"Uid": "2", "Nev": follows, "Leiras": ""},
       "OrarendiNapHetirendje": {"Uid": "3", "Nev": week, "Leiras": ""},
-      "OsztalyCsoport": null,
+      "OsztalyCsoport": {"Uid": "41077", "Nev": "10.Kp"},
     };
 
 List<SchoolCalendarDay> _days(List<Map> json) =>
