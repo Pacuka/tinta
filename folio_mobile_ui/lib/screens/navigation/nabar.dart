@@ -87,7 +87,10 @@ class Navbar extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 10.0),
+        // iPhone: a SafeArea már kihagyja a rendszercsík helyét, a plusz
+        // 10 pont miatt túl magasan lebegett a menü.
+        padding: EdgeInsets.fromLTRB(
+            20.0, 8.0, 20.0, Platform.isIOS ? 0.0 : 10.0),
         child: Container(
           height: 64.0,
           decoration: BoxDecoration(

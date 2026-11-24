@@ -1046,6 +1046,24 @@ class SettingsScreenState extends State<SettingsScreen>
                           ),
                         ),
 
+                        // Kis megjegyzés: a Tinta Napló egy másik app (a névegyezés miatt)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(32, 10, 32, 0),
+                          child: Text(
+                            "not_tinta_naplo".i18n,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  fontSize: 11.0,
+                                  color: AppColors.of(context)
+                                      .text
+                                      .withValues(alpha: 0.4),
+                                ),
+                          ),
+                        ),
+
                         const SizedBox(height: 20.0),
 
                         // Developer settings (shown below version after unlocking)
