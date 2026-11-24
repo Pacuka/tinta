@@ -10,9 +10,13 @@
 > korábban eKRÉTA Informatikai Zrt.). Az „e-KRÉTA” név a
 > tulajdonosáé. Használata saját felelősségre történik.
 
-> A Tinta **nem azonos a Tinta Napló** nevű alkalmazással. Az egy később, 2026 novemberében
-> indult, független KRÉTA-kliens, [más fejlesztőtől](https://github.com/mlnlbrt10/tinta-naplo). A két app nem kapcsolódik egymáshoz, és nem
-> ugyanaz a kódjuk. A Tinta 2026 októbere óta érhető el.
+> A Tinta **nem azonos a Tinta Napló** nevű alkalmazással. A Tinta 2026. október 26-án jelent meg,
+> már ezzel a névvel és a tintapacás, tollheggyes ikonnal. A Tinta Napló egy másik, független KRÉTA-kliens,
+> [más fejlesztőtől](https://github.com/mlnlbrt10/tinta-naplo): 2026. november 10-én reKRETA néven indult, és
+> november 13-án lett belőle Tinta Napló. Ugyanazon a napon kapta a mostani ikonját is, amely nagyon hasonlít
+> a Tintáéra (fehér tintapaca, benne kivágott töltőtollhegy). A két app nem kapcsolódik egymáshoz, és nem
+> ugyanaz a kódjuk. A Tintát mindig a [Releases](https://github.com/Pacuka/tinta/releases/latest) oldalról
+> vagy a [tinta.pacuka.hu](https://tinta.pacuka.hu)-ról töltsd le.
 
 ## Letöltés
 
