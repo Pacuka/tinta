@@ -3,7 +3,7 @@ description: "Egy nem hivatalos e-KRÉTA kliens, diákoktól diákoknak."
 homepage: https://github.com/Pacuka/tinta
 publish_to: "none"
 
-version: 1.7.0+12
+version: 1.7.1+13
 
 environment:
   sdk: ^3.6.0
